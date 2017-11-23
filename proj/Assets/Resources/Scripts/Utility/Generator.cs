@@ -59,7 +59,7 @@ public class Generator : PlacementTool
         bool bothLimits = (lifeLimited && simulLimited);
 
         exhausted = (lifeLimited && totalSpawned >= totalLimit);
-        full = (simulLimited && spawnedObjs.Count < simultaneousLimit);
+        full = (simulLimited && spawnedObjs.Count >= simultaneousLimit);
 
 
         // Change name
@@ -139,6 +139,7 @@ public class Generator : PlacementTool
         yield return new WaitForSeconds(spawnCooldown);
 
         // If spawning in waves
+        //if ()
     }
 
 

@@ -35,7 +35,11 @@ public class GameManager : MonoBehaviour
     public static Sprite emptyHeartSprite;
 
     public static float screenFadeAmount = 0f;
+    public static float letterboxFadeAmount = 0f;
 
+    public static GameObject letterboxObj;
+
+    public static GameObject canvasObj;
     public static GameObject pauseMenuObj;
     public static GameObject optionsMenuObj;
     public static GameObject exitMenuObj;
@@ -44,7 +48,11 @@ public class GameManager : MonoBehaviour
     public static UnityEngine.EventSystems.StandaloneInputModule inputModule;
     public static UnityEngine.EventSystems.EventSystem eventSystem;
 
+    public static Texture talkButtonTex;
+
     public static float timeRate = 1f;
+
+    public static bool cutsceneMode = false;
 
 
     //Awake is always called before any Start functions
@@ -115,9 +123,15 @@ public class GameManager : MonoBehaviour
             camera = cameraObj.GetComponent("CameraManager") as CameraManager;
         }
 
+        // Letterbox
+        letterboxObj = GameObject.Find("UI_Letterbox");
+
+        // Textures
+        talkButtonTex = Resources.Load<Texture>("Textures/tex_leftButtonPrompt");
+
         // Menu references
         currentMenuObj = null;
-        GameObject canvasObj = GameObject.Find("Canvas");
+        canvasObj = GameObject.Find("Canvas");
         if (canvasObj != null)
         {
             foreach (Transform child in canvasObj.transform)
@@ -192,6 +206,13 @@ public class GameManager : MonoBehaviour
 
     void ManageMenus()
     {
+        letterboxFadeAmount = Mathf.Max(0f, letterboxFadeAmount - 0.05f);
+        if (cutsceneMode)
+        {
+            letterboxFadeAmount = Mathf.Min(1f, letterboxFadeAmount + 0.1f);
+        }
+
+
         if (inputModule != null)
         {
             inputModule.horizontalAxis = controllerTypeStr + " Walk X";
@@ -427,6 +448,17 @@ public class GameManager : MonoBehaviour
             Color tempColor = screenFadeScr.color;
             tempColor.a = isGamePaused ? 0.5f : screenFadeAmount;
             screenFadeScr.color = tempColor;
+        }
+
+        if (letterboxObj != null)
+        {
+            UnityEngine.UI.Image[] barScrs = letterboxObj.GetComponentsInChildren<UnityEngine.UI.Image>();
+            foreach(UnityEngine.UI.Image bar in barScrs)
+            {
+                Color tempColor = bar.color;
+                tempColor.a = letterboxFadeAmount;
+                bar.color = tempColor;
+            }
         }
     }
 

@@ -95,10 +95,10 @@ public class CollidingEntity : MonoBehaviour
         PlaySound(clip, 1f);
     }
 
-    public virtual void ProcessCollision(Transform otherTrans)
+    public virtual void ProcessCollision(Transform otherTrans, Vector3 point, Vector3 normal)
     {
         // Debug
-        print(otherTrans.gameObject.name + " touched " + gameObject.name + "from the " + collisionSide.ToString());
+        //print(otherTrans.gameObject.name + " touched " + gameObject.name + "from the " + collisionSide.ToString());
 
         // Process collision effects
         CollidingEntity otherScr = otherTrans.GetComponent("CollidingEntity") as CollidingEntity;
@@ -108,32 +108,36 @@ public class CollidingEntity : MonoBehaviour
             // Kill
             if (FlagsHelper.IsSet(otherScr.killFlags, collisionSide))
             {
-                ReceiveKill(collisionSide, otherScr);
+                ReceiveKill(collisionSide, otherScr, otherTrans, point, normal);
             }
 
             // Harm
-            else if (FlagsHelper.IsSet(otherScr.harmFlags, collisionSide) && FlagsHelper.IsSet(vulnerableFlags, collisionSide))
+            if (FlagsHelper.IsSet(otherScr.harmFlags, collisionSide) && FlagsHelper.IsSet(vulnerableFlags, collisionSide))
             {
-                ReceiveHarm(collisionSide, otherScr);
+                ReceiveHarm(collisionSide, otherScr, otherTrans, point, normal);
             }
 
             // Push
-            else if (FlagsHelper.IsSet(otherScr.pushFlags, collisionSide))
+            if (FlagsHelper.IsSet(otherScr.pushFlags, collisionSide))
             {
-                ReceivePush(collisionSide, otherScr);
+                ReceivePush(collisionSide, otherScr, otherTrans, point, normal);
             }
 
             // Block
-            else if (FlagsHelper.IsSet(otherScr.blockFlags, collisionSide))
+            if (FlagsHelper.IsSet(otherScr.blockFlags, collisionSide))
             {
-                ReceiveBlock(collisionSide, otherScr);
+                ReceiveBlock(collisionSide, otherScr, otherTrans, point, normal);
             }
 
             // Bounce
-            else if (FlagsHelper.IsSet(otherScr.bounceFlags, collisionSide))
+            if (FlagsHelper.IsSet(otherScr.bounceFlags, collisionSide))
             {
-                ReceiveBounce(collisionSide, otherScr);
+                ReceiveBounce(collisionSide, otherScr, otherTrans, point, normal);
             }
+        }
+        else
+        {
+            ReceiveBlock(collisionSide, null, otherTrans, point, normal);
         }
     }
 
@@ -194,7 +198,7 @@ public class CollidingEntity : MonoBehaviour
             }
 
             // Now process the collision for this hit
-            ProcessCollision (hit.otherCollider.transform);
+            ProcessCollision (hit.otherCollider.transform, hit.point, hit.normal);
         }
     }
 
@@ -254,40 +258,40 @@ public class CollidingEntity : MonoBehaviour
             }
 
             // Now process the collision for this hit
-            ProcessCollision (hit.transform);
+            ProcessCollision (hit.transform, hit.point, hit.normal);
         }
     }
 
 
-    public virtual void ReceiveHarm(CollideDir side, CollidingEntity otherScr)
+    public virtual void ReceiveHarm(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
-        print(gameObject.name + " was harmed by " + otherScr.gameObject.name);
+        print(gameObject.name + " was harmed by " + otherTrans.gameObject.name);
 
         if (health != null)
         {
             health.TakeHit();
         }
     }
-    public virtual void ReceiveKill(CollideDir side, CollidingEntity otherScr)
+    public virtual void ReceiveKill(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
-        print(gameObject.name + " was killed by " + otherScr.gameObject.name);
+        //print(gameObject.name + " was killed by " + otherTrans.gameObject.name);
 
         if (health != null)
         {
             health.Kill();
         }
     }
-    public virtual void ReceiveBlock(CollideDir side, CollidingEntity otherScr)
+    public virtual void ReceiveBlock(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
-        print(gameObject.name + " was blocked by " + otherScr.gameObject.name);
+        //print(gameObject.name + " was blocked by " + otherTrans.gameObject.name);
     }
-    public virtual void ReceivePush(CollideDir side, CollidingEntity otherScr)
+    public virtual void ReceivePush(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
-        print(gameObject.name + " was pushed by " + otherScr.gameObject.name);
+        //print(gameObject.name + " was pushed by " + otherTrans.gameObject.name);
     }
-    public virtual void ReceiveBounce(CollideDir side, CollidingEntity otherScr)
+    public virtual void ReceiveBounce(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
-        print(gameObject.name + " bounced off " + otherScr.gameObject.name + " to their " + side.ToString());
+        //print(gameObject.name + " bounced off " + otherTrans.gameObject.name + " to their " + side.ToString());
     }
 
 

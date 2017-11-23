@@ -144,6 +144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 1
+  currentHp: 0
   vulnerable: 1
   mercySeconds: 1
   deathEffect: {fileID: 0}
@@ -168,7 +169,9 @@ MonoBehaviour:
   pushFlags: 0
   bounceFlags: 2
   controller: {fileID: 0}
+  collider: {fileID: 0}
   health: {fileID: 0}
+  sound: {fileID: 0}
   collisionSides: 0
   collisionSide: 0
   groundNormal: {x: 0, y: 1, z: 0}

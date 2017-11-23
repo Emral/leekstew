@@ -16,8 +16,8 @@ public class HealthPoints : MonoBehaviour
 
     private Vector3 startPosition;
 
-    private float mercyCountdown = 0f;
-    private float respawnCountdown;
+    [HideInInspector] public float mercyCountdown = 0f;
+    [HideInInspector] public float respawnCountdown;
 
 
 
@@ -67,7 +67,7 @@ public class HealthPoints : MonoBehaviour
 
     public void ChangeHP (int amount, bool bypassMax)
     {
-        if (bypassMax || currentHp+amount <= hp)
+        if (bypassMax || currentHp+amount <= hp || amount < 0)
             currentHp += amount;
         else
             currentHp = Mathf.Max(currentHp, hp);
@@ -75,6 +75,7 @@ public class HealthPoints : MonoBehaviour
         // Check for death
         if (currentHp <= 0)
         {
+            currentHp = 0;
             Kill();
         }
         else

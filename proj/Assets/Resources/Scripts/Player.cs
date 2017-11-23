@@ -16,8 +16,25 @@ public class Player : CollidingEntity
 
     public AudioClip[] jumpSounds;
     public AudioClip[] doublejumpSounds;
+    public AudioClip[] hurtSounds;
 
     public int jumpLenienceTimer = -1;
+
+    [HideInInspector] public bool inputActive = true;
+
+    private Vector3 wallNormal;
+    private Vector3 wallPoint;
+
+    private bool wallSliding = false;
+    private bool wallJumping = false;
+    private int wallSlidingCounter = 0;
+    private float wallSlidingTime = 0f;
+
+    public GameObject hurtParticle;
+    public GameObject wallSlideParticle;
+    public GameObject wallJumpParticle;
+
+    private bool hurtPause = false;
 
     private float squashAmount = 0;
 
@@ -30,12 +47,13 @@ public class Player : CollidingEntity
 
     private Transform model;
     private MoveState moveState = MoveState.Falling;
-
+    
     private Vector3 moveDir;
     private float forwardMomentum;
     public Vector3 directionalMomentum;
 
     private string animState;
+    private bool lockedAnimState = false;
 
     private Vector3 cameraForward;
     private Animator animator;
@@ -89,7 +107,7 @@ public class Player : CollidingEntity
 
     void SetAnimState (string state, float crossfade)
     {
-        if (animState != state)
+        if (animState != state && !lockedAnimState)
         {
             animator.CrossFade(state, crossfade);
             animState = state;
@@ -154,19 +172,140 @@ public class Player : CollidingEntity
         }
     }
 
+    IEnumerator HurtAnim()
+    {
+        // Delay by a frame for reasons
+        //yield return null;
+
+        Material tempMat = gameObject.GetComponentInChildren<SkinnedMeshRenderer>().material;
+        tempMat.mainTexture = Resources.Load<Texture>("Textures/tex_demo_alt1");
+
+        AudioClip randHurtSound = hurtSounds[(int)Random.Range(0, hurtSounds.Length)];
+        PlaySound(randHurtSound, Random.Range(0.8f, 1.2f));
+
+        GameObject.Instantiate(hurtParticle, transform.position+Vector3.up, Quaternion.identity, transform);
+        SetAnimState("flipping", 0.25f);
+        lockedAnimState = true;
+        inputActive = false;
+
+        Transform modelCenter = transform.Find("modelCentered");
+        hurtPause = true;
+
+        Vector3 tempMomentum = directionalMomentum + Vector3.zero;
+
+        float timeLeft = 0.35f;
+        while (timeLeft > 0)
+        {
+            modelCenter.localRotation = Quaternion.Euler(-22f, 0f, 0f);
+
+            tempMomentum = new Vector3(directionalMomentum.x != 0 ? directionalMomentum.x : tempMomentum.x,
+                                       directionalMomentum.y != 0 ? directionalMomentum.y : tempMomentum.y,
+                                       directionalMomentum.z != 0 ? directionalMomentum.z : tempMomentum.z);
+
+            directionalMomentum = new Vector3(0f, 0.01f, 0f);
+            jumpsPerformed = 99;
+            timeLeft -= Time.deltaTime;
+            yield return null;
+        }
+        directionalMomentum = tempMomentum;
+
+        modelCenter.localRotation = Quaternion.identity;
+        hurtPause = false;
+        inputActive = true;
+        lockedAnimState = false;
+
+        // Blinking
+        Material blinkMat = new Material(tempMat);
+        Color blinkCol = new Color(1, 1, 1, 1);
+        foreach (SkinnedMeshRenderer renderer in gameObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            renderer.material = blinkMat;
+        }
+
+        timeLeft = 0.3f;
+        while (health.mercyCountdown > 0f)
+        {
+            blinkCol.g = 0.5f + 0.3f * Mathf.Round(Mathf.Cos(Time.time * 20f));
+            blinkCol.b = blinkCol.g;
+            blinkMat.color = blinkCol;
+
+            yield return null;
+        }
+        tempMat.mainTexture = Resources.Load<Texture>("Textures/tex_demo");
+
+        foreach (SkinnedMeshRenderer renderer in gameObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            renderer.material = tempMat;
+        }
+    }
+
+    IEnumerator BounceRoutine()
+    {
+        /*
+        while (hurtPause)
+        {
+            yield return null;
+        }
+        //*/
+
+        transform.Translate(Vector3.up*0.1f);
+        directionalMomentum.y = jumpStrength*0.015f;
+        controller.Move(directionalMomentum);
+        groundedCompensation = false;
+
+        releasedJump = true;
+        jumpsPerformed = 1;
+        yield return null;
+    }
+
+    IEnumerator WallJumpVelocity()
+    {
+        GameObject.Instantiate(wallJumpParticle, wallPoint, Quaternion.identity);
+        wallJumping = true;
+        SetAnimState("walljumping", 0f);
+        lockedAnimState = true;
+        transform.rotation = Quaternion.LookRotation(wallNormal, Vector3.up);
+        Vector3 reflectedDir = Vector3.Lerp(wallNormal, Vector3.Reflect(moveDir, wallNormal), 0.5f);
+        float timeLeft = 0.3f;
+        while (timeLeft > 0 && !groundedCompensation)
+        {
+
+            directionalMomentum += reflectedDir * 0.25f;
+            timeLeft -= Time.deltaTime;
+            yield return null;
+        }
+        lockedAnimState = false;
+        wallJumping = false;
+    }
+
     IEnumerator DoubleJumpFlip()
     {
+        SetAnimState("flipping", 0.5f);
+        lockedAnimState = true;
         Transform modelCenter = transform.Find("modelCentered");
         float totalTime = 0.5f;
         float timeLeft = totalTime;
+
+        float lastTimeLeft = timeLeft;
+
         while(timeLeft > 0 && !groundedCompensation)
         {
             float timeMult = timeLeft / totalTime;
             float timeMultEased = Mathf.Sqrt(1 - timeMult*timeMult);
             modelCenter.localRotation = Quaternion.Euler(360 * timeMultEased, 0, 0);
             timeLeft -= Time.deltaTime;
+
+            if (timeLeft < 0.5f*totalTime && lastTimeLeft >= 0.5f*totalTime)
+            {
+                lockedAnimState = false;
+                SetAnimState("falling", 1f);
+                lockedAnimState = true;
+            }
+
+            lastTimeLeft = timeLeft;
             yield return null;
         }
+        lockedAnimState = false;
         modelCenter.localRotation = Quaternion.Euler(0, 0, 0);
     }
 
@@ -193,7 +332,7 @@ public class Player : CollidingEntity
 
             if (!groundedCompensation)
             {
-                jumpLenienceTimer = Mathf.Max(-1, jumpLenienceTimer-1);
+                jumpLenienceTimer = Mathf.Max(-1, jumpLenienceTimer - 1);
                 if (jumpLenienceTimer == 0)
                 {
                     jumpsPerformed = Mathf.Max(jumpsPerformed, 1);
@@ -206,8 +345,8 @@ public class Player : CollidingEntity
 
 
             // Determine walking direction
-            float h = GameManager.inputVals["Walk X"];
-            float v = GameManager.inputVals["Walk Y"];
+            float h = inputActive && !GameManager.cutsceneMode ? GameManager.inputVals["Walk X"] : 0;
+            float v = inputActive && !GameManager.cutsceneMode ? GameManager.inputVals["Walk Y"] : 0;
 
             if (Camera.main != null)
             {
@@ -226,15 +365,14 @@ public class Player : CollidingEntity
 
 
             // Perform horizontal movement
-            Quaternion targetRotation = transform.rotation;
-            if (moveDir.magnitude > 0)
-                targetRotation = Quaternion.LookRotation(moveDir, Vector3.up);
+            Quaternion targetRotation = moveDir.magnitude > 0 ? Quaternion.LookRotation(moveDir, Vector3.up) : transform.rotation;
+            targetRotation = wallJumping ? Quaternion.LookRotation(directionalMomentum, Vector3.up) : targetRotation;
 
 
             if (controller.isGrounded)
             {
                 //forwardMomentum = moveDir.magnitude * moveSpeed;
-                directionalMomentum = moveDir * moveSpeed; //Vector3.forward * forwardMomentum;
+                directionalMomentum = new Vector3(0f, directionalMomentum.y, 0f) + moveDir * moveSpeed; //Vector3.forward * forwardMomentum;
 
                 if (moveDir.magnitude > 0)
                 {
@@ -272,10 +410,14 @@ public class Player : CollidingEntity
                 directionalMomentum.y = Mathf.Max(directionalMomentum.y - 0.01f, -2f);
 
 
+            //Debug.DrawRay(transform.position, wallNormal * 200f, Color.red);
+            if (wallSliding)
+                print("CURRENTLY WALL SLIDING");
+
             // Perform jump
-            if (GameManager.inputPress["Jump"] && jumpsPerformed < jumpLimit)
+            if (GameManager.inputPress["Jump"] && (wallSliding || jumpsPerformed < jumpLimit) && !GameManager.cutsceneMode)
             {
-                squashAmount = -1.5f;
+                squashAmount = jumpsPerformed == 0 || wallSliding ? -1.5f : 0f;
                 releasedJump = false;
 
                 transform.Translate(Vector3.up * 0.1f);
@@ -283,11 +425,23 @@ public class Player : CollidingEntity
                 groundedCompensation = false;
 
                 AudioClip randJumpSound = jumpSounds[(int)Random.Range(0, jumpSounds.Length)];
-                if (jumpsPerformed > 0)
+                if (wallSliding)
                 {
-                    StartCoroutine("DoubleJumpFlip");
-                    randJumpSound = doublejumpSounds[(int)Random.Range(0, doublejumpSounds.Length)];
+                    print("WALL JUMP");
+                    directionalMomentum.y *= 0.9f;
+                    StartCoroutine(WallJumpVelocity());
+                    jumpsPerformed = 1;
                 }
+                else
+                {
+                    if (jumpsPerformed > 0)
+                    {
+                        StartCoroutine("DoubleJumpFlip");
+                        randJumpSound = doublejumpSounds[(int)Random.Range(0, doublejumpSounds.Length)];
+                    }
+                    jumpsPerformed++;
+                }
+
 
                 /*
                 if (moveDir.magnitude > 0 && jumpsPerformed > 0)
@@ -303,10 +457,11 @@ public class Player : CollidingEntity
                 //controller.velocity = newVel;
 
                 SetAnimState("jumping", 0f);
-                jumpsPerformed++;
                 PlaySound(randJumpSound, Random.Range(0.8f,1.2f));
+                wallSliding = false;
             }
-            if (GameManager.inputRelease["Jump"] && !groundedCompensation && controller.velocity.y > 0 && !releasedJump)
+
+            if (GameManager.inputRelease["Jump"] && !groundedCompensation && controller.velocity.y > 0 && !releasedJump && !GameManager.cutsceneMode)
             {
                 releasedJump = true;
                 directionalMomentum.y *= 0.5f;
@@ -318,6 +473,21 @@ public class Player : CollidingEntity
 
             // Slope movement
             Vector3 slopedMomentum = Vector3.Scale(directionalMomentum, groundNormal + new Vector3(1f, 0f, 1f));
+
+
+            // Wall sliding stuff (I think this needs to go before committing movement because the collision is processed during movement)
+            Transform modelCenter = transform.Find("modelCentered");
+            modelCenter.localRotation = Quaternion.Lerp(modelCenter.localRotation, Quaternion.Euler(0f, 100f, 0f), 0.5f);
+            if (!wallSliding)
+            {
+                modelCenter.localRotation = Quaternion.identity;
+                wallSlidingTime = 0f;
+            }
+            else
+            {
+                print("WALL NORMAL:" + wallNormal.ToString());
+            }
+            wallSliding = false;
 
 
             // Commit movement
@@ -340,25 +510,58 @@ public class Player : CollidingEntity
                 animator.speed = 1;
             }
 
-
             // Restart at the last checkpoint position if fallen off the level
             if (transform.position.y < -20)
                 transform.position = startPos;
         }
     }
 
-    public override void ReceiveBounce(CollideDir side, CollidingEntity otherScr)
-    {
-        base.ReceiveBounce(side, otherScr);
 
-        //if  (side == CollideDir.Down)
+
+    public override void ReceiveBounce(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
+    {
+        base.ReceiveBounce(side, otherScr, otherTrans, point, normal);
+
+        if (directionalMomentum.y < 0)
+            StartCoroutine(BounceRoutine());
+    }
+
+    public override void ReceiveHarm(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
+    {
+        if (health != null && !hurtPause)
         {
-            //transform.Translate(Vector3.up * 0.1f);
-            directionalMomentum.y = 0.5f;
-            groundedCompensation = false;
-            releasedJump = true;
-            jumpsPerformed = 1;
-            controller.Move(directionalMomentum);
+            if (health.vulnerable && health.mercyCountdown <= 0)
+            {
+                base.ReceiveHarm(side, otherScr, otherTrans, point, normal);
+                StartCoroutine(HurtAnim());
+            }
+        }
+    }
+
+
+    public override void ReceiveBlock(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
+    {
+        base.ReceiveBlock(side, otherScr, otherTrans, point, normal);
+
+        if (side == CollideDir.Front)
+        {
+            wallNormal = normal;
+            wallPoint = point;
+
+            if (!groundedCompensation && groundDistance > 0.2f && directionalMomentum.y < 0f)
+            {
+                wallSliding = true;
+
+                wallSlidingCounter = (wallSlidingCounter + 1) % 6;
+                if (wallSlidingCounter == 0)
+                    GameObject.Instantiate(wallSlideParticle, point, Quaternion.identity);
+
+                wallSlidingTime += Time.deltaTime;
+                //print("sliding down wall");
+                directionalMomentum.y = Mathf.Max(Mathf.Lerp(0f, -0.3f, Mathf.InverseLerp(0f, 1f, wallSlidingTime)), directionalMomentum.y);
+                directionalMomentum.x = 0;
+                directionalMomentum.z = 0;
+            }
         }
     }
 }

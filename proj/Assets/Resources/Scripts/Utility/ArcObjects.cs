@@ -10,6 +10,8 @@ public class ArcObjects : ObjectGroup
     public Vector3 endPoint;// = transform.position + Vector3.right;
     public Vector3 controlPoint;// = transform.position + (Vector3.up + Vector3.right)*0.5f;
 
+    public bool checkToCenterControlPoint = false;
+
     [HideInInspector] public int cachedCount = 0;
 
 
@@ -51,12 +53,18 @@ public class ArcObjects : ObjectGroup
 
         if (endPoint != null && controlPoint != null && gap > 0)
         {
+            if  (checkToCenterControlPoint)
+            {
+                checkToCenterControlPoint = false;
+                controlPoint = 0.5f*(endPoint);
+            }
+
             float length = 0f;
             Vector3 prevPoint = transform.position;
             int resolution = 64;
             for (int i = 1; i < resolution; i++)
             {
-                Vector3 currentPoint = GetCurvePoint(transform.position, controlPoint, endPoint, i / (resolution - 1f));
+                Vector3 currentPoint = GetCurvePoint(transform.position, transform.position+controlPoint, transform.position + endPoint, i / (resolution - 1f));
                 length += Vector3.Distance(currentPoint, prevPoint);
                 prevPoint = currentPoint;
             }
@@ -66,7 +74,7 @@ public class ArcObjects : ObjectGroup
             cachedCount = 0;
             for (int j = 0; j < numInstances; j++)
             {
-                PlacePrefab(GetCurvePoint(transform.position, controlPoint, endPoint, j / (numInstances - 1f)), (cachedCount + 1).ToString() + " --");
+                PlacePrefab(GetCurvePoint(transform.position, transform.position + controlPoint, transform.position + endPoint, j / (numInstances - 1f)), (cachedCount + 1).ToString() + " --");
                 cachedCount++;
             }
 

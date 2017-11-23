@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4234228867411766}
   - component: {fileID: 114411195683671396}
+  - component: {fileID: 65440758975265282}
   m_Layer: 0
   m_Name: Obj_Spikes
   m_TagString: Untagged
@@ -37,7 +38,6 @@ GameObject:
   - component: {fileID: 4335979506627304}
   - component: {fileID: 33968009878115722}
   - component: {fileID: 23066199901277962}
-  - component: {fileID: 65084675308651364}
   m_Layer: 0
   m_Name: mesh_spikes
   m_TagString: Untagged
@@ -67,7 +67,7 @@ Transform:
   m_GameObject: {fileID: 1548783974672870}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_LocalScale: {x: 100, y: 200, z: 100}
   m_Children: []
   m_Father: {fileID: 4234228867411766}
   m_RootOrder: 0
@@ -113,17 +113,17 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1548783974672870}
   m_Mesh: {fileID: 4300000, guid: edb55cd24f88424468cf06798de86960, type: 3}
---- !u!65 &65084675308651364
+--- !u!65 &65440758975265282
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1548783974672870}
+  m_GameObject: {fileID: 1158428091420030}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.01, y: 0.01, z: 0.01}
+  m_Size: {x: 1, y: 0.75, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114411195683671396
 MonoBehaviour:

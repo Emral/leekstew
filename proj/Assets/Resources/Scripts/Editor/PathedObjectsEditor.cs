@@ -13,7 +13,7 @@ public class PathedObjectsEditor : Editor
         if (obj.transform.childCount != obj.cachedCount)
             obj.isDirty = true;
 
-        if (obj.points.Length > 0)
+        if (obj.points.Length > 0 && obj.gap > 0)
         {
             for (int i = 1; i < obj.points.Length; i++)
             {

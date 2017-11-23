@@ -37,7 +37,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4462222702050906}
-  - component: {fileID: 114432879184431276}
   m_Layer: 0
   m_Name: Obj_Sign
   m_TagString: Untagged
@@ -84,7 +83,7 @@ Transform:
   m_GameObject: {fileID: 1214322132209134}
   m_LocalRotation: {x: 0.018108238, y: 0.999192, z: -0.03587607, w: 0.00065017765}
   m_LocalPosition: {x: -0.018, y: 0.903, z: 0.084}
-  m_LocalScale: {x: 0.5854824, y: 0.4801449, z: 0.48014504}
+  m_LocalScale: {x: 0.58548313, y: 0.480145, z: 0.4801454}
   m_Children: []
   m_Father: {fileID: 4462222702050906}
   m_RootOrder: 0
@@ -217,17 +216,3 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114432879184431276
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1806117691034352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 774d3ec761e837242a6e3bccc68402fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  text: Hello there, good sir or madam. I am the default text.
-  font: {fileID: 12800000, guid: c3b0e3bbcdf8a4b4092b61aacbbce416, type: 3}
-  background: {fileID: 2800000, guid: 6dc88d61e9f14f74299e408b2876b629, type: 3}
