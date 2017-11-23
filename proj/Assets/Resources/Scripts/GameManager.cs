@@ -462,6 +462,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public IEnumerator ScreenFadeChange(float goal, float goalTime)
+    {
+        float startAmount = screenFadeAmount;
+        float currentTime = 0;
+        while (currentTime < goalTime)
+        {
+            screenFadeAmount = Mathf.Lerp(startAmount, goal, currentTime / goalTime);
+            currentTime += Time.deltaTime;
+            yield return null;
+        }
+        screenFadeAmount = goal;
+    }
+
     public void QuitGame()
     {
         if (Application.isEditor)

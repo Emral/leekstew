@@ -59,6 +59,8 @@ public class Player : CollidingEntity
     private Animator animator;
     private bool ehhhImWalkinHere;
 
+    private Vector3 lastTouchedNormal = Vector3.zero;
+
 
     // Use this for initialization
     void Start ()
@@ -169,6 +171,7 @@ public class Player : CollidingEntity
             squashAmount = 1f;
             jumpsPerformed = 0;
             directionalMomentum.y = -0.1f;
+            lastTouchedNormal = Vector3.zero;
         }
     }
 
@@ -428,6 +431,7 @@ public class Player : CollidingEntity
                 if (wallSliding)
                 {
                     print("WALL JUMP");
+                    lastTouchedNormal = wallNormal;
                     directionalMomentum.y *= 0.9f;
                     StartCoroutine(WallJumpVelocity());
                     jumpsPerformed = 1;
@@ -542,6 +546,10 @@ public class Player : CollidingEntity
     public override void ReceiveBlock(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
         base.ReceiveBlock(side, otherScr, otherTrans, point, normal);
+
+        if (lastTouchedNormal != Vector3.zero) {
+            if (Vector3.Angle(normal, lastTouchedNormal) <= 90.5f) return;
+        }
 
         if (side == CollideDir.Front)
         {
