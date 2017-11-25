@@ -1,0 +1,93 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="snd_checkpoint_data" version="1.3.0" audacityversion="2.1.1" sel0="0.0000000000" sel1="2.7751927438" vpos="288" h="0.0000000000" zoom="149.9002301287" rate="44100.0" snapto="off" selectionformat="samples" frequencyformat="Hz" bandwidthformat="octaves">
+	<tags>
+		<tag name="COMMENTS" value="reference libFLAC 1.2.1 20070917"/>
+	</tags>
+	<wavetrack name="snd_checkpoint" channel="0" linked="1" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="96822">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000124.au" len="96822" min="-0.536914" max="0.470214" rms="0.055688"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="snd_checkpoint" channel="1" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="96822">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000835.au" len="96822" min="-0.440941" max="0.400992" rms="0.037371"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="245372__quaker540__hq-explosion" channel="2" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="1" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="122386">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000e17.au" len="122386" min="-0.60256" max="0.602541" rms="0.245458"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="274121__bone666138__choir-of-voices-single-chord" channel="0" linked="1" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.45363506">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="266480">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000b32.au" len="250670" min="-0.23114" max="0.226868" rms="0.032587"/>
+				</waveblock>
+				<waveblock start="250670">
+					<simpleblockfile filename="e0000386.au" len="15810" min="0.0" max="0.0" rms="0.0"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="274121__bone666138__choir-of-voices-single-chord" channel="1" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.45363506">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="266480">
+				<waveblock start="0">
+					<simpleblockfile filename="e00004f6.au" len="250670" min="-0.300262" max="0.253235" rms="0.039989"/>
+				</waveblock>
+				<waveblock start="250670">
+					<simpleblockfile filename="e0000a22.au" len="15810" min="0.0" max="0.0" rms="0.0"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="315942__benjaminharveydesign__high-note" channel="2" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="48000" gain="1.0" pan="0.0">
+		<waveclip offset="1.06070551">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="71727">
+				<waveblock start="0">
+					<simpleblockfile filename="e000078d.au" len="71727" min="-0.262838" max="0.347837" rms="0.064541"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="61521__hjohnl__final-angelic-sound" channel="0" linked="1" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="83707">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000d9c.au" len="83707" min="-0.190555" max="0.190543" rms="0.023658"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="61521__hjohnl__final-angelic-sound" channel="1" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="83707">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000a2d.au" len="83707" min="-0.190557" max="0.190544" rms="0.022615"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+</project>

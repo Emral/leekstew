@@ -1,0 +1,100 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+[System.Serializable]
+public class SongData
+{
+    public AudioClip key;
+    public string name;
+    public string artist;
+    public string album;
+    public int loopStart;
+    public int loopEnd;
+}
+
+
+public class AudioManager : MonoBehaviour
+{
+    public static AudioManager instance = null;
+
+    public UnityEngine.Audio.AudioMixer mixer;
+    [SerializeField] public List<SongData> songs;
+    private Dictionary<AudioClip, SongData> songDict;
+
+    public static AudioClip currentMusic;
+    public static bool usingLoopPoints = false;
+
+
+    // Use this for initialization
+    private void Awake ()
+    {
+        if (instance == null)
+            instance = this;
+
+        songDict = new Dictionary<AudioClip, SongData>();
+        foreach(SongData song in songs)
+        {
+            songDict.Add(song.key, song);
+        }
+    }
+	
+	// Update is called once per frame
+	void Update ()
+    {
+        mixer.SetFloat("musicVolume", (1-Mathf.Pow(1-OptionsManager.musicVolume, 2)) * 70f - 80f);
+        mixer.SetFloat("soundVolume", (1-Mathf.Pow(1-OptionsManager.soundVolume, 2)) * 80f - 80f);
+
+        currentMusic = null;
+        AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
+        if (aud.isPlaying)
+            currentMusic = aud.clip;
+    }
+
+
+    public void StopMusic()
+    {
+        AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
+        aud.Stop();
+    }
+
+    public void SetMusic(AudioClip music, bool loop=true, bool useLoopPoints=false)
+    {
+        AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
+        if (aud.clip != music || aud.loop != loop || usingLoopPoints != useLoopPoints)
+        {
+            StopMusic();
+
+            aud.loop = loop;
+            aud.clip = music;
+            aud.Play();
+            currentMusic = music;
+
+            if (useLoopPoints)
+                StartCoroutine(LoopMusic(music));
+        }
+    }
+
+    private IEnumerator LoopMusic(AudioClip audio)
+    {
+        SongData thisSongData = songDict[audio];
+        int loopStart = 0;
+        int loopEnd = audio.samples;
+
+        if (thisSongData != null)
+        {
+            loopStart = thisSongData.loopStart > 0 ? thisSongData.loopStart : loopStart;
+            loopEnd = thisSongData.loopEnd > 0 ? thisSongData.loopEnd : loopEnd;
+        }
+
+        AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
+        while (aud.isPlaying)
+        {
+            if (aud.timeSamples >= loopEnd && loopEnd < audio.samples)
+                aud.timeSamples = loopStart;
+            yield return null;
+        }
+    }
+    //*/
+}
