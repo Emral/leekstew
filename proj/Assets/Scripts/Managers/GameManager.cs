@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour
     public static bool isGamePaused = false;
     public static bool cutsceneMode = false;
 
+    public static float timeSinceInput = 0f;
+
     public static float timeRate = 1f;
 
 
@@ -125,18 +127,30 @@ public class GameManager : MonoBehaviour
                 controllerTypeStr = "Gamepad";
 
 
-            // Get the values
-            inputPress["Any"] = inputPress["Any"];
-            inputRelease["Any"] = inputRelease["Any"];
+        // Get the values
+            float inputAxisAny = 0f;
+            inputPress["Any"] = false;
+            inputRelease["Any"] = false;
             foreach (string verb in inputVerbs)
             {
                 string ctStr = controllerTypeStr + " " + verb;
 
                 inputVals[verb] = Input.GetAxis(ctStr);
+                if (inputVals[verb] != 0)
+                    inputAxisAny = inputVals[verb];
                 inputPress[verb] = Input.GetButtonDown(ctStr);
                 inputPress["Any"] = inputPress["Any"] || inputPress[verb];
                 inputRelease[verb] = Input.GetButtonUp(ctStr);
                 inputRelease["Any"] = inputRelease["Any"] || inputRelease[verb];
+            }
+
+
+            // Time since any input was pressed
+            timeSinceInput += Time.deltaTime;
+            if (inputPress["Any"] || inputRelease["Any"] || inputAxisAny != 0)
+            {
+                print("TIME SINCE INPUT RESET");
+                timeSinceInput = 0f;
             }
 
 

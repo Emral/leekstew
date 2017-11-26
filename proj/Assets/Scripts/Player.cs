@@ -448,6 +448,7 @@ public class Player : CollidingEntity
         {
             // Delay by a frame for reasons
             //yield return null;
+            UIManager.hpFadeCounter = 0f;
 
             Material tempMat = gameObject.GetComponentInChildren<SkinnedMeshRenderer>().material;
             tempMat.mainTexture = hurtTexture;

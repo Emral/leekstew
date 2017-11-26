@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 [System.Serializable]
@@ -137,16 +138,27 @@ public class LevelManager : MonoBehaviour
         // Level intro stuff
         // Intro text
         UIManager.UpdateRefs();
-        UnityEngine.UI.Text introText = UIManager.levelIntroObj.GetComponentInChildren<UnityEngine.UI.Text>();
-
         if (beginningLevel)
         {
-            if (currentLevel != null)
-                introText.text = currentLevel.name;
-            yield return new WaitForSeconds(1f);
+            if (currentLevel != null && UIManager.levelIntroObj != null)
+            {
+                Text introName = GameObject.Find("LevelIntroName").GetComponentInChildren<Text>();
+                Text introCreator = GameObject.Find("LevelIntroCreator").GetComponentInChildren<Text>();
+                RawImage introThumbnail = GameObject.Find("LevelIntroThumbnail").GetComponentInChildren<RawImage>();
+                introName.text = currentLevel.name;
+                introCreator.text = currentLevel.creator;
+                introThumbnail.texture = currentLevel.thumbnail;
+
+                yield return new WaitForSeconds(1f);
+                UIManager.DoFadeCanvasGroup(UIManager.levelIntroGroup, 0f, 1f);
+            }
+            yield return new WaitForSeconds(0.5f);
+        }
+        else
+        {
+            UIManager.levelIntroObj.SetActive(false);
         }
 
-        introText.text = "";
 
         // Start the level music
         if (currentLevel != null)

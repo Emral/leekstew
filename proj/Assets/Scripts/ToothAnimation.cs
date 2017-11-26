@@ -14,17 +14,20 @@ public class ToothAnimation : MonoBehaviour
     {
         hoverOffset = transform.position.x + transform.position.y + transform.position.z;
 	}
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
-        hover = transform.Find("Hover");
-        tooth = hover.Find(modelName);
+        if (Time.timeScale != 0f)
+        {
+            hover = transform.Find("Hover");
+            tooth = hover.Find(modelName);
 
-        if (tooth != null)
-            tooth.Rotate(0,-2,0);
+            if (tooth != null)
+                tooth.Rotate(0, -2, 0);
 
-        if (hover != null)
-            hover.transform.localPosition = new Vector3(0f, 0.5f + 0.125f*Mathf.Cos(0.05f*Time.frameCount + hoverOffset), 0f);
+            if (hover != null)
+                hover.transform.localPosition = new Vector3(0f, 0.5f + 0.125f * Mathf.Cos(2.5f * Time.timeSinceLevelLoad + hoverOffset), 0f);
+        }
     }
 }

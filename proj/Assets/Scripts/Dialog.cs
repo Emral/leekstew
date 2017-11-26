@@ -63,7 +63,7 @@ public class Dialog : MonoBehaviour {
         style.normal.textColor = textColor;
 
         // Display the bubble
-        if  (cam != null  &&  animPercent > 0f)
+        if  (cam != null  &&  animPercent > 0f && !GameManager.isGamePaused)
         {
             Vector3 worldPos = new Vector3(transform.position.x, transform.position.y + Mathf.Lerp(1f, 1.5f, animPercent), transform.position.z);
             Vector3 pos = cam.WorldToScreenPoint(worldPos);

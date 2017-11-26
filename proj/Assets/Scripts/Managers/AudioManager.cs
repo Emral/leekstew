@@ -24,6 +24,7 @@ public class AudioManager : MonoBehaviour
     private Dictionary<AudioClip, SongData> songDict;
 
     public static AudioClip currentMusic;
+    public static SongData currentSong;
     public static bool usingLoopPoints = false;
 
 
@@ -39,17 +40,20 @@ public class AudioManager : MonoBehaviour
             songDict.Add(song.key, song);
         }
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
-        mixer.SetFloat("musicVolume", (1-Mathf.Pow(1-OptionsManager.musicVolume, 2)) * 70f - 80f);
-        mixer.SetFloat("soundVolume", (1-Mathf.Pow(1-OptionsManager.soundVolume, 2)) * 80f - 80f);
+        mixer.SetFloat("musicVolume", (1 - Mathf.Pow(1 - OptionsManager.musicVolume, 2)) * 70f - 80f);
+        mixer.SetFloat("soundVolume", (1 - Mathf.Pow(1 - OptionsManager.soundVolume, 2)) * 80f - 80f);
 
         currentMusic = null;
         AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
         if (aud.isPlaying)
+        {
             currentMusic = aud.clip;
+            currentSong = songDict[currentMusic];
+        }
     }
 
 
@@ -64,6 +68,8 @@ public class AudioManager : MonoBehaviour
         AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
         if (aud.clip != music || aud.loop != loop || usingLoopPoints != useLoopPoints)
         {
+            UIManager.hpFadeCounter = 0f;
+
             StopMusic();
 
             aud.loop = loop;

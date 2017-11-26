@@ -9,7 +9,7 @@ public class Title : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        UIManager.instance.DoScreenFadeChange(0f, 1f);
+        UIManager.DoScreenFadeChange(0f, 1f);
     }
 	
 	// Update is called once per frame

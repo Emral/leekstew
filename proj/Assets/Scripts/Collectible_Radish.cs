@@ -16,5 +16,6 @@ public class Collectible_Radish : Collectible
     {
         base.OnCollectEnd();
         GameManager.player.health.ChangeHP(1, addSoulHearts);
+        UIManager.hpFadeCounter = 0f;
     }
 }
