@@ -40,6 +40,8 @@ public class CollidingEntity : MonoBehaviour
     [HideInInspector] public float groundDistance;
     [HideInInspector] public Vector3 groundPoint;
 
+    public bool bounceRestoresDoubleJump = false;
+    public float bounceStrength = 18;
 
     public virtual void Update()
     {
@@ -132,7 +134,7 @@ public class CollidingEntity : MonoBehaviour
             // Bounce
             if (FlagsHelper.IsSet(otherScr.bounceFlags, collisionSide))
             {
-                ReceiveBounce(collisionSide, otherScr, otherTrans, point, normal);
+                ReceiveBounce(collisionSide, otherScr, otherTrans, point, normal, otherScr.bounceRestoresDoubleJump, otherScr.bounceStrength);
             }
         }
         else
@@ -289,7 +291,7 @@ public class CollidingEntity : MonoBehaviour
     {
         //print(gameObject.name + " was pushed by " + otherTrans.gameObject.name);
     }
-    public virtual void ReceiveBounce(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
+    public virtual void ReceiveBounce(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal, bool refreshDouble, float strength)
     {
         //print(gameObject.name + " bounced off " + otherTrans.gameObject.name + " to their " + side.ToString());
     }

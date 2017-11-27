@@ -63,8 +63,8 @@ public class Player : CollidingEntity
     private Animator animator;
     private bool ehhhImWalkinHere;
 
-    private Vector3 lastTouchedNormal = Vector3.zero;
-
+    private float lastWalljumpHeight = Mathf.Infinity;
+    private Vector3 lastWallNormal = Vector3.zero;
 
     // Use this for initialization
     void Start ()
@@ -175,7 +175,8 @@ public class Player : CollidingEntity
             squashAmount = 1f;
             jumpsPerformed = 0;
             directionalMomentum.y = -0.1f;
-            lastTouchedNormal = Vector3.zero;
+            lastWalljumpHeight = Mathf.Infinity;
+            lastWallNormal = Vector3.zero;
         }
     }
 
@@ -291,6 +292,7 @@ public class Player : CollidingEntity
                 squashAmount = jumpsPerformed == 0 || wallSliding ? -1.5f : 0f;
                 releasedJump = false;
 
+                lastWallNormal = wallNormal;
                 transform.Translate(Vector3.up * 0.1f);
                 directionalMomentum.y = jumpStrength * Mathf.Pow(jumpDecayRate, jumpsPerformed) * 0.015f;
                 groundedCompensation = false;
@@ -299,7 +301,6 @@ public class Player : CollidingEntity
                 if (wallSliding)
                 {
                     print("WALL JUMP");
-                    lastTouchedNormal = wallNormal;
                     directionalMomentum.y *= 0.9f;
                     StartCoroutine(WallJumpVelocity());
                     jumpsPerformed = 1;
@@ -394,57 +395,56 @@ public class Player : CollidingEntity
 
 
     #region collision events
-        public override void ReceiveBounce(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
-        {
-            base.ReceiveBounce(side, otherScr, otherTrans, point, normal);
+    public override void ReceiveBounce(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal, bool refreshDouble, float strength)
+    {
+        base.ReceiveBounce(side, otherScr, otherTrans, point, normal, refreshDouble, strength);
 
-            if (directionalMomentum.y < 0)
-                StartCoroutine(BounceRoutine());
-        }
-        public override void ReceiveHarm(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
+        if (directionalMomentum.y < 0)
+            StartCoroutine(BounceRoutine(refreshDouble, strength));
+    }
+    public override void ReceiveHarm(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
+    {
+        if (health != null && !hurtPause)
         {
-            if (health != null && !hurtPause)
+            if (health.vulnerable && health.mercyCountdown <= 0)
             {
-                if (health.vulnerable && health.mercyCountdown <= 0)
-                {
-                    base.ReceiveHarm(side, otherScr, otherTrans, point, normal);
-                    StartCoroutine(HurtAnim());
-                }
+                base.ReceiveHarm(side, otherScr, otherTrans, point, normal);
+                StartCoroutine(HurtAnim());
             }
         }
-        public override void ReceiveBlock(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
+    }
+    public override void ReceiveBlock(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
+    {
+        base.ReceiveBlock(side, otherScr, otherTrans, point, normal);
+            
+        if (Vector3.Angle(normal, lastWallNormal) <= 90.5 && point.y > lastWalljumpHeight) return;
+
+        if (side == CollideDir.Front)
         {
-            base.ReceiveBlock(side, otherScr, otherTrans, point, normal);
+            wallNormal = normal;
+            wallPoint = point;
 
-            if (lastTouchedNormal != Vector3.zero) {
-                if (Vector3.Angle(normal, lastTouchedNormal) <= 90.5f) return;
-            }
-
-            if (side == CollideDir.Front)
+            if (!groundedCompensation && groundDistance > 0.2f && directionalMomentum.y < 0f)
             {
-                wallNormal = normal;
-                wallPoint = point;
+                wallSliding = true;
+                lastWalljumpHeight = point.y;
 
-                if (!groundedCompensation && groundDistance > 0.2f && directionalMomentum.y < 0f)
-                {
-                    wallSliding = true;
+                wallSlidingCounter = (wallSlidingCounter + 1) % 6;
+                if (wallSlidingCounter == 0)
+                    GameObject.Instantiate(wallSlideParticle, point, Quaternion.identity);
 
-                    wallSlidingCounter = (wallSlidingCounter + 1) % 6;
-                    if (wallSlidingCounter == 0)
-                        GameObject.Instantiate(wallSlideParticle, point, Quaternion.identity);
-
-                    wallSlidingTime += Time.deltaTime;
-                    //print("sliding down wall");
-                    directionalMomentum.y = Mathf.Max(Mathf.Lerp(0f, -0.3f, Mathf.InverseLerp(0f, 1f, wallSlidingTime)), directionalMomentum.y);
-                    directionalMomentum.x = 0;
-                    directionalMomentum.z = 0;
-                }
+                wallSlidingTime += Time.deltaTime;
+                //print("sliding down wall");
+                directionalMomentum.y = Mathf.Max(Mathf.Lerp(0f, -0.3f, Mathf.InverseLerp(0f, 1f, wallSlidingTime)), directionalMomentum.y);
+                directionalMomentum.x = 0;
+                directionalMomentum.z = 0;
             }
         }
+    }
     #endregion
 
     #region coroutines
-        IEnumerator HurtAnim()
+    IEnumerator HurtAnim()
         {
             // Delay by a frame for reasons
             //yield return null;
@@ -536,7 +536,7 @@ public class Player : CollidingEntity
                 StartCoroutine(DeathSequence());
             }
         }
-        IEnumerator BounceRoutine()
+        IEnumerator BounceRoutine(bool refreshDouble, float strength)
         {
             /*
             while (hurtPause)
@@ -546,12 +546,14 @@ public class Player : CollidingEntity
             //*/
 
             transform.Translate(Vector3.up * 0.1f);
-            directionalMomentum.y = jumpStrength * 0.015f;
+            directionalMomentum.y = strength * 0.015f;
             controller.Move(directionalMomentum);
             groundedCompensation = false;
 
-            releasedJump = true;
-            jumpsPerformed = 1;
+            if (refreshDouble) {
+                releasedJump = true;
+                jumpsPerformed = 1;
+            }
             yield return null;
         }
         IEnumerator WallJumpVelocity()
