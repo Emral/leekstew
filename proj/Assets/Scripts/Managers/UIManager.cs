@@ -333,7 +333,7 @@ public class UIManager : MonoBehaviour
         // Loop
         while (true)
         {
-            hpBarObj.transform.parent = canvasObj.transform;
+            hpBarObj.transform.SetParent(canvasObj.transform);
                 
             playerHP = GameManager.player.health;
             hpBarObj = GameObject.Find("UI_PlayerHP");

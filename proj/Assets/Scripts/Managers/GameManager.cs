@@ -149,7 +149,7 @@ public class GameManager : MonoBehaviour
             timeSinceInput += Time.deltaTime;
             if (inputPress["Any"] || inputRelease["Any"] || inputAxisAny != 0)
             {
-                print("TIME SINCE INPUT RESET");
+                //print("TIME SINCE INPUT RESET");
                 timeSinceInput = 0f;
             }
 

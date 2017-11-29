@@ -22,7 +22,7 @@ public class MovementCommand
 
 
 
-public class PathedMovement : CollidingEntity
+public class PathedMovement : MonoBehaviour
 {
     public bool active = true;
     public float gap = 1f;
@@ -31,7 +31,6 @@ public class PathedMovement : CollidingEntity
     private bool inRoutine = false;
     public MovementCommand[] steps;
     private int currentPos = 0;
-    private Transform otherScr;
 
     void Start()
     {
@@ -77,13 +76,7 @@ public class PathedMovement : CollidingEntity
         }
         currentPos = (currentPos + 1) % steps.Length;
     }
-
-    public override void OnCollisionEnter(Collision c)
-    {
-        base.OnCollisionEnter(c);
-        otherScr = c.transform;
-    }
-    
+        
     private IEnumerator Move(float time, Vector3 direction)
     {
         float startTime = 0;

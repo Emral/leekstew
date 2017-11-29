@@ -48,6 +48,7 @@ public class Player : CollidingEntity
 
     private bool releasedJump = false;
     private bool groundedCompensation = false;
+    private bool touchingMovingSurface = false;
 
     private Transform model;
     private MoveState moveState = MoveState.Falling;
@@ -145,21 +146,27 @@ public class Player : CollidingEntity
         }
         */
         // Landing on something
-        if (collisionSide == CollideDir.Down  &&  hit.gameObject.layer == 9)
+        if (collisionSide == CollideDir.Down)
         {
-
-            LandOnSolidSurface();
-            //transform.position = new Vector3(transform.position.x, contact.point.y, transform.position.z);
-            /*
-            if (controller != null)
+            if (hit.gameObject.layer == 9)
             {
-                Vector3 newVel = controller.velocity;
-                    newVel.x = 0f;
-                newVel.z = 0f;
-                //controller.velocity = newVel;
+
+                LandOnSolidSurface();
+                //transform.position = new Vector3(transform.position.x, contact.point.y, transform.position.z);
+                /*
+                if (controller != null)
+                {
+                    Vector3 newVel = controller.velocity;
+                        newVel.x = 0f;
+                    newVel.z = 0f;
+                    //controller.velocity = newVel;
+                }
+                */
+                //forwardMomentum = 0f;
+            } else if (hit.gameObject.layer == 12)
+            {
+                LandOnMovingSurface(hit.transform.parent);
             }
-            */
-            //forwardMomentum = 0f;
         }
         //print(contact.thisCollider.name + " hit " + contact.otherCollider.name);
         //Debug.DrawRay(contact.point, contact.normal, Color.white);
@@ -177,6 +184,15 @@ public class Player : CollidingEntity
             directionalMomentum.y = -0.1f;
             lastWalljumpHeight = Mathf.Infinity;
             lastWallNormal = Vector3.zero;
+        }
+    }
+    public void LandOnMovingSurface(Transform platform)
+    {
+        if (!groundedCompensation)
+        {
+            transform.SetParent(platform);
+            touchingMovingSurface = true;
+            LandOnSolidSurface();
         }
     }
 
@@ -246,6 +262,11 @@ public class Player : CollidingEntity
                 //forwardMomentum = moveDir.magnitude * moveSpeed;
                 directionalMomentum = new Vector3(0f, directionalMomentum.y, 0f) + moveDir * moveSpeed; //Vector3.forward * forwardMomentum;
 
+                if (touchingMovingSurface)
+                {
+                    transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+                }
+
                 if (moveDir.magnitude > 0)
                 {
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnRate);
@@ -279,7 +300,14 @@ public class Player : CollidingEntity
 
             // Vertical movement
             if (!groundedCompensation)
+            {
                 directionalMomentum.y = Mathf.Max(directionalMomentum.y - 0.01f, -2f);
+
+                if (touchingMovingSurface)
+                {
+                    transform.SetParent(null);
+                }
+            }
 
 
             //Debug.DrawRay(transform.position, wallNormal * 200f, Color.red);
@@ -416,7 +444,6 @@ public class Player : CollidingEntity
     public override void ReceiveBlock(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
         base.ReceiveBlock(side, otherScr, otherTrans, point, normal);
-            
         if (Vector3.Angle(normal, lastWallNormal) <= 90.5 && point.y > lastWalljumpHeight) return;
 
         if (side == CollideDir.Front)
