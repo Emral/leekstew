@@ -203,14 +203,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levels:
-  - key: Scene_Test1
-    name: Test Level
-    creator: Rockythechao & Enjl
+  - key: Scene_EnjlTest
+    name: Enjl stole the 7 chaos levels
+    creator: Rockythechao & Enjl (& Enjl)
     thumbnail: {fileID: 0}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
   - key: Scene_1-1
-    name: Demo Goes Christmas Shopping
-    creator: Enjl
+    name: Popsicle Garden
+    creator: Rockythechao & Enjl
     thumbnail: {fileID: 0}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
   - key: Scene_Boss
