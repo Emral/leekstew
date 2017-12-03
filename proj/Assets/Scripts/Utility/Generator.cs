@@ -20,6 +20,13 @@ public class Generator : PlacementTool
 
     public GameObject spawnEffect;
 
+
+    // Projectile stuff
+    public bool spawnProjectiles;
+    [SerializeField] public ProjectileProperties[] projectileProperties;
+
+
+    // Control vars
     private int totalSpawned = 0;
     private List<Transform> spawnedObjs = new List<Transform>();
 
@@ -135,7 +142,13 @@ public class Generator : PlacementTool
         }
 
         // Add the new prefab intance
-        spawnedObjs.Add(GameObject.Instantiate(RandomPrefab(), transform.position + randomPos, Quaternion.identity).transform);
+        GameObject spawnedInstance = GameObject.Instantiate(RandomPrefab(), transform.position + randomPos, Quaternion.identity);
+        if (spawnProjectiles && projectileProperties.Length > 0)
+        {
+            Projectile projectileScr = spawnedInstance.AddComponent<Projectile>();
+            projectileScr.properties = projectileProperties[Random.Range(0, projectileProperties.Length - 1)];
+        }
+        spawnedObjs.Add(spawnedInstance.transform);
         yield return new WaitForSeconds(spawnCooldown);
 
         // If spawning in waves

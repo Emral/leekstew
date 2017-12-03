@@ -38,6 +38,7 @@ GameObject:
   - component: {fileID: 20385678383088920}
   - component: {fileID: 124795918320915102}
   - component: {fileID: 81420191831695922}
+  - component: {fileID: 45553154732084190}
   - component: {fileID: 114753073157757604}
   m_Layer: 0
   m_Name: Main Camera
@@ -138,6 +139,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!45 &45553154732084190
+Skybox:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1612413887885852}
+  m_Enabled: 1
+  m_CustomSkybox: {fileID: 2100000, guid: 05a08b084724c1344b0151c1c9f7d53c, type: 2}
 --- !u!81 &81420191831695922
 AudioListener:
   m_ObjectHideFlags: 1
@@ -157,9 +166,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  dolly: {fileID: 0}
-  camera: {fileID: 0}
-  shake: {fileID: 0}
   getBehindPlayer: 0
 --- !u!114 &114484013355320352
 MonoBehaviour:
@@ -172,8 +178,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0a050afa4175aa42bb04d01ca7c79b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shakeAmount: 0
+  effectAmount: 0
+  decayStyle: 1
   decayRate: 0.05
+  interval: 0
+  activeWhenPaused: 0
+  squashScale: {x: 1, y: 1, z: 1}
   shakeOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &114753073157757604
 MonoBehaviour:

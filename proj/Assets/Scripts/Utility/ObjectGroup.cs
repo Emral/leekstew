@@ -6,6 +6,9 @@ public class ObjectGroup : PlacementTool
 {
     public bool isDirty = false;
     public int firstInstanceID;
+    public Vector3 rotOffset;
+    public Vector3 rotRandom;
+    public Vector3 posRandom;
     [HideInInspector] public int idAssigned;
     private int isDirtyCounter = 0;
 
@@ -41,11 +44,15 @@ public class ObjectGroup : PlacementTool
     }
 
 
-    public virtual GameObject PlacePrefab(Vector3 position, string label = "")
+    public virtual GameObject PlacePrefab(Vector3 position, Vector3 rotation, string label = "")
     {
+        Vector3 newPos = position + new Vector3(Random.Range(-posRandom.x, posRandom.x), Random.Range(-posRandom.y, posRandom.y), Random.Range(-posRandom.z, posRandom.z));
+        Quaternion newRot = Quaternion.Euler(rotation + rotOffset + new Vector3(Random.Range(-rotRandom.x, rotRandom.x), Random.Range(-rotRandom.y, rotRandom.y), Random.Range(-rotRandom.z, rotRandom.z)));
+
         GameObject selected = RandomPrefab();
-        GameObject spawned = GameObject.Instantiate(selected, position, Quaternion.identity, transform);
+        GameObject spawned = GameObject.Instantiate(selected, newPos, newRot, transform);
         spawned.transform.SetAsFirstSibling();
+
         if (!label.Equals(""))
             spawned.name = label + " " + selected.name;
 
@@ -56,6 +63,10 @@ public class ObjectGroup : PlacementTool
         }
 
         return spawned;
+    }
+    public virtual GameObject PlacePrefab(Vector3 position, string label = "")
+    {
+        return PlacePrefab(position, Vector3.zero, label);
     }
 
     public virtual void Clear()

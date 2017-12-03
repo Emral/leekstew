@@ -57,15 +57,15 @@ public class AudioManager : MonoBehaviour
     }
 
 
-    public void StopMusic()
+    public static void StopMusic()
     {
-        AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
+        AudioSource aud = instance.transform.GetComponent("AudioSource") as AudioSource;
         aud.Stop();
     }
 
-    public void SetMusic(AudioClip music, bool loop=true, bool useLoopPoints=false)
+    public static void SetMusic(AudioClip music, bool loop=true, bool useLoopPoints=false)
     {
-        AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
+        AudioSource aud = instance.transform.GetComponent("AudioSource") as AudioSource;
         if (aud.clip != music || aud.loop != loop || usingLoopPoints != useLoopPoints)
         {
             UIManager.hpFadeCounter = 0f;
@@ -78,7 +78,7 @@ public class AudioManager : MonoBehaviour
             currentMusic = music;
 
             if (useLoopPoints)
-                StartCoroutine(LoopMusic(music));
+                instance.StartCoroutine(instance.LoopMusic(music));
         }
     }
 

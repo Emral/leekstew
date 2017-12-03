@@ -25,7 +25,7 @@ public class Title : MonoBehaviour {
     public IEnumerator StartGame()
     {
         GetComponent<AudioSource>().Play();
-        AudioManager.instance.StopMusic();
+        AudioManager.StopMusic();
 
         UIManager ui = UIManager.instance;
         yield return ui.StartCoroutine(ui.ScreenFadeChange(1f, 1f));

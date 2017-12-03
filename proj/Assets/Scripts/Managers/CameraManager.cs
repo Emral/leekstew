@@ -2,14 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class CameraBehavior
+{
+    public bool fixedYaw;
+    public Vector3 newYaw;
+    public bool fixedPitch;
+    public Vector3 newPitch;
+    public bool changeTarget;
+    public Transform newTarget;
+    public bool limitedRegion;
+    public Vector3 regionMin;
+    public Vector3 regionMax;
+}
+
+
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager instance;
 
+    public static float targetZoom = 1f;
+    public static float currentZoom = 1f;
+    public static float zoomSpeed = 0.05f;
+
     public Transform target;
-    [HideInInspector] public Transform dolly;
-    [HideInInspector] public Transform camera;
-    [HideInInspector] public Shake shake;
+    [HideInInspector] public static Transform dolly;
+    [HideInInspector] public static Transform camera;
+    [HideInInspector] public static Shake shake;
+    [HideInInspector] public static Skybox skybox;
 
     private bool playerChoiceLock = false;
 
@@ -22,6 +42,7 @@ public class CameraManager : MonoBehaviour
         dolly = transform.Find("Dolly");
         camera = dolly.Find("Main Camera");
         shake = dolly.gameObject.GetComponent<Shake>();
+        skybox = Camera.main.gameObject.GetComponent<Skybox>();
     }
 
     private void Awake()
@@ -226,6 +247,6 @@ public class CameraManager : MonoBehaviour
             yield return null;
         }
 
-        shake.shakeAmount = strength;
+        shake.effectAmount = strength;
     }
 }

@@ -38,7 +38,7 @@ public class Checkpoint : MonoBehaviour
             {
                 modelTrans.LookAt(playerScr.transform);
                 squash = Mathf.Lerp(0.5f, 0f, Mathf.InverseLerp(1.5f, 4f, distanceToPlayer));
-                shake.shakeAmount = squash*0.5f;
+                shake.effectAmount = squash*0.5f;
 
                 Vector3 shakeVector = shake.shakeOffset;
                 shakeVector.y = 0f;

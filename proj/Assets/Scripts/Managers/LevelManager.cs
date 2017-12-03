@@ -154,7 +154,7 @@ public class LevelManager : MonoBehaviour
             }
             yield return new WaitForSeconds(0.5f);
         }
-        else
+        else if (UIManager.levelIntroObj != null)
         {
             UIManager.levelIntroObj.SetActive(false);
         }
@@ -162,7 +162,7 @@ public class LevelManager : MonoBehaviour
 
         // Start the level music
         if (currentLevel != null)
-            AudioManager.instance.SetMusic(currentLevel.music);
+            AudioManager.SetMusic(currentLevel.music);
 
 
         // Fade the screen in

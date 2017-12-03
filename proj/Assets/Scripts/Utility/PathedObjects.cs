@@ -9,10 +9,14 @@ public class PathedObjects : ObjectGroup
     public float gap = 1f;
     public bool relative = true;
     public bool closed = false;
+    public bool orientToPath = false;
     [HideInInspector] public int cachedCount = 0;
 
     [ReorderableList] public Vector3[] points;
 
+    private Vector3 startPt;
+    private Vector3 endPt;
+    private Vector3 posOffsetPt;
 
 
     public override void Reset()
@@ -34,11 +38,29 @@ public class PathedObjects : ObjectGroup
         }
     }
 
+    public override GameObject PlacePrefab(Vector3 position, string label = "")
+    {
+        GameObject spawned = base.PlacePrefab(position, label);
+        if (orientToPath)
+        {
+            Vector3 lookDir = endPt-startPt;
+            GameObject lookAtParent = GameObject.Instantiate(new GameObject(), spawned.transform.position, Quaternion.identity, transform);
+            spawned.transform.parent = lookAtParent.transform;
+            lookAtParent.transform.rotation = Quaternion.LookRotation(lookDir);
+            spawned.transform.parent = transform;
+            spawned.transform.SetAsFirstSibling();
+            GameObject.DestroyImmediate(lookAtParent);
+        }
+
+        return spawned;
+    }
+
 
     public override void Recreate()
     {
         base.Recreate();
         Vector3 offset = relative ? transform.position : Vector3.zero;
+        posOffsetPt = offset;
 
         typeName = "Path";
 
@@ -70,8 +92,8 @@ public class PathedObjects : ObjectGroup
             cachedCount = 0;
             for (int i = 0; i < tempPoints.Length - 1; i++)
             {
-                Vector3 startPt = tempPoints[i];
-                Vector3 endPt = tempPoints[i+1];
+                startPt = tempPoints[i];
+                endPt = tempPoints[i+1];
                 float dist = Vector3.Distance(startPt, endPt);
 
                 float numInstances = Mathf.Floor(dist / gap);
@@ -85,6 +107,7 @@ public class PathedObjects : ObjectGroup
             // If the path isn't closed, place one last prefab at the end point
             if (!closed || points.Length <= 2)
             {
+                endPt += (endPt - startPt);
                 PlacePrefab(points[points.Length - 1] + offset, (cachedCount + 1).ToString() + " --");
                 cachedCount++;
             }
