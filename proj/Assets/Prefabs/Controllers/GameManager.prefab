@@ -209,8 +209,8 @@ MonoBehaviour:
     thumbnail: {fileID: 0}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
   - key: Scene_RockyTest
-    name: 
-    creator: Rockythechao & Enjl (& Enjl)
+    name: He took 7 levels.  That's as many as seven ones.  And that's terrible.
+    creator: Rockythechao & Enjl (& Rockythechao)
     thumbnail: {fileID: 0}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
   - key: Scene_1-1
