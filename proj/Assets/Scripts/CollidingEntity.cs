@@ -28,6 +28,10 @@ public class CollidingEntity : MonoBehaviour
     [EnumFlag] public CollideDir pushFlags;
     [EnumFlag] public CollideDir bounceFlags;
 
+    [EnumFlag] public CollideDir powerOnFlags;
+    [EnumFlag] public CollideDir powerOffFlags;
+    [EnumFlag] public CollideDir toggleFlags;
+
     [HideInInspector] public CharacterController controller;
     [HideInInspector] public Collider collider;
     [HideInInspector] public HealthPoints health;
@@ -42,6 +46,10 @@ public class CollidingEntity : MonoBehaviour
 
     public bool bounceRestoresDoubleJump = false;
     public float bounceStrength = 18;
+    public bool canPower = true;
+    public float powerCooldown = 0f;
+    public Battery[] powerTargets;
+    private float powerCooldownTimer;
 
     public virtual void Update()
     {
@@ -68,6 +76,11 @@ public class CollidingEntity : MonoBehaviour
     public virtual void LateUpdate()
     {
         ResetCollisionFlags();
+
+        if (powerCooldownTimer > 0)
+        {
+            powerCooldownTimer = Mathf.Max(powerCooldownTimer - Time.deltaTime, 0);
+        }
     }
 
     public virtual void UpdateReferences()
@@ -103,7 +116,7 @@ public class CollidingEntity : MonoBehaviour
         //print(otherTrans.gameObject.name + " touched " + gameObject.name + "from the " + collisionSide.ToString());
 
         // Process collision effects
-        CollidingEntity otherScr = otherTrans.GetComponent("CollidingEntity") as CollidingEntity;
+        CollidingEntity otherScr = otherTrans.GetComponent<CollidingEntity>();
 
         if (otherScr != null)
         {
@@ -135,6 +148,32 @@ public class CollidingEntity : MonoBehaviour
             if (FlagsHelper.IsSet(otherScr.bounceFlags, collisionSide))
             {
                 ReceiveBounce(collisionSide, otherScr, otherTrans, point, normal, otherScr.bounceRestoresDoubleJump, otherScr.bounceStrength);
+            }
+
+            // Power
+            if (canPower)
+            {
+                if (powerCooldownTimer == 0)
+                {
+                    foreach (Battery target in powerTargets)
+                    {
+                        if (FlagsHelper.IsSet(powerOnFlags, collisionSide))
+                        {
+                            target.PowerOn();
+                            powerCooldownTimer = powerCooldown;
+                        }
+                        if (FlagsHelper.IsSet(powerOffFlags, collisionSide))
+                        {
+                            target.PowerOff();
+                            powerCooldownTimer = powerCooldown;
+                        }
+                        if (FlagsHelper.IsSet(toggleFlags, collisionSide))
+                        {
+                            target.TogglePower();
+                            powerCooldownTimer = powerCooldown;
+                        }
+                    }
+                }
             }
         }
         else
@@ -208,6 +247,7 @@ public class CollidingEntity : MonoBehaviour
     {
         // Reset the current collison side
         collisionSide = CollideDir.None;
+        CollidingEntity other = hit.transform.gameObject.GetComponent<CollidingEntity>();
 
         if (controller != null)
         {
@@ -216,6 +256,10 @@ public class CollidingEntity : MonoBehaviour
             {
                 FlagsHelper.Set(ref collisionSides, CollideDir.Up);
                 collisionSide = CollideDir.Up;
+                if (other != null)
+                {
+                    other.collisionSide = CollideDir.Down;
+                }
             }
 
             // Store bottom collision
@@ -224,6 +268,10 @@ public class CollidingEntity : MonoBehaviour
                 FlagsHelper.Set(ref collisionSides, CollideDir.Down);
                 collisionSide = CollideDir.Down;
                 groundNormal = hit.normal;
+                if (other != null)
+                {
+                    other.collisionSide = CollideDir.Up;
+                }
             }
 
             // Store horizontal collison
@@ -236,6 +284,10 @@ public class CollidingEntity : MonoBehaviour
                     // front
                     FlagsHelper.Set(ref collisionSides, CollideDir.Front);
                     collisionSide = CollideDir.Front;
+                    if (other != null)
+                    {
+                        other.collisionSide = CollideDir.Back;
+                    }
                 }
                 else if (angleDiff <= 135)
                 {
@@ -244,11 +296,19 @@ public class CollidingEntity : MonoBehaviour
                     {
                         FlagsHelper.Set(ref collisionSides, CollideDir.Right);
                         collisionSide = CollideDir.Right;
+                        if (other != null)
+                        {
+                            other.collisionSide = CollideDir.Left;
+                        }
                     }
                     else
                     {
                         FlagsHelper.Set(ref collisionSides, CollideDir.Left);
                         collisionSide = CollideDir.Left;
+                        if (other != null)
+                        {
+                            other.collisionSide = CollideDir.Right;
+                        }
                     }
                 }
                 else
@@ -256,11 +316,19 @@ public class CollidingEntity : MonoBehaviour
                     // back
                     FlagsHelper.Set(ref collisionSides, CollideDir.Back);
                     collisionSide = CollideDir.Back;
+                    if (other != null)
+                    {
+                        other.collisionSide = CollideDir.Front;
+                    }
                 }
             }
 
             // Now process the collision for this hit
             ProcessCollision (hit.transform, hit.point, hit.normal);
+            if (other != null)
+            {
+                other.ProcessCollision(transform, hit.point, hit.normal);
+            }
         }
     }
 
