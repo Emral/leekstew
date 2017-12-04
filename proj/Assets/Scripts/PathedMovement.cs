@@ -80,6 +80,17 @@ public class PathedMovement : MonoBehaviour
         Activate();
     }
 
+    private void Update()
+    {
+        if (!active && useBattery && !inRoutine)
+        {
+            if (attachedBattery.GetActive())
+            {
+                Activate();
+            }
+        }
+    }
+
     public void Activate()
     {
         active = true;
@@ -97,12 +108,19 @@ public class PathedMovement : MonoBehaviour
     public void Reset()
     {
         active = false;
+        inRoutine = false;
         transform.position = originalPosition;
         transform.rotation = originalRotation;
 
         if (type != PathType.Single)
         {
             Activate();
+        } else
+        {
+            if (useBattery && currentPos == 0)
+            {
+                attachedBattery.PowerOff();
+            }
         }
 
     }
