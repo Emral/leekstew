@@ -53,8 +53,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabs:
   - {fileID: 1503439219885262, guid: 16efffdb481290047af53d8ce5037e1b, type: 2}
+  toggledObjs: []
+  typeName: GenericPlacer
   isDirty: 1
+  firstInstanceID: 0
+  rotOffset: {x: 0, y: 0, z: 0}
+  rotRandom: {x: 0, y: 0, z: 0}
+  posRandom: {x: 0, y: 0, z: 0}
+  idAssigned: 0
   gap: 1
   relative: 1
+  closed: 0
+  orientToPath: 0
   cachedCount: 23
-  points: []
+  points:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}

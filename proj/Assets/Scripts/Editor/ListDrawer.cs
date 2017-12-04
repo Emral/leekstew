@@ -6,6 +6,22 @@ using UnityEngine;
 [CustomPropertyDrawer(typeof(ReorderableListAttribute))]
 public class ListDrawer : PropertyDrawer
 {
+    private const float ITEMSIZE = 15f;
+
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        if (property.isExpanded)
+        {
+            return base.GetPropertyHeight(property, label) + ITEMSIZE * (property.CountInProperty());
+        }
+        else
+        {
+            return base.GetPropertyHeight(property, label);
+        }
+    }
+
+
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         //ReorderableListAttribute listSettings = (ReorderableListAttribute)attribute;
@@ -53,13 +69,15 @@ public class ListDrawer : PropertyDrawer
         bool moveUp = false;
         bool moveDown = false;
 
+        float baseHeight = base.GetPropertyHeight(property, label);
+
         EditorGUI.BeginProperty(position, label, property);
 
-        EditorGUI.PropertyField(new Rect(position.x, position.y, position.width-50, position.height), property);
+        EditorGUI.PropertyField(new Rect(position.x, position.y, position.width-50, position.height), property, true);
         if (myIndex > 0)
-            moveUp = GUI.Button(new Rect(position.x + position.width - 40, position.y, 20, position.height), "U");
+            moveUp = GUI.Button(new Rect(position.x + position.width - 40, position.y, 20, baseHeight), "U");
         if (myIndex < arrayProp.arraySize-1)
-            moveDown = GUI.Button(new Rect(position.x + position.width - 20, position.y, 20, position.height), "D");
+            moveDown = GUI.Button(new Rect(position.x + position.width - 20, position.y, 20, baseHeight), "D");
 
         if (moveUp)
             arrayProp.MoveArrayElement(myIndex, myIndex - 1);

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,6 +13,8 @@ public class LevelData
     public Scene scene;
     public string name;
     public string creator;
+    public bool isHub;
+    public bool isIncluded = true;
     public Texture2D thumbnail;
     public AudioClip music;
 }
@@ -20,34 +23,72 @@ public class LevelData
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager instance = null;
-
     public static LevelData currentLevel;
 
-    private bool beginningLevel = true;
+    private static bool beginningLevel = true;
+    public static bool isWarping = false;
+
+    public static Vector3 warpDestination;
+    public static int currentRoom = 0;
+    public static int checkpointRoom = 0;
 
     public static int currentCheckpoint = -1;
     public static List<int> checkpointsActive = new List<int>();
 
+    public static GameObject[] roomObjects;
+    public static Dictionary<int, string> roomNames;
 
-    [SerializeField] public List<LevelData> levels;
-    private Dictionary<string, LevelData> levelDict;
+
+    // This feature doesn't work yet 
+    [HideInInspector] public bool checkToAddScenesToBuildList = false;
+
+
+    [SerializeField] [ReorderableList] public List<LevelData> levels;
+    private static Dictionary<string, LevelData> levelDict;
 
     #region monobehavior events
-        private void Awake()
-        {
-            if (instance == null)
-                instance = this;
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
 
-            levelDict = new Dictionary<string, LevelData>();
+        levelDict = new Dictionary<string, LevelData>();
+        foreach (LevelData level in levels)
+        {
+            levelDict.Add(level.key, level);
+        }
+    }
+
+    public void OnValidate()
+    {
+        // If the player checked the thing, load all of the levels' scenes into the build scene list
+        if (checkToAddScenesToBuildList)
+        {
+            checkToAddScenesToBuildList = false;
+
+            var original = EditorBuildSettings.scenes;
+            var newSettings = new EditorBuildSettingsScene[levels.Count];
+
+            // Add the title screen
+            newSettings[0] = original[0];
+
+            int i = 0;
             foreach (LevelData level in levels)
             {
-                levelDict.Add(level.key, level);
+                if (Application.CanStreamedLevelBeLoaded(level.key))
+                {
+                    var sceneToAdd = new EditorBuildSettingsScene("Assets/Scenes/" + level.key + ".unity", true);
+                    newSettings[i++] = sceneToAdd;
+                }
             }
+
+            EditorBuildSettings.scenes = newSettings;
         }
+    }
     #endregion
 
     #region initialization
-        public static void InitLevel()
+    public static void InitLevel()
         {
         if (instance == null)
             instance = GameManager.instance.GetComponent<LevelManager>();
@@ -57,39 +98,70 @@ public class LevelManager : MonoBehaviour
     #endregion
 
     #region methods
+    public static LevelData GetLevelInfo(string sceneName)
+    {
+        return levelDict[sceneName];
+    }
     public void LoadScene(string scene, bool resetCheckpoints=true)
+    {
+        if (resetCheckpoints)
         {
-            if (resetCheckpoints)
-                currentCheckpoint = -1;
+            currentCheckpoint = -1;
+            checkpointRoom = 0;
+        }
 
-            UIManager.instance.StopAllCoroutines();
-            GameManager.instance.StopAllCoroutines();
+        UIManager.instance.StopAllCoroutines();
+        GameManager.instance.StopAllCoroutines();
 
-            if (levelDict[scene] != null)
-            {
-                currentLevel = levelDict[scene];
-            }
+        if (levelDict[scene] != null)
+        {
+            currentLevel = levelDict[scene];
+        }
 
-            SceneManager.LoadScene(scene);
-            GameManager.instance.Awake();
-        }
-        public void LoadScene(string scene)
+        SceneManager.LoadScene(scene);
+        GameManager.instance.Awake();
+    }
+    public void LoadScene(string scene)
+    {
+        LoadScene(scene, true);
+    }
+    public void ReloadScene()
+    {
+        LoadScene(SceneManager.GetActiveScene().name, false);
+    }
+    public void RestartLevel()
+    {
+        LoadScene(SceneManager.GetActiveScene().name, true);
+    }
+    public static void EnterLevel(string level)
+    {
+        beginningLevel = true;
+        instance.LoadScene(level, true);
+    }
+    public static void CatalogRooms()
+    {
+        roomObjects = GameObject.FindGameObjectsWithTag("Room");
+        roomNames = new Dictionary<int, string>();
+
+        for (int i = 0;  i < roomObjects.Length;  i++)
         {
-            LoadScene(scene, true);
+            Room scr = roomObjects[i].GetComponent<Room>();
+            roomNames[scr.roomId] = scr.name;
         }
-        public void ReloadScene()
+    }
+    public static void ShowAndHideRooms()
+    {
+        foreach (GameObject room in roomObjects)
         {
-            LoadScene(SceneManager.GetActiveScene().name, false);
+            Room scr = room.GetComponent<Room>();
+            room.SetActive(currentRoom == scr.roomId);
         }
-        public void RestartLevel()
-        {
-            LoadScene(SceneManager.GetActiveScene().name, true);
-        }
-        public void EnterLevel(string level)
-        {
-            beginningLevel = true;
-            LoadScene(level, true);
-        }
+    }
+    public static void ChangeRoom(int newRoom)
+    {
+        currentRoom = newRoom;
+        ShowAndHideRooms();
+    }
     #endregion
 
     #region coroutines
@@ -110,6 +182,17 @@ public class LevelManager : MonoBehaviour
         if (GameManager.camera.target == null)
             GameManager.camera.target = GameManager.player.transform;
 
+        // Place the player at the warp destination
+        if (isWarping)
+        {
+            isWarping = false;
+            GameManager.player.transform.position = warpDestination;
+        }
+        else
+        {
+            currentRoom = checkpointRoom;
+        }
+
         // Checkpoint management
         GameObject[] checkpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
         foreach (GameObject checkpoint in checkpoints)
@@ -127,6 +210,10 @@ public class LevelManager : MonoBehaviour
                 GameManager.player.transform.position = checkpoint.transform.position + Vector3.up * 0.5f;
             }
         }
+
+        // Room management
+        CatalogRooms();
+        ShowAndHideRooms();
 
         // If the current level is null, initialize it from the name of the scene
         if (currentLevel == null)

@@ -149,8 +149,11 @@ MonoBehaviour:
   mercySeconds: 1
   deathEffect: {fileID: 0}
   respawn: 1
-  destroyOnDeah: 1
+  destroyOnDeath: 1
   respawnDelay: 2
+  mercyCountdown: 0
+  respawnCountdown: 0
+  dead: 0
 --- !u!114 &114663706730947530
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -168,6 +171,9 @@ MonoBehaviour:
   blockFlags: 0
   pushFlags: 0
   bounceFlags: 2
+  powerOnFlags: 0
+  powerOffFlags: 0
+  toggleFlags: 0
   controller: {fileID: 0}
   collider: {fileID: 0}
   health: {fileID: 0}
@@ -177,6 +183,13 @@ MonoBehaviour:
   groundNormal: {x: 0, y: 1, z: 0}
   groundDistance: 0
   groundPoint: {x: 0, y: 0, z: 0}
+  bounceFlagsUsed: 1
+  powerFlagsUsed: 0
+  bounceRestoresDoubleJump: 0
+  bounceStrength: 18
+  canPower: 1
+  powerCooldown: 0
+  powerTargets: []
 --- !u!143 &143393701519847610
 CharacterController:
   m_ObjectHideFlags: 1

@@ -176,6 +176,9 @@ MonoBehaviour:
   blockFlags: 0
   pushFlags: 0
   bounceFlags: 0
+  powerOnFlags: 0
+  powerOffFlags: 0
+  toggleFlags: 0
   controller: {fileID: 0}
   collider: {fileID: 0}
   health: {fileID: 0}
@@ -185,6 +188,13 @@ MonoBehaviour:
   groundNormal: {x: 0, y: 1, z: 0}
   groundDistance: 0
   groundPoint: {x: 0, y: 0, z: 0}
+  bounceFlagsUsed: 0
+  powerFlagsUsed: 0
+  bounceRestoresDoubleJump: 0
+  bounceStrength: 18
+  canPower: 1
+  powerCooldown: 0
+  powerTargets: []
 --- !u!143 &143197038796267446
 CharacterController:
   m_ObjectHideFlags: 1

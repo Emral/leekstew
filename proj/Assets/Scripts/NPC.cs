@@ -5,7 +5,7 @@ using UnityEngine;
 public class NPC : MonoBehaviour
 {
     private float distToPlayer = 999f;
-    private float talkDist = 2.5f;
+    public float talkDist = 2.5f;
     [HideInInspector] public float talkCooldown = 0f;
 
     public virtual void Update()

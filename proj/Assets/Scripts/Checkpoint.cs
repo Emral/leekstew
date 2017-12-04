@@ -67,6 +67,7 @@ public class Checkpoint : MonoBehaviour
         if (LevelManager.currentCheckpoint != checkpointID)
         {
             LevelManager.currentCheckpoint = checkpointID;
+            LevelManager.checkpointRoom = LevelManager.currentRoom;
 
             GetComponent<AudioSource>().Play();
             GameManager.ScreenShake(1f);

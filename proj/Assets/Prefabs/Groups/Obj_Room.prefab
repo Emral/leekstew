@@ -125,7 +125,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4992571146284730}
   m_Layer: 0
-  m_Name: CHECKPOINTS
+  m_Name: PROGRESS OBJECTS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -283,6 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8db8fd5ca4d3d04c9ca11fc202fbbfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  roomId: -1
   changeCamera: 0
   newCamera:
     fixedYaw: 0

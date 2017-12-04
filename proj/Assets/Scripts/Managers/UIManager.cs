@@ -269,9 +269,9 @@ public class UIManager : MonoBehaviour
         musicFadeCounter = 999f;
         pickupFadeCounter = 999f;
     }
-    public static void DoScreenFadeChange(float goal, float goalTime)
+    public static void DoScreenFadeChange(float goal, float goalTime, float delay=0f)
     {
-        instance.StartCoroutine(instance.ScreenFadeChange(goal, goalTime));
+        instance.StartCoroutine(instance.ScreenFadeChange(goal, goalTime, delay));
     }
     public static void DoFadeCanvasGroup(CanvasGroup group, float newAlpha, float fadeTime)
     {
@@ -445,8 +445,11 @@ public class UIManager : MonoBehaviour
         }
 
     }
-    public IEnumerator ScreenFadeChange(float goal, float goalTime)
+    public IEnumerator ScreenFadeChange(float goal, float goalTime, float delay = 0f)
     {
+        if (delay != 0f)
+            yield return new WaitForSeconds(delay);
+
         float startAmount = screenFadeAmount;
         float currentTime = 0;
         while (currentTime < goalTime)

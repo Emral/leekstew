@@ -179,16 +179,34 @@ MonoBehaviour:
     album: This game's soundtrack
     loopStart: 0
     loopEnd: 0
+  - key: {fileID: 8300000, guid: 31f814f35cef59a499039f1d5bbdfd66, type: 3}
+    name: Ice Path (Remix)
+    artist: Alex-R
+    album: A 2nd X Thing OST
+    loopStart: 0
+    loopEnd: 0
   - key: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
     name: Clouds
     artist: Prsynth1111
     album: A Super Mario Thing OST
     loopStart: 0
     loopEnd: 0
-  - key: {fileID: 8300000, guid: c62efb89a7f69db429a83dd805ab9c6d, type: 3}
-    name: Hoist the Sword and Pride in the Heart
-    artist: Yuzo Koshiro
-    album: Etrian Mystery Dungeon OST
+  - key: {fileID: 8300000, guid: ed4f427960d59a449bdf4f7db2f643c1, type: 3}
+    name: Frozen Citadel
+    artist: Yonowaaru
+    album: A 2nd Mario Thing OST
+    loopStart: 0
+    loopEnd: 0
+  - key: {fileID: 8300000, guid: f5e04a6d2bdbe574b8326b9d6c2b42df, type: 3}
+    name: Desperate Life-And-Death Skirmish with an Egregiously Curmudgeonly Waterfowl
+    artist: rockythechao
+    album: One-offs
+    loopStart: 0
+    loopEnd: 0
+  - key: {fileID: 8300000, guid: 3fae8c509c2e1b2479b7f0539c939f57, type: 3}
+    name: Oh Whoa, What the Heck is This?
+    artist: rockythechao
+    album: One-offs
     loopStart: 0
     loopEnd: 0
 --- !u!114 &114964361305744834
@@ -202,25 +220,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 678fb95c8fbb4e14fae0eb3eca66eb2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  checkToAddScenesToBuildList: 0
   levels:
+  - key: Scene_Hub1
+    name: Popsicle Garden
+    creator: Enjl
+    isHub: 1
+    isIncluded: 1
+    thumbnail: {fileID: 0}
+    music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
+  - key: Scene_1-1
+    name: Level Name
+    creator: Enjl
+    isHub: 0
+    isIncluded: 1
+    thumbnail: {fileID: 0}
+    music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
+  - key: Scene_Boss1
+    name: Showdown in Snowtown
+    creator: Rockythechao
+    isHub: 0
+    isIncluded: 1
+    thumbnail: {fileID: 0}
+    music: {fileID: 8300000, guid: ed4f427960d59a449bdf4f7db2f643c1, type: 3}
   - key: Scene_EnjlTest
     name: Enjl stole the 7 chaos levels
     creator: Rockythechao & Enjl (& Enjl)
+    isHub: 0
+    isIncluded: 0
     thumbnail: {fileID: 0}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
   - key: Scene_RockyTest
     name: He took 7 levels.  That's as many as seven ones.  And that's terrible.
     creator: Rockythechao & Enjl (& Rockythechao)
-    thumbnail: {fileID: 0}
-    music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
-  - key: Scene_1-1
-    name: Popsicle Garden
-    creator: Rockythechao & Enjl
-    thumbnail: {fileID: 0}
-    music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
-  - key: Scene_Boss
-    name: 'Showdown: Ice Furba Ronnie III'
-    creator: Rockythechao
+    isHub: 0
+    isIncluded: 0
     thumbnail: {fileID: 0}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
 --- !u!114 &114974772451663938

@@ -20,12 +20,14 @@ public class AudioManager : MonoBehaviour
     public static AudioManager instance = null;
 
     public UnityEngine.Audio.AudioMixer mixer;
-    [SerializeField] public List<SongData> songs;
+    [SerializeField] [ReorderableList] public List<SongData> songs;
     private Dictionary<AudioClip, SongData> songDict;
 
     public static AudioClip currentMusic;
     public static SongData currentSong;
     public static bool usingLoopPoints = false;
+
+    public static float musicFadeAmount = 1f;
 
 
     // Use this for initialization
@@ -63,6 +65,15 @@ public class AudioManager : MonoBehaviour
         aud.Stop();
     }
 
+    public static void FadeOutMusic(float seconds, bool stop)
+    {
+        AudioSource aud = instance.transform.GetComponent("AudioSource") as AudioSource;
+        if (stop)
+            instance.StartCoroutine(instance.MusicFadeChange(0f, seconds));
+        else
+            instance.StartCoroutine(instance.MusicFadeToStop(seconds));
+    }
+
     public static void SetMusic(AudioClip music, bool loop=true, bool useLoopPoints=false)
     {
         AudioSource aud = instance.transform.GetComponent("AudioSource") as AudioSource;
@@ -81,6 +92,30 @@ public class AudioManager : MonoBehaviour
                 instance.StartCoroutine(instance.LoopMusic(music));
         }
     }
+
+
+    public IEnumerator MusicFadeToStop(float goalTime)
+    {
+        yield return instance.StartCoroutine(instance.MusicFadeChange(0f, goalTime));
+        StopMusic();
+    }
+
+    public IEnumerator MusicFadeChange(float goal, float goalTime, float delay = 0f)
+    {
+        if (delay != 0f)
+            yield return new WaitForSeconds(delay);
+
+        float startAmount = musicFadeAmount;
+        float currentTime = 0;
+        while (currentTime < goalTime)
+        {
+            musicFadeAmount = Mathf.Lerp(startAmount, goal, currentTime / goalTime);
+            currentTime += Time.deltaTime;
+            yield return null;
+        }
+        musicFadeAmount = goal;
+    }
+
 
     private IEnumerator LoopMusic(AudioClip audio)
     {

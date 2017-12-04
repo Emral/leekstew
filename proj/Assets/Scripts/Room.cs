@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
+    public int roomId = -1;
     public bool changeCamera;
     public CameraBehavior newCamera;
     public AudioClip music;

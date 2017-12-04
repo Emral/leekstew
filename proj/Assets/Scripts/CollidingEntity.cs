@@ -44,6 +44,9 @@ public class CollidingEntity : MonoBehaviour
     [HideInInspector] public float groundDistance;
     [HideInInspector] public Vector3 groundPoint;
 
+    [HideInInspector] public bool bounceFlagsUsed;
+    [HideInInspector] public bool powerFlagsUsed;
+
     public bool bounceRestoresDoubleJump = false;
     public float bounceStrength = 18;
     public bool canPower = true;
