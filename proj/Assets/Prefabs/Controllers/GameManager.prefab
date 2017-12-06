@@ -257,6 +257,13 @@ MonoBehaviour:
     isIncluded: 0
     thumbnail: {fileID: 0}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
+  - key: Scene_Sublevel_1
+    name: Cookie Corridor
+    creator: Enjl
+    isHub: 0
+    isIncluded: 1
+    thumbnail: {fileID: 0}
+    music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
 --- !u!114 &114974772451663938
 MonoBehaviour:
   m_ObjectHideFlags: 1
