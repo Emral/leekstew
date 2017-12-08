@@ -365,6 +365,8 @@ MonoBehaviour:
   passive: 1
   stayOnScreen: 0
   dialogEnabled: 1
+  talkDist: 0.75
+  bubbleHeight: 2
   animPercent: 0
 --- !u!114 &114880421131921186
 MonoBehaviour:
@@ -377,11 +379,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d54703ec5dd6ba049b22c5942c54868f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  talkDist: 0.5
+  talkDist: 0.75
+  talkIconHeight: 2.5
   talkCooldown: 0
   scene: 
   room: 0
-  destination: {x: 0, y: 0, z: 0}
+  destinationOffset: {x: 0, y: 0, z: 0}
+  destinationWarpPad: {fileID: 0}
 --- !u!198 &198711077971544556
 ParticleSystem:
   m_ObjectHideFlags: 1

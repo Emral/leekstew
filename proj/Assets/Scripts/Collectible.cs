@@ -26,7 +26,7 @@ public class Collectible : MonoBehaviour
             GameObject.Destroy(gameObject);
 	}
 
-    public virtual void OnCollectStart()
+    public virtual IEnumerator OnCollectStart()
     {
         if (collectStartSound != null)
             GameManager.player.PlaySound(collectStartSound, Random.Range(0.75f, 1.25f));
@@ -35,8 +35,10 @@ public class Collectible : MonoBehaviour
             GameObject effect = GameObject.Instantiate(collectStartEffect, transform.position, Quaternion.identity);
             //effect.transform.localScale = new Vector3(3f, 3f, 3f);
         }
+
+        yield return null;
     }
-    public virtual void OnCollectEnd()
+    public virtual IEnumerator OnCollectEnd()
     {
         if (collectEndSound != null)
             GameManager.player.PlaySound(collectEndSound, Random.Range(0.75f, 1.25f));
@@ -45,11 +47,12 @@ public class Collectible : MonoBehaviour
             GameObject effect = GameObject.Instantiate(collectEndEffect, transform.position, Quaternion.identity);
             //effect.transform.localScale = new Vector3(3f, 3f, 3f);
         }
+        yield return null;
     }
 
     public IEnumerator PullToPlayer()
     {
-        OnCollectStart();
+        yield return StartCoroutine(OnCollectStart());
 
         // If a gravitating collectible, pull to the player
         if (gravitate)
@@ -78,7 +81,7 @@ public class Collectible : MonoBehaviour
 
         // Collect
 
-        OnCollectEnd();
+        yield return StartCoroutine(OnCollectEnd());
         GameObject.Destroy(gameObject);
     }
 

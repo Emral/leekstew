@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Manga-Dots
+  m_Shader: {fileID: 4800000, guid: b56c75590651fe14aafa3be91eb325f2, type: 3}
+  m_ShaderKeywords: ANICEL_DOTS_DYNAMIC ANICEL_MANGA ANICEL_SPECULAR
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Detail:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Illum:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ShadowBrushMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecBrushMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _Brightness: 0.3880597
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DstBlend: 0
+    - _EmissionLM: 0
+    - _FresPower: 8
+    - _Gap: 0.8253731
+    - _GapSpec: 0.58507466
+    - _Glossiness: 0
+    - _HarshLight: 100
+    - _Harshness: 100
+    - _Levels: 2.8656716
+    - _LineAd: 0
+    - _LinePow: 0.23134328
+    - _Offset: -0.19402988
+    - _Outline: 0.015424799
+    - _Rad: 0.0017313433
+    - _RadSpec: 0.001
+    - _Saturate: 1.8059702
+    - _ShadowDepth: 1
+    - _ShadowDotDensity: 0.8
+    - _ShadowDotRadius: 0.002
+    - _ShadowLineDensity: 0.5
+    - _ShadowLineStroke: 50
+    - _ShadowOffset: 0.66
+    - _ShadowSaturation: 1
+    - _ShadowSharpness: 0
+    - _Sheen: 0.119403
+    - _Shine: 0.05432834
+    - _Shininess: 0.078125
+    - _SpecDotDensity: 0.8
+    - _SpecDotRadius: 0.002
+    - _SpecLevels: 2
+    - _SpecLineDensity: 0.5
+    - _SpecLineStroke: 50
+    - _SpecSharpness: 0
+    - _SrcBlend: 1
+    - _Stroke: 136.56717
+    - _StrokeSpec: 300
+    - _ZWrite: 1
+    m_Colors:
+    - _Color: {r: 0.6431373, g: 0.6431373, b: 0.6431373, a: 1}
+    - _Colour: {r: 1, g: 1, b: 1, a: 1}
+    - _FresColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
+    - _HueShift: {r: 1, g: 1, b: 1, a: 0}
+    - _LineCol: {r: 0, g: 0, b: 0, a: 0}
+    - _ShadowHue: {r: 0, g: 0, b: 0, a: 0}
+    - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecColour: {r: 1, g: 1, b: 1, a: 0.15686275}

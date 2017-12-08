@@ -203,7 +203,7 @@ MonoBehaviour:
   edgeExp: 1
   sampleDist: 1.48
   edgesOnly: 0
-  edgesOnlyBgColor: {r: 1, g: 1, b: 1, a: 1}
+  edgesOnlyBgColor: {r: 0, g: 0.54482746, b: 1, a: 1}
   edgeDetectShader: {fileID: 4800000, guid: 0d1644bdf064147baa97f235fc5b4903, type: 3}
 --- !u!124 &124795918320915102
 Behaviour:

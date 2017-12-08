@@ -10,10 +10,11 @@ public class Collectible_Tooth : Collectible
     }
 
     // Update is called once per frame
-    public override void OnCollectEnd()
+    public override IEnumerator OnCollectEnd()
     {
         UIManager.pickupFadeCounter = 0f;
         base.OnCollectEnd();
         GameManager.teethCollected++;
+        yield return null;
     }
 }

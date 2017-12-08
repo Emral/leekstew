@@ -6,6 +6,7 @@ public class NPC : MonoBehaviour
 {
     private float distToPlayer = 999f;
     public float talkDist = 2.5f;
+    public float talkIconHeight = 2f;
     [HideInInspector] public float talkCooldown = 0f;
 
     public virtual void Update()
@@ -23,7 +24,7 @@ public class NPC : MonoBehaviour
     {
         if (distToPlayer < talkDist && !GameManager.cutsceneMode && talkCooldown <= 0f)
         {
-            Vector3 worldPos = new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z);
+            Vector3 worldPos = transform.position + Vector3.up*talkIconHeight;
             Vector3 pos = Camera.main.WorldToScreenPoint(worldPos);
 
             GUI.DrawTexture(new Rect(pos.x - Screen.width * 0.025f, Screen.height - pos.y - Screen.width * 0.025f, Screen.width*0.05f, Screen.width * 0.05f), UIManager.instance.talkButtonTexture);

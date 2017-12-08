@@ -23,6 +23,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] [ReorderableList] public List<SongData> songs;
     private Dictionary<AudioClip, SongData> songDict;
 
+    public static AudioSource source;
+
     public static AudioClip currentMusic;
     public static SongData currentSong;
     public static bool usingLoopPoints = false;
@@ -50,10 +52,10 @@ public class AudioManager : MonoBehaviour
         mixer.SetFloat("soundVolume", (1 - Mathf.Pow(1 - OptionsManager.soundVolume, 2)) * 80f - 80f);
 
         currentMusic = null;
-        AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
-        if (aud.isPlaying)
+        source = transform.GetComponent<AudioSource>();
+        if (source.isPlaying)
         {
-            currentMusic = aud.clip;
+            currentMusic = source.clip;
             currentSong = songDict[currentMusic];
         }
     }
@@ -61,13 +63,21 @@ public class AudioManager : MonoBehaviour
 
     public static void StopMusic()
     {
-        AudioSource aud = instance.transform.GetComponent("AudioSource") as AudioSource;
-        aud.Stop();
+        source.Stop();
+    }
+
+    public static void PauseMusic()
+    {
+        source.Pause();
+    }
+
+    public static void ResumeMusic()
+    {
+        source.UnPause();
     }
 
     public static void FadeOutMusic(float seconds, bool stop)
     {
-        AudioSource aud = instance.transform.GetComponent("AudioSource") as AudioSource;
         if (stop)
             instance.StartCoroutine(instance.MusicFadeChange(0f, seconds));
         else
@@ -76,16 +86,15 @@ public class AudioManager : MonoBehaviour
 
     public static void SetMusic(AudioClip music, bool loop=true, bool useLoopPoints=false)
     {
-        AudioSource aud = instance.transform.GetComponent("AudioSource") as AudioSource;
-        if (aud.clip != music || aud.loop != loop || usingLoopPoints != useLoopPoints)
+        if (source.clip != music || source.loop != loop || usingLoopPoints != useLoopPoints)
         {
             UIManager.hpFadeCounter = 0f;
 
             StopMusic();
 
-            aud.loop = loop;
-            aud.clip = music;
-            aud.Play();
+            source.loop = loop;
+            source.clip = music;
+            source.Play();
             currentMusic = music;
 
             if (useLoopPoints)
@@ -129,11 +138,10 @@ public class AudioManager : MonoBehaviour
             loopEnd = thisSongData.loopEnd > 0 ? thisSongData.loopEnd : loopEnd;
         }
 
-        AudioSource aud = transform.GetComponent("AudioSource") as AudioSource;
-        while (aud.isPlaying)
+        while (source.isPlaying)
         {
-            if (aud.timeSamples >= loopEnd && loopEnd < audio.samples)
-                aud.timeSamples = loopStart;
+            if (source.timeSamples >= loopEnd && loopEnd < audio.samples)
+                source.timeSamples = loopStart;
             yield return null;
         }
     }

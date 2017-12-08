@@ -56,6 +56,7 @@ GameObject:
   - component: {fileID: 4807329652677684}
   - component: {fileID: 114677114570676110}
   - component: {fileID: 82724086640766484}
+  - component: {fileID: 114773584943923814}
   m_Layer: 0
   m_Name: Obj_Checkpoint
   m_TagString: Checkpoint
@@ -407,8 +408,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0a050afa4175aa42bb04d01ca7c79b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shakeAmount: 0
+  effectAmount: 0
+  decayStyle: 1
   decayRate: 0
+  interval: 0
+  activeWhenPaused: 0
+  squashScale: {x: 1, y: 1, z: 1}
   shakeOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &114677114570676110
 MonoBehaviour:
@@ -427,3 +432,22 @@ MonoBehaviour:
   passiveEffect: {fileID: 1238228199979102, guid: 7f4540dd3ae93de4aa6c453c1a578cf2,
     type: 2}
   checkpointID: 0
+--- !u!114 &114773584943923814
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1547292066683334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 774d3ec761e837242a6e3bccc68402fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: Checkpawnt!
+  font: {fileID: 12800000, guid: c3b0e3bbcdf8a4b4092b61aacbbce416, type: 3}
+  background: {fileID: 2800000, guid: 6dc88d61e9f14f74299e408b2876b629, type: 3}
+  passive: 1
+  stayOnScreen: 1
+  dialogEnabled: 0
+  bubbleHeight: 0.5
+  animPercent: 0

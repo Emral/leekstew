@@ -12,10 +12,9 @@ public class Collectible_Leek : Collectible
 	}
 	
 	// Update is called once per frame
-	public override void OnCollectEnd()
+	public override IEnumerator OnCollectEnd()
     {
         //base.OnCollectEnd();
-
         UIManager.pickupFadeCounter = 0f;
 
         if (collectEndSound != null)
@@ -26,5 +25,7 @@ public class Collectible_Leek : Collectible
         }
 
         GameManager.leeksCollected++;
+
+        yield return null;
 	}
 }

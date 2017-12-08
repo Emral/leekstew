@@ -6,7 +6,8 @@ public class WarpPad : NPC
 {
     public string scene;
     public int room;
-    public Vector3 destination;
+    public Vector3 destinationOffset;
+    public Transform destinationWarpPad;
 
     private Dialog dialog;
     private bool sameScene = false;
@@ -48,11 +49,14 @@ public class WarpPad : NPC
     public override IEnumerator OnPlayerInteract()
     {
         GameManager.player.inputActive = false;
-        LevelManager.warpDestination = destination;
+        if (destinationWarpPad != null)
+            LevelManager.warpDestination = destinationWarpPad.position + Vector3.up*0.1f;
+
+        LevelManager.warpDestination += destinationOffset;
 
 
         // Fade out
-        if (!sameScene)
+        if (!sameScene || LevelManager.roomMusic[room] != AudioManager.currentMusic) 
         {
             AudioManager.FadeOutMusic(0.5f, true);
         }
@@ -62,9 +66,11 @@ public class WarpPad : NPC
         // If warping to a room in the same scene, just move the player, refresh the rooms and fade back in
         if (sameScene)
         {
-            GameManager.player.transform.position = destination;
+            GameManager.player.transform.position = LevelManager.warpDestination;
             LevelManager.ChangeRoom(room);
-            yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(0f, 0.5f));
+            GameManager.player.inputActive = true;
+            AudioManager.SetMusic(LevelManager.roomMusic[room]);
+            yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(0f, 0.5f));            
         }
         else
         {

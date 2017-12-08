@@ -12,10 +12,11 @@ public class Collectible_Radish : Collectible
     }
 
     // Update is called once per frame
-    public override void OnCollectEnd()
+    public override IEnumerator OnCollectEnd()
     {
         base.OnCollectEnd();
         GameManager.player.health.ChangeHP(1, addSoulHearts);
         UIManager.hpFadeCounter = 0f;
+        yield return null;
     }
 }

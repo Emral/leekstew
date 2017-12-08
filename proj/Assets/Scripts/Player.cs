@@ -323,6 +323,15 @@ public class Player : CollidingEntity
                     }
 
 
+                    // Enter sliding
+                    if (Vector3.Angle(Vector3.up, groundNormal) > 45)
+                    {
+                        directionalMomentum += 0.2f * new Vector3(groundNormal.x, 0f, groundNormal.z);
+                        //if (directionalMomentum.magnitude += 0.2f * new Vector3(groundNormal.x, 0f, groundNormal.z);
+                        //groundedStates[0] = GroundedState.Sliding;
+                    }
+
+
                     // Handling for moving over a ledge
                     if (!controller.isGrounded && groundDistance > 0.5f && groundedCompensation) //&& Mathf.Abs(controller.velocity.y) > 1f)
                     {
@@ -478,11 +487,6 @@ public class Player : CollidingEntity
 
             // Rotate self toward target rotation
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnRate*rotRateMult);
-
-
-            // Slope movement
-            Vector3 slopedMomentum = Vector3.Scale(directionalMomentum, groundNormal + new Vector3(1f, 0f, 1f));
-
 
             // Commit movement
             if (groundedCompensation)

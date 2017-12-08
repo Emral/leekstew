@@ -11,6 +11,9 @@ public class Dialog : MonoBehaviour {
     public bool stayOnScreen = false;
     public bool dialogEnabled = true;
 
+    public float talkDist = 3f;
+    public float bubbleHeight = 0.5f;
+
     [HideInInspector] public float animPercent = 0f;
     private Color textColor;
     private GUIStyle style;
@@ -52,7 +55,7 @@ public class Dialog : MonoBehaviour {
         if (passive)
         {
             animPercent = Mathf.Max(0f, animPercent - animRate);
-            if (distance < 3f && !text.Equals("") && dialogEnabled)
+            if (distance < talkDist && !text.Equals("") && dialogEnabled)
             {
                 animPercent = Mathf.Min(1f, animPercent + animRate*2f);
             }
@@ -65,7 +68,7 @@ public class Dialog : MonoBehaviour {
         // Display the bubble
         if  (cam != null  &&  animPercent > 0f && !GameManager.isGamePaused)
         {
-            Vector3 worldPos = new Vector3(transform.position.x, transform.position.y + Mathf.Lerp(1f, 1.5f, animPercent), transform.position.z);
+            Vector3 worldPos = new Vector3(transform.position.x, transform.position.y + 1f + Mathf.Lerp(0f, bubbleHeight, animPercent), transform.position.z);
             Vector3 pos = cam.WorldToScreenPoint(worldPos);
 
             Vector2 textRegionSize = new Vector2(200, 1);
@@ -84,7 +87,7 @@ public class Dialog : MonoBehaviour {
             Vector2 scaledRegionSize = new Vector2(Mathf.Lerp(1, textRegionSize.x, animPercent), Mathf.Lerp(1, textRegionSize.y, animPercent));
             if (stayOnScreen)
             {
-                pos = new Vector3(Mathf.Clamp(pos.x, 0f, Screen.width-scaledRegionSize.x), Mathf.Clamp(pos.y, 0f, Screen.height - scaledRegionSize.y), pos.z);
+                pos = new Vector3(Mathf.Clamp(pos.x, scaledRegionSize.x, Screen.width-scaledRegionSize.x), Mathf.Clamp(pos.y, scaledRegionSize.y, Screen.height - scaledRegionSize.y), pos.z);
             }
             Rect boxRect = new Rect(pos.x - (0.5f * scaledRegionSize.x), Screen.height - pos.y - scaledRegionSize.y, scaledRegionSize.x, scaledRegionSize.y);
             GUI.Label(boxRect, textContent, style);

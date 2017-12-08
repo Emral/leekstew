@@ -37,6 +37,7 @@ public class LevelManager : MonoBehaviour
 
     public static GameObject[] roomObjects;
     public static Dictionary<int, string> roomNames;
+    public static Dictionary<int, AudioClip> roomMusic;
 
 
     // This feature doesn't work yet 
@@ -142,11 +143,13 @@ public class LevelManager : MonoBehaviour
     {
         roomObjects = GameObject.FindGameObjectsWithTag("Room");
         roomNames = new Dictionary<int, string>();
+        roomMusic = new Dictionary<int, AudioClip>();
 
         for (int i = 0;  i < roomObjects.Length;  i++)
         {
             Room scr = roomObjects[i].GetComponent<Room>();
             roomNames[scr.roomId] = scr.name;
+            roomMusic[scr.roomId] = scr.music;
         }
     }
     public static void ShowAndHideRooms()
