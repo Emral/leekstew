@@ -143,7 +143,7 @@ public class PathedMovement : MonoBehaviour
             int lastPos = currentPos - 1;
             if (currentPos == 0)
             {
-                lastPos = steps.Length;
+                lastPos = steps.Length - 1;
             }
             MovementCommand m = steps[lastPos];
             OnEventEnd(lastPos, m.type, m.duration, m.interpretSpeedAsGoal, m.speed, m.angularSpeed, m.freezePosition, m.freezeRotation);
