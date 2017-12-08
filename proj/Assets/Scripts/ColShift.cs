@@ -1,0 +1,48 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ColShift : MonoBehaviour {
+
+    private Material[] m;
+    private float t;
+
+    public Gradient newColor;
+
+    public float length = 1;
+
+    public bool paused = false;
+    public bool shared = false;
+
+	// Use this for initialization
+	void Start () {
+        if (shared)
+        {
+            m = gameObject.GetComponent<MeshRenderer>().sharedMaterials;
+        } else
+        {
+            m = gameObject.GetComponent<MeshRenderer>().materials;
+        }
+        if (length <= 0)
+        {
+            length = 0.0001f;
+        }
+    }
+
+    private void UpdateColor()
+    {
+        t += Time.deltaTime;
+        for (int i = 0; i < m.Length; i++)
+        {
+            m[i].color = newColor.Evaluate((t / length) % 1);
+        }
+    }
+	
+	// Update is called once per frame
+	void Update () {
+        if (!paused)
+        {
+            UpdateColor();
+        }
+	}
+}
