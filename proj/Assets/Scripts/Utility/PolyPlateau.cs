@@ -120,7 +120,7 @@ public class PolyPlateau : MonoBehaviour
             groundMesh = new Mesh();
 
 
-        if (Application.isEditor && isDirty)
+        if (Application.isEditor && !Application.isPlaying && isDirty)
         {
             //print("Running Update because a plateau is dirty");
             if (wallsTrans != null)
@@ -134,7 +134,7 @@ public class PolyPlateau : MonoBehaviour
 
     public void LateUpdate()
     {
-        if (Application.isEditor && isDirty)
+        if (Application.isEditor && !Application.isPlaying && isDirty)
         {
             //print("Running LateUpdate because a plateau is dirty");
 

@@ -60,19 +60,7 @@ public class CollidingEntity : MonoBehaviour
 
         if (!GameManager.isGamePaused)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, -Vector3.up, out hit, 100.0f, 1 << 9))
-            {
-                groundDistance = hit.distance;
-                groundPoint = hit.point;
-                groundNormal = hit.normal;
-            }
-            else
-            {
-                groundDistance = 100f;
-                groundPoint = transform.position + (Vector3.up * -100f);
-                groundNormal = Vector3.up;
-            }
+            UpdateGroundInfo();
         }
     }
 
@@ -83,6 +71,23 @@ public class CollidingEntity : MonoBehaviour
         if (powerCooldownTimer > 0)
         {
             powerCooldownTimer = Mathf.Max(powerCooldownTimer - Time.deltaTime, 0);
+        }
+    }
+
+    public void UpdateGroundInfo()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, -Vector3.up, out hit, 100.0f, 1 << 9))
+        {
+            groundDistance = hit.distance;
+            groundPoint = hit.point;
+            groundNormal = hit.normal;
+        }
+        else
+        {
+            groundDistance = 100f;
+            groundPoint = transform.position + (Vector3.up * -100f);
+            groundNormal = Vector3.up;
         }
     }
 
@@ -98,6 +103,13 @@ public class CollidingEntity : MonoBehaviour
             sound = GetComponent<AudioSource>();
     }
 
+
+    public virtual void ShiftToGround()
+    {
+        UpdateGroundInfo();
+        if (groundDistance < 1f)
+            transform.Translate(Vector3.up * -groundDistance);
+    }
 
     public virtual void PlaySound(AudioClip clip, float pitch)
     {

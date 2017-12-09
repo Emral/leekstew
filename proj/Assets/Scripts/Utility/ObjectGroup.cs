@@ -12,6 +12,13 @@ public class ObjectGroup : PlacementTool
     [HideInInspector] public int idAssigned;
     private int isDirtyCounter = 0;
 
+    public GameObject clearEffect;
+    public BatteryCharge[] clearPowerCharges;
+
+    private bool playerStartedClearing = false;
+    private int cachedChildCount = -99;
+    private bool hasBeenCleared = false;
+
 
     public override void Reset()
     {
@@ -22,24 +29,48 @@ public class ObjectGroup : PlacementTool
 
     public virtual void OnValidate()
     {
-        if (Application.isEditor)
+        if (Application.isEditor && !Application.isPlaying)
             isDirty = true;
     }
 
     public override void Update()
     {
-        if (Application.isEditor && isDirty)
-        {
+        if (isDirty && !Application.isPlaying)
             Clear();
+
+        if (Application.isPlaying)
+        {
+            if (playerStartedClearing && !hasBeenCleared && cachedChildCount == 0)
+            {
+                hasBeenCleared = true;
+                if (clearEffect != null)
+                    GameObject.Instantiate(clearEffect, GameManager.player.transform.position, Quaternion.identity);
+
+                if (clearPowerCharges.Length > 0)
+                {
+                    foreach (BatteryCharge charge in clearPowerCharges)
+                    {
+                        charge.target.ReceiveCharge(charge.signal);
+                    }
+                }
+            }
+
+            if (transform.childCount < cachedChildCount)
+            {
+                playerStartedClearing = true;
+            }
+            
+            cachedChildCount = transform.childCount;
         }
     }
 
     public virtual void LateUpdate()
     {
-        if (Application.isEditor && isDirty && transform.childCount == 0)
+        if (isDirty && transform.childCount == 0)
         {
             isDirty = false;
-            Recreate();
+            if (!Application.isPlaying)
+                Recreate();
         }
     }
 

@@ -61,17 +61,12 @@ MonoBehaviour:
   rotRandom: {x: 0, y: 0, z: 0}
   posRandom: {x: 0, y: 0, z: 0}
   idAssigned: 0
+  clearEffect: {fileID: 0}
+  clearPowerCharges: []
   gap: 1
   relative: 1
   closed: 0
   orientToPath: 0
   cachedCount: 23
   points:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}

@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
 
     public static float timeSinceInput = 0f;
 
+    public static int youDidIt = -1;
+
     public static float timeRate = 1f;
 
 

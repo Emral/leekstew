@@ -50,6 +50,11 @@ public class Player : CollidingEntity
     private float lastWalljumpHeight = Mathf.Infinity;
     private Vector3 lastWallNormal = Vector3.zero;
 
+    // Sliding-related
+    public float slidingDelayTime = 2f;
+    private float slidingTimer = 0f;
+    private float slideSpeed = 0f;
+    private Vector3 slideForwardVector;
 
     // Particle effects
     public GameObject hurtParticle;
@@ -89,6 +94,7 @@ public class Player : CollidingEntity
     private float forwardMomentum;
     public Vector3 directionalMomentum;
     private Quaternion targetRotation;
+    private bool walkingUphill;
 
     // Animation-related
     private string animState;
@@ -103,6 +109,7 @@ public class Player : CollidingEntity
     void Start ()
     {
         // Initialize the state lists
+        moveState = MoveState.Airborn;
         damageStates.Add(DamageState.Vulnerable);
         groundedStates.Add(GroundedState.Walking);
         airbornStates.Add(AirbornState.Falling);
@@ -323,17 +330,23 @@ public class Player : CollidingEntity
                     }
 
 
-                    // Enter sliding
-                    if (Vector3.Angle(Vector3.up, groundNormal) > 45)
+                    // Slope and sliding checks
+                    float forwardSlopeAngle = Vector3.Angle(moveDir, groundNormal)-90;
+                    float backSlopeAngle = Vector3.Angle(-moveDir, groundNormal)-90;
+                    float momentumSlopeAngle = Vector3.Angle(directionalMomentum, groundNormal)-90;
+                    float slopeAngle = Vector3.Angle(Vector3.up, groundNormal);
+
+                    walkingUphill = forwardSlopeAngle > backSlopeAngle;
+                    bool slopeTooSteep = (slopeAngle > 45);
+
+                    if (momentumSlopeAngle < 0)
                     {
-                        directionalMomentum += 0.2f * new Vector3(groundNormal.x, 0f, groundNormal.z);
-                        //if (directionalMomentum.magnitude += 0.2f * new Vector3(groundNormal.x, 0f, groundNormal.z);
-                        //groundedStates[0] = GroundedState.Sliding;
+                        //directionalMomentum.y = (1f-groundNormal.y) * -50f;
+                        // * Mathf.Lerp(0f, 1f-groundNormal.y, Mathf.InverseLerp(0f, slopeAngle, momentumSlopeAngle))*20f;
                     }
 
-
                     // Handling for moving over a ledge
-                    if (!controller.isGrounded && groundDistance > 0.5f && groundedCompensation) //&& Mathf.Abs(controller.velocity.y) > 1f)
+                    if (!controller.isGrounded && groundDistance > 1f && groundedCompensation) //&& Mathf.Abs(controller.velocity.y) > 1f)
                     {
                         moveState = MoveState.Airborn;
                         airbornStates[0] = AirbornState.Falling;
@@ -368,12 +381,59 @@ public class Player : CollidingEntity
                             }
 
                             // Reset horizontal momentum to steer vector * run speed
-                            directionalMomentum = new Vector3(0f, directionalMomentum.y, 0f) + moveDir * runSpeed; //Vector3.forward * forwardMomentum;
+                            directionalMomentum = Vector3.up*directionalMomentum.y + moveDir * runSpeed; //Vector3.forward * forwardMomentum;
+
+                            if (slopeTooSteep)
+                            {
+                                if (walkingUphill)
+                                    slidingTimer -= Time.deltaTime;
+                                else
+                                    slidingTimer = 0f;
+
+                                directionalMomentum = directionalMomentum * (slidingDelayTime - slidingTimer);
+                                if (slidingTimer <= 0)
+                                {
+                                    directionalMomentum = Vector3.zero;
+                                    groundedStates[0] = GroundedState.Sliding;
+                                    slideSpeed = 0f;
+                                }
+
+                                //if (directionalMomentum.magnitude += 0.2f * new Vector3(groundNormal.x, 0f, groundNormal.z);
+                                //groundedStates[0] = GroundedState.Sliding;
+                            }
+                            else
+                            {
+                                slidingTimer = slidingDelayTime;
+                            }
                             break;
 
                         // SLIDING
                         case (GroundedState.Sliding):
                             SetAnimState("flipping", 0.25f);
+                            //modelCenter.localRotation = Quaternion.Euler(-90, 0, 0);
+
+                            print("SLIDE SPEED: "+slideSpeed.ToString());
+
+                            if (slopeAngle > 11)
+                            {
+                                slideSpeed = Mathf.Min(slideSpeed + 0.05f, 0.5f);
+                                slideForwardVector = groundNormal;
+                            }
+                            else
+                            {
+                                slideSpeed -= 0.01f;
+
+                                if (Mathf.Abs(slideSpeed) <= 0.02f || moveDir.magnitude > 0.1f)
+                                {
+                                    groundedStates[0] = GroundedState.Walking;
+                                }
+                            }
+                            directionalMomentum.x = slideForwardVector.x * slideSpeed;
+                            directionalMomentum.z = slideForwardVector.z * slideSpeed;
+
+                            Vector3 hDirMom = directionalMomentum*1f;
+                            hDirMom.y = 0f;
+                            targetRotation = Quaternion.LookRotation(hDirMom, Vector3.up);
 
                             break;
                     }
@@ -489,9 +549,10 @@ public class Player : CollidingEntity
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnRate*rotRateMult);
 
             // Commit movement
-            if (groundedCompensation)
+            if (moveState == MoveState.Grounded)
             {
-                controller.SimpleMove(directionalMomentum * 50f);
+                controller.SimpleMove((directionalMomentum) * 50f);
+                ShiftToGround();
             }
             else
                 controller.Move(directionalMomentum);

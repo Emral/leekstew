@@ -1,6 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
+public enum BoolChange {On, Off, Toggle};
+
+
+[System.Serializable]
+public class BatteryCharge
+{
+    public Battery target;
+    public BoolChange signal;
+}
+
+
 public class Battery : MonoBehaviour
 {
     public enum BatteryType
@@ -25,6 +37,16 @@ public class Battery : MonoBehaviour
         {
             active = defaultActive;
         }
+    }
+
+    public void ReceiveCharge(BoolChange signal)
+    {
+        if (signal == BoolChange.On)
+            PowerOn();
+        else if (signal == BoolChange.Off)
+            PowerOff();
+        else
+            TogglePower();
     }
 
     public void PowerOn()
