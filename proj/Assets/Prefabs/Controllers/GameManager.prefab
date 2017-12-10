@@ -222,7 +222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   checkToAddScenesToBuildList: 0
   levels:
-  - key: Scene_Hub1
+  - key: Scene_Hub
     name: Popsicle Garden
     creator: Enjl
     isHub: 1
