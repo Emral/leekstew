@@ -7,6 +7,8 @@ public class ColShift : MonoBehaviour {
     private Material[] m;
     private float t;
 
+    private Color[] c;
+
     public Gradient newColor;
 
     public float length = 1;
@@ -19,6 +21,11 @@ public class ColShift : MonoBehaviour {
         if (shared)
         {
             m = gameObject.GetComponent<MeshRenderer>().sharedMaterials;
+            c = new Color[m.Length];
+            for (int i = 0; i < m.Length; i++)
+            {
+                c[i] = m[i].color;
+            }
         } else
         {
             m = gameObject.GetComponent<MeshRenderer>().materials;
@@ -44,5 +51,16 @@ public class ColShift : MonoBehaviour {
         {
             UpdateColor();
         }
-	}
+    }
+
+    void OnApplicationQuit()
+    {
+        if (shared)
+        {
+            for (int i = 0; i < m.Length; i++)
+            {
+                m[i].color = c[i];
+            }
+        }
+    }
 }
