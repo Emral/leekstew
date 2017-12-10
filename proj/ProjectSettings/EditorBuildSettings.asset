@@ -14,3 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Scene_EnjlTest.unity
     guid: 4e752dbe2d03bf64ebb9c0956ef7e7ec
+  - enabled: 1
+    path: Assets/Scenes/Scene_Hub.unity
+    guid: bb78cd538c3de404484e1beb11e79be5
+  - enabled: 1
+    path: Assets/Scenes/Scene_Sublevel_1.unity
+    guid: 28374237d01db4240917d44ad1421de1
