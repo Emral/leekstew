@@ -10,7 +10,7 @@ public class ArcObjectsEditor : Editor
     {
         ArcObjects obj = (ArcObjects)target;
 
-        if (obj.transform.childCount != obj.cachedCount)
+        if (obj.transform.childCount != obj.cachedCount && obj.updateAutomatically)
             obj.isDirty = true;
 
         if (obj.gap > 0)
@@ -23,12 +23,14 @@ public class ArcObjectsEditor : Editor
             if (!Vector3.Equals(obj.endPoint, newEndPoint))
             {
                 obj.endPoint = newEndPoint;
-                obj.isDirty = true;
+                if (obj.updateAutomatically)
+                    obj.isDirty = true;
             }
             if (!Vector3.Equals(obj.controlPoint, newControlPoint))
             {
                 obj.controlPoint = newControlPoint;
-                obj.isDirty = true;
+                if (obj.updateAutomatically)
+                    obj.isDirty = true;
             }
         }
     }

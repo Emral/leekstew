@@ -10,6 +10,7 @@ public class PathedObjects : ObjectGroup
     public bool relative = true;
     public bool closed = false;
     public bool orientToPath = false;
+    public bool objectsHaveCollision = true;
     [HideInInspector] public int cachedCount = 0;
 
     [ReorderableList] public Vector3[] points;
@@ -45,11 +46,21 @@ public class PathedObjects : ObjectGroup
         {
             Vector3 lookDir = endPt-startPt;
             GameObject lookAtParent = GameObject.Instantiate(new GameObject(), spawned.transform.position, Quaternion.identity, transform);
+            lookAtParent.name = "I Shouldn't Exist, Please Delete Me";
             spawned.transform.parent = lookAtParent.transform;
             lookAtParent.transform.rotation = Quaternion.LookRotation(lookDir);
             spawned.transform.parent = transform;
             spawned.transform.SetAsFirstSibling();
             GameObject.DestroyImmediate(lookAtParent);
+        }
+
+        if (!objectsHaveCollision)
+        {
+            Collider[] colliders = spawned.GetComponentsInChildren<Collider>(true);
+            foreach(Collider collider in colliders)
+            {
+                collider.enabled = false;
+            }
         }
 
         return spawned;

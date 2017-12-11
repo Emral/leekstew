@@ -10,7 +10,6 @@ public class WarpPad : NPC
     public Vector3 destinationOffset;
     public Transform destinationWarpPad;
 
-    public int warpPadID;
     public bool locked;
     public bool unlockDestinationWarpPad = false;
 
@@ -28,6 +27,14 @@ public class WarpPad : NPC
             sameScene = (LevelManager.currentLevel.key == scene || scene == "");
         }
 
+        // Disable talking if locked
+        if (locked)
+        {
+            talkCooldown = 2f;
+            if (SaveManager.CurrentLevelSave.warpPadsActivated.Contains(instanceID))
+                locked = false;
+        }
+
         // Manage dialogue
         if (dialog == null)
             dialog = gameObject.GetComponent<Dialog>();
@@ -38,7 +45,8 @@ public class WarpPad : NPC
 
             if (sameScene)
             {
-                destName = LevelManager.roomNames[room];
+                if (LevelManager.roomNames.Count > room)
+                    destName = LevelManager.roomNames[room];
             }
             else
             {
@@ -79,6 +87,12 @@ public class WarpPad : NPC
             // If warping to a room in the same scene, just move the player, refresh the rooms and fade back in
             if (sameScene)
             {
+                if (destinationWarpPad != null && unlockDestinationWarpPad)
+                {
+                    WarpPad destPadScr = destinationWarpPad.GetComponent<WarpPad>();
+                    SaveManager.CurrentLevelSave.warpPadsActivated.Add(destPadScr.instanceID);
+                }
+
                 GameManager.player.transform.position = LevelManager.warpDestination;
                 LevelManager.ChangeRoom(room);
                 GameManager.player.inputActive = true;

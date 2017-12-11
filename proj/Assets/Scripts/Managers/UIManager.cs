@@ -339,6 +339,11 @@ public class UIManager : MonoBehaviour
         // Loop
         while (true)
         {
+            while (hpBarObj == null)
+            {
+                yield return null;
+            }
+
             hpBarObj.transform.SetParent(canvasObj.transform);
                 
             playerHP = GameManager.player.health;
@@ -507,15 +512,18 @@ public class UIManager : MonoBehaviour
     }
     public IEnumerator FadeCanvasGroup(CanvasGroup group, float newAlpha, float fadeTime)
     {
-        float startAmount = group.alpha;
-        float currentTime = 0;
-        while (currentTime < fadeTime)
+        if (group != null)
         {
-            group.alpha = Mathf.Lerp(startAmount, newAlpha, currentTime / fadeTime);
-            currentTime += Time.deltaTime;
-            yield return null;
+            float startAmount = group.alpha;
+            float currentTime = 0;
+            while (currentTime < fadeTime)
+            {
+                group.alpha = Mathf.Lerp(startAmount, newAlpha, currentTime / fadeTime);
+                currentTime += Time.deltaTime;
+                yield return null;
+            }
+            group.alpha = newAlpha;
         }
-        group.alpha = newAlpha;
     }
     #endregion
 }

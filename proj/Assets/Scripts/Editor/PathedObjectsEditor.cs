@@ -10,7 +10,7 @@ public class PathedObjectsEditor : Editor
     {
         PathedObjects obj = (PathedObjects)target;
 
-        if (obj.transform.childCount != obj.cachedCount)
+        if (obj.transform.childCount != obj.cachedCount && obj.updateAutomatically)
             obj.isDirty = true;
 
         if (obj.points.Length > 0 && obj.gap > 0)
@@ -23,7 +23,8 @@ public class PathedObjectsEditor : Editor
                 if (!Vector3.Equals(obj.points[i], newPoint))
                 {
                     obj.points[i] = newPoint;
-                    obj.isDirty = true;
+                    if (obj.updateAutomatically)
+                        obj.isDirty = true;
                 }
             }
         }
