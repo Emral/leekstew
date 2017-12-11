@@ -358,7 +358,7 @@ public class Player : CollidingEntity
                     }
 
                     // Jumping
-                    if (GameManager.inputPress["Jump"])
+                    if (GameManager.inputPress["Jump"] && !GameManager.cutsceneMode)
                         PerformGenericJump(JumpType.Jump);
 
                     // Substate behavior
@@ -539,14 +539,14 @@ public class Player : CollidingEntity
 
                             // Walljumping
                             canDoubleJump = false;
-                            if (GameManager.inputPress["Jump"])
+                            if (GameManager.inputPress["Jump"] && !GameManager.cutsceneMode)
                                 PerformWallJump();
                             break;
                     }
 
 
                     // Double jump yo
-                    if (GameManager.inputPress["Jump"] && canDoubleJump)
+                    if (GameManager.inputPress["Jump"] && canDoubleJump && !GameManager.cutsceneMode)
                         PerformDoubleJump();
 
                     break;

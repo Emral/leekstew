@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ObjectGroup : PlacementTool
 {
+    public bool updateAutomatically = false;
     public bool isDirty = false;
     public int firstInstanceID;
     public Vector3 rotOffset;
@@ -29,7 +30,7 @@ public class ObjectGroup : PlacementTool
 
     public virtual void OnValidate()
     {
-        if (Application.isEditor && !Application.isPlaying)
+        if (Application.isEditor && !Application.isPlaying && updateAutomatically)
             isDirty = true;
     }
 
