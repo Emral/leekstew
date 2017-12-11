@@ -53,7 +53,7 @@ public class ColShift : MonoBehaviour {
         }
     }
 
-    void OnApplicationQuit()
+    void OnDisable()
     {
         if (shared)
         {
