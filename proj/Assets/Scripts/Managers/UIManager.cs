@@ -28,6 +28,7 @@ public class UIManager : MonoBehaviour
     public static float pickupFadeCounter = 2f;
     public static GameObject pickupBarObj;
     public static CanvasGroup pickupBarGroup;
+    public static int currentTeethShown;
 
     public static float hpFadeCounter = 2f;
     public static GameObject hpBarObj;
@@ -37,11 +38,15 @@ public class UIManager : MonoBehaviour
     public static GameObject musicCreditsObj;
     public static CanvasGroup musicCreditsGroup;
 
+    public static GameObject saveTextObj;
+    public static CanvasGroup saveTextGroup;
+
     public static GameObject canvasObj;
     public static GameObject pauseMenuObj;
     public static GameObject optionsMenuObj;
     public static GameObject exitMenuObj;
     public static GameObject currentMenuObj;
+
 
     public static UnityEngine.EventSystems.StandaloneInputModule inputModule;
     public static UnityEngine.EventSystems.EventSystem eventSystem;
@@ -57,6 +62,7 @@ public class UIManager : MonoBehaviour
     public static void InitUI()
     {
         instance.StartCoroutine(instance.UpdateHPBar());
+        instance.StartCoroutine(instance.UpdateToothMonitoring());
     }
     void Update()
     {
@@ -89,8 +95,8 @@ public class UIManager : MonoBehaviour
         {
             Text teethCounter = GameObject.Find("TeethCounter").GetComponent("Text") as Text;
             Text leekCounter = GameObject.Find("LeekCounter").GetComponent("Text") as Text;
-            teethCounter.text = GameManager.teethCollected.ToString();
-            leekCounter.text = GameManager.leeksCollected.ToString();
+            teethCounter.text = currentTeethShown.ToString();
+            leekCounter.text = SaveManager.currentSave.TotalLeeks.ToString();
 
             bool shouldFade = (GameManager.timeSinceInput <= 1f || pickupFadeCounter < 7f);
             pickupFadeCounter += (shouldFade ? 1 : -1) * Time.deltaTime;
@@ -445,6 +451,45 @@ public class UIManager : MonoBehaviour
         }
 
     }
+
+    public IEnumerator UpdateToothMonitoring()
+    {
+        while (true)
+        {
+            int toothGap = SaveManager.currentSave.NetTeeth - currentTeethShown;
+            if (toothGap != 0)
+            {
+                int startValue = currentTeethShown;
+                float goalTime = 1f;
+                float currentTime = 0f;
+                while (currentTime < goalTime)
+                {
+                    int endValue = SaveManager.currentSave.NetTeeth;
+                    currentTeethShown = Mathf.RoundToInt(Mathf.Lerp(startValue, endValue, currentTime/goalTime));
+                    pickupFadeCounter = 0f;
+                    currentTime += Time.deltaTime;
+                    yield return null;
+                }
+                currentTeethShown = SaveManager.currentSave.NetTeeth;
+            }
+            yield return null;
+        }
+    }
+
+    public IEnumerator ShowSaving()
+    {
+        Text saveText = saveTextObj.GetComponent<Text>();
+        saveText.text = "Saving...";
+        yield return FadeCanvasGroup(saveTextGroup, 1, 0.5f);
+    }
+    public IEnumerator ShowSaveFinished()
+    {
+        Text saveText = saveTextObj.GetComponent<Text>();
+        saveText.text = "Game Saved!";
+        yield return new WaitForSeconds(1f);
+        yield return FadeCanvasGroup(saveTextGroup, 1, 1f);
+    }
+
     public IEnumerator ScreenFadeChange(float goal, float goalTime, float delay = 0f)
     {
         if (delay != 0f)

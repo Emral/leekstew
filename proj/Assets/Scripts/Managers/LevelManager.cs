@@ -17,6 +17,7 @@ public class LevelData
     public bool isIncluded = true;
     public Texture2D thumbnail;
     public AudioClip music;
+    [HideInInspector] public int index;
 }
 
 
@@ -34,18 +35,18 @@ public class LevelManager : MonoBehaviour
 
     public static int currentCheckpoint = -1;
     public static List<int> checkpointsActive = new List<int>();
+    public static List<int> warpsActive = new List<int>();
 
     public static GameObject[] roomObjects;
     public static Dictionary<int, string> roomNames;
     public static Dictionary<int, AudioClip> roomMusic;
 
-
     // This feature doesn't work yet 
     [HideInInspector] public bool checkToAddScenesToBuildList = false;
 
-
     [SerializeField] [ReorderableList] public List<LevelData> levels;
     private static Dictionary<string, LevelData> levelDict;
+
 
     #region monobehavior events
     private void Awake()
@@ -54,8 +55,10 @@ public class LevelManager : MonoBehaviour
             instance = this;
 
         levelDict = new Dictionary<string, LevelData>();
-        foreach (LevelData level in levels)
+        for (int i = 0; i < levels.Count; i++)
         {
+            LevelData level = levels[i];
+            level.index = i;
             levelDict.Add(level.key, level);
         }
     }

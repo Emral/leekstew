@@ -21,7 +21,6 @@ public class Player : CollidingEntity
     public float jumpStrength = 18f;
     public int jumpLimit = 2;
     public float jumpDecayRate = 0.75f;
-    public float gravityRate = 0.01f;
 
     // Sound effects
     public AudioClip[] jumpSounds;
@@ -311,6 +310,8 @@ public class Player : CollidingEntity
             targetRotation = moveDir.magnitude > 0 ? Quaternion.LookRotation(moveDir, Vector3.up) : transform.rotation;
             float rotRateMult = 1f;
 
+            // Should shift down flag
+            bool shouldShiftDown = false;
 
             // STATUS EX MACHINA
             switch (moveState)
@@ -338,6 +339,7 @@ public class Player : CollidingEntity
 
                     walkingUphill = forwardSlopeAngle > backSlopeAngle;
                     bool slopeTooSteep = (slopeAngle > 45);
+                    shouldShiftDown = !walkingUphill;
 
                     if (momentumSlopeAngle < 0)
                     {
@@ -352,6 +354,7 @@ public class Player : CollidingEntity
                         airbornStates[0] = AirbornState.Falling;
                         groundedCompensation = false;
                         jumpLenienceTimer = 20;
+                        print("LEAVING THE GROUND YO");
                     }
 
                     // Jumping
@@ -380,6 +383,10 @@ public class Player : CollidingEntity
                                 SetAnimState("standing", 0.25f);
                             }
 
+                            // Reset model center offsets
+                            modelCenter.localRotation = Quaternion.identity;
+                            modelCenter.localPosition = Vector3.up * 0.75f;
+
                             // Reset horizontal momentum to steer vector * run speed
                             directionalMomentum = Vector3.up*directionalMomentum.y + moveDir * runSpeed; //Vector3.forward * forwardMomentum;
 
@@ -390,11 +397,15 @@ public class Player : CollidingEntity
                                 else
                                     slidingTimer = 0f;
 
+                                float tempYVal = directionalMomentum.y;
+
                                 directionalMomentum = directionalMomentum * (slidingDelayTime - slidingTimer);
+                                directionalMomentum.y = tempYVal;
                                 if (slidingTimer <= 0)
                                 {
                                     directionalMomentum = Vector3.zero;
                                     groundedStates[0] = GroundedState.Sliding;
+                                    transform.rotation = Quaternion.LookRotation(groundNormal, Vector3.up);
                                     slideSpeed = 0f;
                                 }
 
@@ -410,9 +421,10 @@ public class Player : CollidingEntity
                         // SLIDING
                         case (GroundedState.Sliding):
                             SetAnimState("flipping", 0.25f);
-                            //modelCenter.localRotation = Quaternion.Euler(-90, 0, 0);
+                            modelCenter.localRotation = Quaternion.Euler(-45, 0, 0);
+                            modelCenter.localPosition = Vector3.up * 0.5f;
 
-                            print("SLIDE SPEED: "+slideSpeed.ToString());
+                            //print("SLIDE SPEED: "+slideSpeed.ToString());
 
                             if (slopeAngle > 11)
                             {
@@ -516,10 +528,11 @@ public class Player : CollidingEntity
 
                             // Restrict momentum based on time spent sliding
                             directionalMomentum.x = 0;
-                            directionalMomentum.y = Mathf.Max(Mathf.Lerp(0f, -0.3f, Mathf.InverseLerp(0f, 1f, wallSlidingTime)), directionalMomentum.y);
                             directionalMomentum.z = 0;
+                            directionalMomentum.y = Mathf.Max(Mathf.Lerp(0f, -0.3f, Mathf.InverseLerp(0f, 1f, wallSlidingTime)), directionalMomentum.y);
 
                             // Sliding particles
+                            wallPoint.y = transform.position.y;
                             wallSlidingCounter = (wallSlidingCounter + 1) % 6;
                             if (wallSlidingCounter == 0)
                                 GameObject.Instantiate(wallSlideParticle, wallPoint, Quaternion.identity);
@@ -552,7 +565,8 @@ public class Player : CollidingEntity
             if (moveState == MoveState.Grounded)
             {
                 controller.SimpleMove((directionalMomentum) * 50f);
-                ShiftToGround();
+                if (shouldShiftDown)
+                    ShiftToGround();
             }
             else
                 controller.Move(directionalMomentum);
@@ -597,6 +611,7 @@ public class Player : CollidingEntity
         {
             wallNormal = normal;
             wallPoint = point;
+            print("wall point updated");
 
             if (!groundedCompensation && groundDistance > 0.2f && directionalMomentum.y < 0f)
             {
@@ -628,7 +643,7 @@ public class Player : CollidingEntity
         Transform modelCenter = transform.Find("modelCentered");
         hurtPause = true;
 
-        
+       
         // Black background if the player dies
         if (health.currentHp <= 0)
         {

@@ -22,9 +22,14 @@ public class Collectible : MonoBehaviour
 
     void Start ()
     {
-        if (!respawn && GameManager.itemsCollected[instanceID] == true)
+        if (!respawn && !RespawnConditions())
             GameObject.Destroy(gameObject);
-	}
+    }
+
+    public virtual bool RespawnConditions()
+    {
+        return (GameManager.itemsCollected[instanceID] == false);
+    }
 
     public virtual IEnumerator OnCollectStart()
     {

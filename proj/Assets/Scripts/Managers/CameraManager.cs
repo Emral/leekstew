@@ -1,25 +1,57 @@
 ﻿using System.Collections;
+using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
+
+
+[System.Flags] public enum CameraProperties
+{
+    None     = 0,
+    Yaw      = 1,
+    Pitch    = 2,
+    XPan     = 4,
+    YPan     = 8,
+    Zoom     = 16,
+    Target   = 32,
+    Position = 64,
+    Region   = 128
+}
 
 [System.Serializable]
 public class CameraBehavior
 {
-    public bool fixedYaw;
-    public Vector3 newYaw;
-    public bool fixedPitch;
-    public Vector3 newPitch;
-    public bool changeTarget;
-    public Transform newTarget;
-    public bool limitedRegion;
+    [EnumFlag] public CameraProperties changedProperties;
+    public float yaw;
+    public float pitch;
+    public float panX;
+    public float panY;
+    public float zoom;
+    public Vector3 position;
+    public Transform target;
     public Vector3 regionMin;
     public Vector3 regionMax;
+
+    public override string ToString()
+    {
+        string compiled = "(";
+
+        FieldInfo[] properties = this.GetType().GetFields();
+        foreach (FieldInfo mI in properties)
+        {
+            compiled = compiled + mI.Name +": "+ mI.GetValue(this).ToString() + ", ";
+        }
+        compiled = compiled + ")";
+
+        return compiled;
+    }
 }
 
 
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager instance;
+    public static CameraBehavior currentBehavior;
+    public static List<CameraBehavior> behaviorHistory;
 
     public static float targetZoom = 1f;
     public static float currentZoom = 1f;
@@ -31,10 +63,17 @@ public class CameraManager : MonoBehaviour
     [HideInInspector] public static Shake shake;
     [HideInInspector] public static Skybox skybox;
 
+    [HideInInspector] public static float constantShake = 0f;
+
+    private bool shifting = false;
+
     private bool playerChoiceLock = false;
 
     public bool getBehindPlayer = false;
 
+
+
+    private CameraBehavior defaultBehavior;
 
     public void UpdateRefs()
     {
@@ -43,6 +82,19 @@ public class CameraManager : MonoBehaviour
         camera = dolly.Find("Main Camera");
         shake = dolly.gameObject.GetComponent<Shake>();
         skybox = Camera.main.gameObject.GetComponent<Skybox>();
+
+        if (defaultBehavior != null)
+        {
+            defaultBehavior.zoom = camera.localPosition.z;
+            defaultBehavior.pitch = dolly.localRotation.eulerAngles.x;
+            defaultBehavior.yaw = dolly.localRotation.eulerAngles.y;
+        }
+
+        if (behaviorHistory != null)
+        {
+            if (behaviorHistory.Count > 10)
+                behaviorHistory.RemoveAt(10);
+        }
     }
 
     private void Awake()
@@ -52,7 +104,33 @@ public class CameraManager : MonoBehaviour
 
     void Start()
     {
+        behaviorHistory = new List<CameraBehavior>();
         UpdateRefs();
+        defaultBehavior = CaptureCurrentShot();
+        defaultBehavior.changedProperties = (CameraProperties)~0;
+        defaultBehavior.regionMin = Vector3.one * -9999f;
+        defaultBehavior.regionMax = Vector3.one * 9999f;
+    }
+
+    public static CameraBehavior CaptureCurrentShot()
+    {
+        CameraBehavior newBehavior = new CameraBehavior();
+        newBehavior.changedProperties = (CameraProperties)~0;
+
+        //print("INITIAL PROPS: " + System.Convert.ToString((int)newBehavior.changedProperties, 2));
+
+        FlagsHelper.Unset(ref newBehavior.changedProperties, CameraProperties.Region);
+
+        newBehavior.panX = camera.localPosition.x;
+        newBehavior.panY = camera.localPosition.y;
+        newBehavior.zoom = camera.localPosition.z;
+        newBehavior.pitch = dolly.localRotation.eulerAngles.x;
+        newBehavior.yaw = dolly.localRotation.eulerAngles.y;
+        newBehavior.position = instance.transform.position;
+        newBehavior.target = instance.target;
+
+       // print("CHANGED PROPS: " + System.Convert.ToString((int)newBehavior.changedProperties,2));
+        return newBehavior;
     }
 
     // Update is called once per frame
@@ -60,184 +138,286 @@ public class CameraManager : MonoBehaviour
     {
         UpdateRefs();
 
+        if (constantShake >= 0f)
+            shake.effectAmount = constantShake;
+
+        dolly.localPosition = (shake.shakeOffset * OptionsManager.cameraShakeStrength);
+
+
         if (target != null && !GameManager.isGamePaused)
         {
-            transform.position = target.position;  //transform.position = Vector3.Lerp(transform.position, target.position, 0.25f);
-
             float moveX = 0;
             float moveY = 0;
 
-            if (GameManager.player != null)
+            if (!shifting)
             {
-                if (target == GameManager.player.transform)
+                if (currentBehavior != null)
                 {
-                    // Player camera control stick
-                    moveX = GameManager.inputVals["Cam X"] * OptionsManager.cameraSpeedX * 0.5f * (OptionsManager.cameraInvertedX ? -1 : 1);
-                    moveY = GameManager.inputVals["Cam Y"] * OptionsManager.cameraSpeedY * 0.33f * (OptionsManager.cameraInvertedY ? 1 : -1);
+                    ApplyCurrentBehavior();
+                }
 
-                    Vector2 vertLimits = new Vector2(-22f, 80f);
+                if (target != null)
+                    transform.position = target.position;  //transform.position = Vector3.Lerp(transform.position, target.position, 0.25f);
 
-                    float currentVal = dolly.rotation.eulerAngles.x;
-                    if (currentVal > 180)
-                        currentVal -= 360;
-
-                    float vertSpan = vertLimits.y - vertLimits.x;
-                    float vertMid = (vertLimits.x + vertLimits.y) * 0.5f;
-                    float vertDistAbs = Mathf.Abs(currentVal - vertMid);
-                    float vertMidDistMult = 1f - Mathf.InverseLerp(0f, vertSpan * 0.5f, vertDistAbs);
-
-                    float vertAdd = moveY;
-                    if ((moveY > 0 && currentVal > vertMid) || (moveY < 0 && currentVal < vertMid))
-                        vertAdd *= vertMidDistMult;
-
-                    float newX = dolly.rotation.eulerAngles.x + vertAdd;
-                    if (newX > 180)
-                        newX = Mathf.Max(newX, 360f + vertLimits.x);
-                    else
-                        newX = Mathf.Clamp(newX, vertLimits.x, vertLimits.y);
-
-
-
-                    Quaternion rotation = Quaternion.Euler(newX, dolly.rotation.eulerAngles.y + moveX, 0f);
-                    dolly.rotation = rotation;
-
-                    float angleForLerp = dolly.rotation.eulerAngles.x;
-                    while (angleForLerp > 180)
+                if (GameManager.player != null)
+                {
+                    if (target == GameManager.player.transform && currentBehavior == null)
                     {
-                        angleForLerp -= 360;
-                    }
+                        // Player camera control stick
+                        moveX = GameManager.inputVals["Cam X"] * OptionsManager.cameraSpeedX * 0.5f * (OptionsManager.cameraInvertedX ? -1 : 1) * (GameManager.cutsceneMode ? 0 : 1);
+                        moveY = GameManager.inputVals["Cam Y"] * OptionsManager.cameraSpeedY * 0.33f * (OptionsManager.cameraInvertedY ? 1 : -1) * (GameManager.cutsceneMode ? 0 : 1);
 
-                    float distanceInvLerp = Mathf.InverseLerp(-22f, 80f, angleForLerp);
-                    float distanceAmount = Mathf.Lerp(-2.5f, -25f, distanceInvLerp);
-                    float fovAmount = Mathf.Lerp(70f, 60f, distanceInvLerp);
-                    Vector3 newLocalPos = new Vector3(0, 0, distanceAmount);
-                    camera.localPosition = newLocalPos;
-                    Camera.main.fieldOfView = fovAmount;
+                        Vector2 vertLimits = new Vector2(-22f, 80f);
+
+                        float currentVal = dolly.rotation.eulerAngles.x;
+                        if (currentVal > 180)
+                            currentVal -= 360;
+
+                        float vertSpan = vertLimits.y - vertLimits.x;
+                        float vertMid = (vertLimits.x + vertLimits.y) * 0.5f;
+                        float vertDistAbs = Mathf.Abs(currentVal - vertMid);
+                        float vertMidDistMult = 1f - Mathf.InverseLerp(0f, vertSpan * 0.5f, vertDistAbs);
+
+                        float vertAdd = moveY;
+                        if ((moveY > 0 && currentVal > vertMid) || (moveY < 0 && currentVal < vertMid))
+                            vertAdd *= vertMidDistMult;
+
+                        float newX = dolly.rotation.eulerAngles.x + vertAdd;
+                        if (newX > 180)
+                            newX = Mathf.Max(newX, 360f + vertLimits.x);
+                        else
+                            newX = Mathf.Clamp(newX, vertLimits.x, vertLimits.y);
 
 
-                    Vector3 newPos = new Vector3(0, Mathf.Lerp(2f, 0f, distanceInvLerp), 0);
-                    dolly.localPosition = newPos + (shake.shakeOffset*OptionsManager.cameraShakeStrength);
 
+                        Quaternion rotation = Quaternion.Euler(newX, dolly.rotation.eulerAngles.y + moveX, 0f);
+                        dolly.rotation = rotation;
 
-                    // Camera snap
-                    if (GameManager.inputVals["Cam Focus"] > 0.5)
-                    {
-                        dolly.rotation = Quaternion.Lerp(dolly.rotation, GameManager.player.transform.rotation, 0.03f);
-                    }
-
-
-                    // Player camera automation
-                    float rotRate = (GameManager.player.GetGrounded()) ? 0.01f : 0.00625f;
-                    Vector3 playerRotEuler = GameManager.player.transform.rotation.eulerAngles;
-                    Vector3 dollyEuler = dolly.rotation.eulerAngles;
-
-                    // Avoidance
-                    /*
-                    RaycastHit hit;
-                    LayerMask avoidMask = 1 << 9;
-
-                    if (Physics.Linecast(camera.position, GameManager.player.transform.position, out hit, avoidMask) && moveX == 0)
-                    {
-                        Debug.DrawLine(camera.position, GameManager.player.transform.position, Color.red);
-
-                        Vector3 toPlayerDir = GameManager.player.transform.position - camera.position;
-                        float toPlayerDirY = toPlayerDir.y;
-                        toPlayerDir.y = 0;
-                        float toPlayerDist = Vector3.Distance(GameManager.player.transform.position, camera.position);
-
-                        for (int i = 0; i < 40; i++)
+                        float angleForLerp = dolly.rotation.eulerAngles.x;
+                        while (angleForLerp > 180)
                         {
-                            Vector3 lWhisker = -1 * (Quaternion.Euler(0, 5 * i, 0) * toPlayerDir);
-                            lWhisker.y = -toPlayerDirY;
-                            Vector3 rWhisker = -1 * (Quaternion.Euler(0, -5 * i, 0) * toPlayerDir);
-                            rWhisker.y = -toPlayerDirY;
+                            angleForLerp -= 360;
+                        }
 
-                            Vector3 lWhiskerEnd = GameManager.player.transform.position + lWhisker.normalized * toPlayerDist;
-                            Vector3 rWhiskerEnd = GameManager.player.transform.position + rWhisker.normalized * toPlayerDist;
+                        float distanceInvLerp = Mathf.InverseLerp(-22f, 80f, angleForLerp);
+                        float distanceAmount = Mathf.Lerp(-2.5f, -25f, distanceInvLerp);
+                        float fovAmount = Mathf.Lerp(70f, 60f, distanceInvLerp);
+                        Vector3 newLocalPos = new Vector3(0, 0, distanceAmount);
+                        camera.localPosition = newLocalPos;
+                        Camera.main.fieldOfView = fovAmount;
 
-                            RaycastHit lAvoidHit;
-                            RaycastHit rAvoidHit;
-                            bool lHit = Physics.Linecast(GameManager.player.transform.position, lWhiskerEnd, out lAvoidHit, avoidMask);
-                            bool rHit = Physics.Linecast(GameManager.player.transform.position, rWhiskerEnd, out rAvoidHit, avoidMask);
 
-                            if (lHit != rHit)
+                        Vector3 newPos = new Vector3(0, Mathf.Lerp(2f, 0f, distanceInvLerp), 0);
+                        dolly.localPosition = newPos + (shake.shakeOffset * OptionsManager.cameraShakeStrength);
+
+
+                        // Camera snap
+                        if (GameManager.inputVals["Cam Focus"] > 0.5)
+                        {
+                            dolly.rotation = Quaternion.Lerp(dolly.rotation, GameManager.player.transform.rotation, 0.03f);
+                        }
+
+
+                        // Player camera automation
+                        float rotRate = (GameManager.player.GetGrounded()) ? 0.01f : 0.00625f;
+                        Vector3 playerRotEuler = GameManager.player.transform.rotation.eulerAngles;
+                        Vector3 dollyEuler = dolly.rotation.eulerAngles;
+
+                        // Avoidance
+                        /*
+                        RaycastHit hit;
+                        LayerMask avoidMask = 1 << 9;
+
+                        if (Physics.Linecast(camera.position, GameManager.player.transform.position, out hit, avoidMask) && moveX == 0)
+                        {
+                            Debug.DrawLine(camera.position, GameManager.player.transform.position, Color.red);
+
+                            Vector3 toPlayerDir = GameManager.player.transform.position - camera.position;
+                            float toPlayerDirY = toPlayerDir.y;
+                            toPlayerDir.y = 0;
+                            float toPlayerDist = Vector3.Distance(GameManager.player.transform.position, camera.position);
+
+                            for (int i = 0; i < 40; i++)
                             {
-                                if (lHit)
+                                Vector3 lWhisker = -1 * (Quaternion.Euler(0, 5 * i, 0) * toPlayerDir);
+                                lWhisker.y = -toPlayerDirY;
+                                Vector3 rWhisker = -1 * (Quaternion.Euler(0, -5 * i, 0) * toPlayerDir);
+                                rWhisker.y = -toPlayerDirY;
+
+                                Vector3 lWhiskerEnd = GameManager.player.transform.position + lWhisker.normalized * toPlayerDist;
+                                Vector3 rWhiskerEnd = GameManager.player.transform.position + rWhisker.normalized * toPlayerDist;
+
+                                RaycastHit lAvoidHit;
+                                RaycastHit rAvoidHit;
+                                bool lHit = Physics.Linecast(GameManager.player.transform.position, lWhiskerEnd, out lAvoidHit, avoidMask);
+                                bool rHit = Physics.Linecast(GameManager.player.transform.position, rWhiskerEnd, out rAvoidHit, avoidMask);
+
+                                if (lHit != rHit)
                                 {
-                                    print("Avoiding to the right");
-                                    Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.red);
-                                    Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.yellow);
-                                    dolly.rotation = Quaternion.RotateTowards(dolly.rotation, Quaternion.Euler(dolly.rotation.x, dolly.rotation.y-5*i, dolly.rotation.z), 2);
-                                    break;
+                                    if (lHit)
+                                    {
+                                        print("Avoiding to the right");
+                                        Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.red);
+                                        Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.yellow);
+                                        dolly.rotation = Quaternion.RotateTowards(dolly.rotation, Quaternion.Euler(dolly.rotation.x, dolly.rotation.y-5*i, dolly.rotation.z), 2);
+                                        break;
+                                    }
+                                    else if (rHit)
+                                    {
+                                        print("Avoiding to the left");
+                                        Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.yellow);
+                                        Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.red);
+                                        dolly.rotation = Quaternion.RotateTowards(dolly.rotation, Quaternion.Euler(dolly.rotation.x, dolly.rotation.y+5*i, dolly.rotation.z), 2);
+                                        break;
+                                    }
+
                                 }
-                                else if (rHit)
+                                else if (!lHit)
                                 {
-                                    print("Avoiding to the left");
+                                    print("Random avoiding");
                                     Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.yellow);
-                                    Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.red);
-                                    dolly.rotation = Quaternion.RotateTowards(dolly.rotation, Quaternion.Euler(dolly.rotation.x, dolly.rotation.y+5*i, dolly.rotation.z), 2);
+                                    Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.yellow);
+                                    //dolly.rotation = Quaternion.RotateTowards(dolly.rotation, Quaternion.Euler(dolly.rotation.x, dolly.rotation.y-5*i, dolly.rotation.z), 2);
                                     break;
                                 }
-
-                            }
-                            else if (!lHit)
-                            {
-                                print("Random avoiding");
-                                Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.yellow);
-                                Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.yellow);
-                                //dolly.rotation = Quaternion.RotateTowards(dolly.rotation, Quaternion.Euler(dolly.rotation.x, dolly.rotation.y-5*i, dolly.rotation.z), 2);
-                                break;
-                            }
-                            else
-                            {
-                                Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.red);
-                                Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.red);
+                                else
+                                {
+                                    Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.red);
+                                    Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.red);
+                                }
                             }
                         }
+                        else
+                        {
+                            Debug.DrawLine(camera.position, GameManager.player.transform.position, Color.yellow);
+                        }
+                        */
+
+                        // Look down when falling
+                        if (GameManager.player.groundDistance > 3)
+                        {
+                            playerRotEuler.x += 55;
+                        }
+                        if (GameManager.player.groundDistance > 5)
+                        {
+                            playerRotEuler.x += 22;
+                        }
+
+                        playerRotEuler.y = (playerRotEuler.y) % 360;
+
+
+                        // If the player moves the camera at a certain height, keep it there until it gets lower again
+                        if (dollyEuler.x < 33 && moveX == 0 && moveY == 0)
+                            playerChoiceLock = false;
+
+                        if (dollyEuler.x > 33 && (moveX != 0 || moveY != 0))
+                        {
+                            playerChoiceLock = true;
+                        }
+
+                        if (playerChoiceLock)
+                            playerRotEuler.x = dollyEuler.x;
+
+
+                        // Rotate when moving
+                        CharacterController playercc = GameManager.player.GetCharacterController();
+                        if (playercc.velocity.magnitude > 0 && moveX == 0 && moveY == 0 && Quaternion.Angle(Quaternion.Euler(0f, playerRotEuler.y, 0f), dolly.rotation) < 120f)
+                        {
+                            dolly.rotation = Quaternion.Lerp(dolly.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, playerRotEuler.z), rotRate);
+                        }
+
+                        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, -playerRotEuler.z), 0.005f);
                     }
-                    else
-                    {
-                        Debug.DrawLine(camera.position, GameManager.player.transform.position, Color.yellow);
-                    }
-                    */
-
-                    // Look down when falling
-                    if (GameManager.player.groundDistance > 3)
-                    {
-                        playerRotEuler.x += 55;
-                    }
-                    if (GameManager.player.groundDistance > 5)
-                    {
-                        playerRotEuler.x += 22;
-                    }
-
-                    playerRotEuler.y = (playerRotEuler.y) % 360;
-
-
-                    // If the player moves the camera at a certain height, keep it there until it gets lower again
-                    if (dollyEuler.x < 33 && moveX == 0 && moveY == 0)
-                        playerChoiceLock = false;
-
-                    if (dollyEuler.x > 33 && (moveX != 0 || moveY != 0))
-                    {
-                        playerChoiceLock = true;
-                    }
-
-                    if (playerChoiceLock)
-                        playerRotEuler.x = dollyEuler.x;
-
-
-                    // Rotate when moving
-                    CharacterController playercc = GameManager.player.GetCharacterController();
-                    if (playercc.velocity.magnitude > 0 && moveX == 0 && moveY == 0 && Quaternion.Angle(Quaternion.Euler(0f, playerRotEuler.y, 0f), dolly.rotation) < 120f)
-                    {
-                        dolly.rotation = Quaternion.Lerp(dolly.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, playerRotEuler.z), rotRate);
-                    }
-
-                    //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, -playerRotEuler.z), 0.005f);
                 }
             }
         }
+    }
+
+
+    public static void ApplyCurrentBehavior()
+    {
+        print("APPLYING CAMERA BEHAVIOR");
+
+        Vector3 oldPos = instance.transform.position;
+        Quaternion oldAngle = dolly.rotation;
+        Vector3 oldOffset = camera.localPosition;
+
+        CameraProperties chProps = currentBehavior.changedProperties;
+
+        bool targetChanged = FlagsHelper.IsSet(chProps, CameraProperties.Target);
+        bool positionChanged = FlagsHelper.IsSet(chProps, CameraProperties.Position);
+        bool pitchChanged = FlagsHelper.IsSet(chProps, CameraProperties.Pitch);
+        bool yawChanged = FlagsHelper.IsSet(chProps, CameraProperties.Yaw);
+        bool xPanChanged = FlagsHelper.IsSet(chProps, CameraProperties.XPan);
+        bool yPanChanged = FlagsHelper.IsSet(chProps, CameraProperties.YPan);
+        bool zoomChanged = FlagsHelper.IsSet(chProps, CameraProperties.Zoom);
+        bool regionChanged = FlagsHelper.IsSet(chProps, CameraProperties.Region);
+
+
+        // Position
+        Vector3 newPos = oldPos + Vector3.zero;
+
+        if (targetChanged)
+        {
+            newPos = currentBehavior.target.position;
+        }
+        else if (positionChanged)
+        {
+            newPos = currentBehavior.position;
+        }
+
+        if (regionChanged)
+        {
+            newPos = new Vector3(Mathf.Clamp(newPos.x, currentBehavior.regionMin.x, currentBehavior.regionMax.x),
+                                 Mathf.Clamp(newPos.y, currentBehavior.regionMin.y, currentBehavior.regionMax.y),
+                                 Mathf.Clamp(newPos.z, currentBehavior.regionMin.z, currentBehavior.regionMax.z));
+        }
+
+
+        // Orbit angle
+        Quaternion newAngle = oldAngle;
+
+        if (yawChanged || pitchChanged)
+        {
+            Vector3 newAngleEuler = oldAngle.eulerAngles;
+            if (yawChanged)
+                newAngleEuler.y = currentBehavior.yaw;
+            if (pitchChanged)
+                newAngleEuler.x = currentBehavior.pitch;
+
+            newAngle = Quaternion.Euler(newAngleEuler);
+        }
+
+        // Panning and zoom
+        Vector3 newOffset = oldOffset + Vector3.zero;
+        if (xPanChanged)
+        {
+            newOffset.x = currentBehavior.panX;
+        }
+        if (yPanChanged)
+        {
+            newOffset.y = currentBehavior.panY;
+        }
+        if (zoomChanged)
+        {
+            newOffset.z = currentBehavior.zoom;
+        }
+
+        // Assign
+        instance.transform.position = newPos;
+        dolly.rotation = newAngle;
+        camera.localPosition = newOffset;
+    }
+
+
+
+    public static void DoShiftToNewShot(CameraBehavior newBehavior, float goalTime = 1f)
+    {
+        instance.StartCoroutine(instance.ShiftToNewShot(newBehavior, goalTime));
+    }
+    public static void DoGradualReset(float goalTime = 1f)
+    {
+        instance.StartCoroutine(instance.GraduallyResetShot(goalTime));
     }
 
     public IEnumerator DelayedShake(float strength)
@@ -248,5 +428,131 @@ public class CameraManager : MonoBehaviour
         }
 
         shake.effectAmount = strength;
+    }
+
+    public IEnumerator ShiftToNewShot(CameraBehavior newBehavior, float goalTime = 1f)
+    {
+        Vector3 oldPos = transform.position;
+        Quaternion oldAngle = dolly.rotation;
+        Vector3 oldOffset = camera.localPosition;
+
+
+        bool targetChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Target);
+        bool positionChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Position);
+        bool pitchChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Pitch);
+        bool yawChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Yaw);
+        bool xPanChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.XPan);
+        bool yPanChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.YPan);
+        bool zoomChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Zoom);
+        bool regionChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Region);
+
+        /*
+        if (currentBehavior != null)
+            print("SHIFTING TO " + newBehavior.ToString()+" FROM "+currentBehavior.ToString());
+        else
+            print("SHIFTING TO "+newBehavior.ToString());
+
+
+        int numChanged = 0;
+        bool[] allFlags = { targetChanged, positionChanged, pitchChanged, yawChanged, xPanChanged, yPanChanged, zoomChanged, regionChanged };
+        foreach (bool flag in allFlags)
+        {
+            if (flag)
+                numChanged++;
+        }
+        print("CHANGED FLAGS: " + numChanged.ToString());
+        */
+
+        target = null;
+        currentBehavior = newBehavior;
+        shifting = true;
+
+        float timeLeft = goalTime;
+        while (timeLeft > 0f)
+        {
+            // Position
+            Vector3 newPos = oldPos + Vector3.zero;
+
+            if (targetChanged)
+            {
+                newPos = newBehavior.target.position;
+            }
+            else if (positionChanged)
+            {
+                newPos = newBehavior.position;
+            }
+
+            if (regionChanged)
+            {
+                //print("regionChanged");
+                newPos = new Vector3(Mathf.Clamp(newPos.x, newBehavior.regionMin.x, newBehavior.regionMax.x),
+                                     Mathf.Clamp(newPos.y, newBehavior.regionMin.y, newBehavior.regionMax.y),
+                                     Mathf.Clamp(newPos.z, newBehavior.regionMin.z, newBehavior.regionMax.z));
+            }
+
+
+            // Orbit angle
+            Quaternion newAngle = oldAngle;
+
+            if (yawChanged || pitchChanged)
+            {
+                Vector3 newAngleEuler = oldAngle.eulerAngles;
+                if (yawChanged)
+                    newAngleEuler.y = newBehavior.yaw;
+                if (pitchChanged)
+                    newAngleEuler.x = newBehavior.pitch;
+
+                newAngle = Quaternion.Euler(newAngleEuler);
+            }
+
+            // Panning and zoom
+            Vector3 newOffset = oldOffset + Vector3.zero;
+            if (xPanChanged)
+            {
+                newOffset.x = newBehavior.panX;
+            }
+            if (yPanChanged)
+            {
+                newOffset.y = newBehavior.panY;
+            }
+            if (zoomChanged)
+            {
+                newOffset.z = newBehavior.zoom;
+            }
+
+            /*
+            if (Vector3.Equals(oldPos, newPos))
+                print("POSITIONS ARE THE SAME");
+            if (Vector3.Equals(oldOffset, newOffset))
+                print("OFFSETS ARE THE SAME");
+            if (Quaternion.Equals(oldAngle, newAngle))
+                print("ROTATIONS ARE THE SAME");
+            */
+
+
+            // Assign
+            float percent = 1f - (timeLeft / goalTime);
+
+            transform.position = Vector3.LerpUnclamped(oldPos, newPos, percent);
+            dolly.rotation = Quaternion.Slerp(oldAngle, newAngle, percent);
+            camera.localPosition = Vector3.Lerp(oldOffset, newOffset, percent);
+
+            timeLeft -= Time.deltaTime;
+
+            yield return null;
+        }
+
+        if (targetChanged)
+        {
+            target = newBehavior.target;
+        }
+        behaviorHistory.Insert(0,newBehavior);
+        shifting = false;
+    }
+
+    public IEnumerator GraduallyResetShot(float goalTime = 1f)
+    {
+        yield return StartCoroutine(ShiftToNewShot(defaultBehavior, goalTime));
+        currentBehavior = null;
     }
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Collectible_Tooth : Collectible
 {
+    public int teethValue = 1;
+
     // Use this for initialization
     void Start ()
     {
@@ -14,7 +16,7 @@ public class Collectible_Tooth : Collectible
     {
         UIManager.pickupFadeCounter = 0f;
         base.OnCollectEnd();
-        GameManager.teethCollected++;
+        SaveManager.currentSave.teethCollected += teethValue;
         yield return null;
     }
 }

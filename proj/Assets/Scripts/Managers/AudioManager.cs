@@ -23,6 +23,10 @@ public class AudioManager : MonoBehaviour
     [SerializeField] [ReorderableList] public List<SongData> songs;
     private Dictionary<AudioClip, SongData> songDict;
 
+    public AudioClip[] deniedSounds;
+    public AudioClip popSound;
+    public AudioClip quakeSound;
+
     public static AudioSource source;
 
     public static AudioClip currentMusic;
@@ -57,9 +61,35 @@ public class AudioManager : MonoBehaviour
         {
             currentMusic = source.clip;
             currentSong = songDict[currentMusic];
+            source.pitch = Time.timeScale;
         }
     }
 
+
+    public static AudioSource PlaySound(AudioClip clip, float volume = 1f, float pitch = 1f)
+    {
+        AudioSource source = UIManager.canvasObj.GetComponent<AudioSource>();
+
+        source.pitch = pitch;
+        source.PlayOneShot(clip, volume);
+
+        return source;
+    }
+
+    public static AudioSource PlayDeniedSound()
+    {
+        return PlaySound(instance.deniedSounds[(int)Random.Range(0, instance.deniedSounds.Length)], Random.Range(0.8f, 1.2f));
+    }
+
+    public static AudioSource PlayPopSound()
+    {
+        return PlaySound(instance.popSound, Random.Range(0.8f, 1.2f));
+    }
+
+    public static AudioSource PlayQuakeSound()
+    {
+        return PlaySound(instance.quakeSound);
+    }
 
     public static void StopMusic()
     {

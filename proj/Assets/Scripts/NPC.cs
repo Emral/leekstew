@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class NPC : MonoBehaviour
 {
+    public int instanceID = 0;
+
     private float distToPlayer = 999f;
     public float talkDist = 2.5f;
     public float talkIconHeight = 2f;

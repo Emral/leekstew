@@ -10,6 +10,7 @@ public class CollidingEntityEditor : LeekstewEditor
     AnimBool m_ShowFlags;
     AnimBool m_ShowBounceToggle;
     AnimBool m_ShowBounceProps;
+    AnimBool m_ShowPhysicsProps;
     AnimBool m_ShowPowerToggle;
     AnimBool m_ShowPowerProps;
 
@@ -30,6 +31,9 @@ public class CollidingEntityEditor : LeekstewEditor
         m_ShowPowerProps = new AnimBool(false);
         m_ShowPowerProps.valueChanged.AddListener(Repaint);
 
+        m_ShowPhysicsProps = new AnimBool(false);
+        m_ShowPhysicsProps.valueChanged.AddListener(Repaint);
+
         m_ShowPowerToggle = new AnimBool(false);
         m_ShowPowerToggle.valueChanged.AddListener(Repaint);
     }
@@ -38,6 +42,10 @@ public class CollidingEntityEditor : LeekstewEditor
 
     public override void CustomInspector()
     {
+        // Physics properties
+        string[] physicsPropNames = { "gravityRate" };
+        TogglableFoldingPropertyGroup(physicsPropNames, "Show Physics Properties", m_ShowPhysicsProps);
+
         // Collision flags
         string[] flagPropNames = { "vulnerableFlags", "harmFlags", "killFlags", "blockFlags", "pushFlags", "bounceFlags", "powerOnFlags", "powerOffFlags", "toggleFlags" };
         //ShowPropertyGroup(flagPropNames, "Collision Flags");

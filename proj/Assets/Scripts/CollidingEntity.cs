@@ -47,6 +47,8 @@ public class CollidingEntity : MonoBehaviour
     [HideInInspector] public bool bounceFlagsUsed;
     [HideInInspector] public bool powerFlagsUsed;
 
+    public float gravityRate = 0.01f;
+
     public bool bounceRestoresDoubleJump = false;
     public float bounceStrength = 18;
     public bool canPower = true;
@@ -76,18 +78,21 @@ public class CollidingEntity : MonoBehaviour
 
     public void UpdateGroundInfo()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, -Vector3.up, out hit, 100.0f, 1 << 9))
+        if (gravityRate != 0)
         {
-            groundDistance = hit.distance;
-            groundPoint = hit.point;
-            groundNormal = hit.normal;
-        }
-        else
-        {
-            groundDistance = 100f;
-            groundPoint = transform.position + (Vector3.up * -100f);
-            groundNormal = Vector3.up;
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, -Vector3.up, out hit, 100.0f, 1 << 9))
+            {
+                groundDistance = hit.distance;
+                groundPoint = hit.point;
+                groundNormal = hit.normal;
+            }
+            else
+            {
+                groundDistance = 100f;
+                groundPoint = transform.position + (Vector3.up * -100f);
+                groundNormal = Vector3.up;
+            }
         }
     }
 
@@ -107,8 +112,16 @@ public class CollidingEntity : MonoBehaviour
     public virtual void ShiftToGround()
     {
         UpdateGroundInfo();
-        if (groundDistance < 1f)
-            transform.Translate(Vector3.up * -groundDistance);
+
+        if (groundDistance < 1f && groundDistance > 0.2f)
+        {
+            Vector3 shiftVector = Vector3.up * -1 * (groundDistance + (1-groundNormal.y));
+
+            //if (controller != null)
+            //    controller.Move(shiftVector);
+            //else
+            transform.Translate(shiftVector);
+        }
     }
 
     public virtual void PlaySound(AudioClip clip, float pitch)

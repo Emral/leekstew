@@ -16,6 +16,8 @@ public class OptionsManager : MonoBehaviour
     public static float musicVolume = 0.5f;
     public static bool showMusicCredits = true;
 
+    public static bool autosave = true;
+
 
     void Awake ()
     {

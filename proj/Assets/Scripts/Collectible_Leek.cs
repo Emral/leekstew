@@ -5,14 +5,14 @@ using UnityEngine;
 public class Collectible_Leek : Collectible
 {
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    public override bool RespawnConditions()
     {
-		
-	}
-	
-	// Update is called once per frame
-	public override IEnumerator OnCollectEnd()
+        return !SaveManager.CurrentLevelSave.leeksCollected.Contains(instanceID);
+    }
+
+    // Update is called once per frame
+    public override IEnumerator OnCollectEnd()
     {
         //base.OnCollectEnd();
         UIManager.pickupFadeCounter = 0f;
@@ -24,7 +24,7 @@ public class Collectible_Leek : Collectible
             GameObject effect = GameObject.Instantiate(collectEndEffect, transform.position, Quaternion.identity);
         }
 
-        GameManager.leeksCollected++;
+        SaveManager.CurrentLevelSave.leeksCollected.Add(instanceID);
 
         yield return null;
 	}

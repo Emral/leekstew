@@ -39,33 +39,34 @@ public class GameManager : MonoBehaviour
 
 
     #region monobehavior events
-        public void Awake()
-        {
-            //Check if instance already exists
-            if (instance == null)
+    public void Awake()
+    {
+        //Check if instance already exists
+        if (instance == null)
 
-                //if not, set instance to this
-                instance = this;
+            //if not, set instance to this
+            instance = this;
 
-            //If instance already exists and it's not this:
-            else if (instance != this)
+        //If instance already exists and it's not this:
+        else if (instance != this)
 
-                //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
-                Destroy(gameObject);
+            //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
+            Destroy(gameObject);
 
-            //Sets this to not be destroyed when reloading scene
-            DontDestroyOnLoad(gameObject);
+        //Sets this to not be destroyed when reloading scene
+        DontDestroyOnLoad(gameObject);
 
-            //Call the InitGame function to initialize the first level 
-            InitGame();
-            LevelManager.InitLevel();
-            UIManager.InitUI();
-        }
-        void Update()
-        {
-            UpdateRefs();
-            ManageInput();
-        }
+        //Call the InitGame function to initialize the first level 
+        InitGame();
+        LevelManager.InitLevel();
+        SaveManager.InitSave();
+        UIManager.InitUI();
+    }
+    void Update()
+    {
+        UpdateRefs();
+        ManageInput();
+    }
     #endregion
 
     #region initialization

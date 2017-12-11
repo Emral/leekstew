@@ -5,9 +5,14 @@ using UnityEngine;
 public class WarpPad : NPC
 {
     public string scene;
+
     public int room;
     public Vector3 destinationOffset;
     public Transform destinationWarpPad;
+
+    public int warpPadID;
+    public bool locked;
+    public bool unlockDestinationWarpPad = false;
 
     private Dialog dialog;
     private bool sameScene = false;
@@ -27,7 +32,7 @@ public class WarpPad : NPC
         if (dialog == null)
             dialog = gameObject.GetComponent<Dialog>();
 
-        if (dialog != null)
+        if (dialog != null && dialog.text == "")
         {
             string destName = "";
 
@@ -41,6 +46,7 @@ public class WarpPad : NPC
                 if (info != null)
                     destName = info.name;
             }
+
             dialog.text = destName;
         }
     }
@@ -48,34 +54,42 @@ public class WarpPad : NPC
 
     public override IEnumerator OnPlayerInteract()
     {
-        GameManager.player.inputActive = false;
-        if (destinationWarpPad != null)
-            LevelManager.warpDestination = destinationWarpPad.position + Vector3.up*0.1f;
-
-        LevelManager.warpDestination += destinationOffset;
-
-
-        // Fade out
-        if (!sameScene || LevelManager.roomMusic[room] != AudioManager.currentMusic) 
+        // Deny if locked
+        if (locked)
         {
-            AudioManager.FadeOutMusic(0.5f, true);
-        }
-        yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(1f, 0.5f));
-
-
-        // If warping to a room in the same scene, just move the player, refresh the rooms and fade back in
-        if (sameScene)
-        {
-            GameManager.player.transform.position = LevelManager.warpDestination;
-            LevelManager.ChangeRoom(room);
-            GameManager.player.inputActive = true;
-            AudioManager.SetMusic(LevelManager.roomMusic[room]);
-            yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(0f, 0.5f));            
+            AudioManager.PlayDeniedSound();
         }
         else
         {
-            LevelManager.isWarping = true;
-            LevelManager.EnterLevel(scene);
+            GameManager.player.inputActive = false;
+            if (destinationWarpPad != null)
+                LevelManager.warpDestination = destinationWarpPad.position + Vector3.up * 0.1f;
+
+            LevelManager.warpDestination += destinationOffset;
+
+
+            // Fade out
+            if (!sameScene || LevelManager.roomMusic[room] != AudioManager.currentMusic)
+            {
+                AudioManager.FadeOutMusic(0.5f, true);
+            }
+            yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(1f, 0.5f));
+
+
+            // If warping to a room in the same scene, just move the player, refresh the rooms and fade back in
+            if (sameScene)
+            {
+                GameManager.player.transform.position = LevelManager.warpDestination;
+                LevelManager.ChangeRoom(room);
+                GameManager.player.inputActive = true;
+                AudioManager.SetMusic(LevelManager.roomMusic[room]);
+                yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(0f, 0.5f));
+            }
+            else
+            {
+                LevelManager.isWarping = true;
+                LevelManager.EnterLevel(scene);
+            }
         }
     }
 }
