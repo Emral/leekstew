@@ -182,7 +182,7 @@ public class Player : CollidingEntity
         // Landing on something
         if (collisionSide == CollideDir.Down)
         {
-            if (hit.gameObject.layer == 9)
+            if (hit.gameObject.layer == 9 || hit.gameObject.layer == 14)
             {
                 LandOnSolidSurface();
             }

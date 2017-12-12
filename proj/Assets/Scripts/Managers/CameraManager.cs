@@ -65,6 +65,9 @@ public class CameraManager : MonoBehaviour
 
     [HideInInspector] public static float constantShake = 0f;
 
+    private List<float> leftWhiskerDistances;
+    private List<float> rightWhiskerDistances;
+
     private bool shifting = false;
 
     private bool playerChoiceLock = false;
@@ -104,6 +107,8 @@ public class CameraManager : MonoBehaviour
 
     void Start()
     {
+        leftWhiskerDistances = new List<float>();
+        rightWhiskerDistances = new List<float>();
         behaviorHistory = new List<CameraBehavior>();
         UpdateRefs();
         defaultBehavior = CaptureCurrentShot();
@@ -132,6 +137,7 @@ public class CameraManager : MonoBehaviour
        // print("CHANGED PROPS: " + System.Convert.ToString((int)newBehavior.changedProperties,2));
         return newBehavior;
     }
+
 
     // Update is called once per frame
     void LateUpdate()
@@ -167,6 +173,8 @@ public class CameraManager : MonoBehaviour
                         moveX = GameManager.inputVals["Cam X"] * OptionsManager.cameraSpeedX * 0.5f * (OptionsManager.cameraInvertedX ? -1 : 1) * (GameManager.cutsceneMode ? 0 : 1);
                         moveY = GameManager.inputVals["Cam Y"] * OptionsManager.cameraSpeedY * 0.33f * (OptionsManager.cameraInvertedY ? 1 : -1) * (GameManager.cutsceneMode ? 0 : 1);
 
+
+                        // Vertical management
                         Vector2 vertLimits = new Vector2(-22f, 80f);
 
                         float currentVal = dolly.rotation.eulerAngles.x;
@@ -189,7 +197,7 @@ public class CameraManager : MonoBehaviour
                             newX = Mathf.Clamp(newX, vertLimits.x, vertLimits.y);
 
 
-
+                        // Vert and horizontal
                         Quaternion rotation = Quaternion.Euler(newX, dolly.rotation.eulerAngles.y + moveX, 0f);
                         dolly.rotation = rotation;
 
@@ -199,14 +207,79 @@ public class CameraManager : MonoBehaviour
                             angleForLerp -= 360;
                         }
 
+
+                        // Determine zoom
                         float distanceInvLerp = Mathf.InverseLerp(-22f, 80f, angleForLerp);
                         float distanceAmount = Mathf.Lerp(-2.5f, -25f, distanceInvLerp);
                         float fovAmount = Mathf.Lerp(70f, 60f, distanceInvLerp);
-                        Vector3 newLocalPos = new Vector3(0, 0, distanceAmount);
+                        Vector3 newLocalPos = new Vector3(camera.localPosition.x, camera.localPosition.y, distanceAmount);
                         camera.localPosition = newLocalPos;
                         Camera.main.fieldOfView = fovAmount;
 
 
+                        // Whiskers to avoid walls
+                        leftWhiskerDistances.Clear();
+                        rightWhiskerDistances.Clear();
+                        float rightMinDist = 999f;
+                        float leftMinDist = 999f;
+
+
+                        Vector3 startDirection = camera.position - target.position;
+                        startDirection.y = 0f;//*= -1f;
+
+                        RaycastHit hit;
+                        LayerMask avoidMask = 1 << 9;
+
+
+                        // Main raycast for whiskers
+                        float minDist = 999f;
+                        if (Physics.Linecast(GameManager.player.transform.position, camera.position + Vector3.up, out hit, avoidMask))
+                        {
+                            minDist = hit.distance;
+                        }
+
+
+                        // Side raycasts for whiskers
+                        for (int i = 0; i <= 10; i++)
+                        {
+
+                            // Right side
+                            Ray ray = new Ray(target.position, Quaternion.AngleAxis(45 + (i / 10f) * 90f, Vector3.up) * startDirection);
+                            Vector3 endPoint = ray.GetPoint(distanceAmount);
+
+                            if (Physics.Linecast(target.position, endPoint, out hit, avoidMask))
+                            {
+                                rightMinDist = Mathf.Min(rightMinDist, hit.distance);
+                                rightWhiskerDistances.Add(hit.distance);
+                                endPoint = ray.GetPoint(hit.distance);
+                                Debug.DrawLine(target.position, endPoint, Color.red);
+                            }
+                            else
+                                Debug.DrawLine(target.position, endPoint, Color.yellow);
+
+                            // Left side
+                            ray = new Ray(target.position, Quaternion.AngleAxis(-45 - (i / 10f) * 90f, Vector3.up) * startDirection);
+                            endPoint = ray.GetPoint(distanceAmount);
+
+                            if (Physics.Linecast(target.position, endPoint, out hit, avoidMask))
+                            {
+                                leftMinDist = Mathf.Min(leftMinDist, hit.distance);
+                                leftWhiskerDistances.Add(hit.distance);
+                                endPoint = ray.GetPoint(hit.distance);
+                                Debug.DrawLine(target.position, endPoint, Color.red);
+                            }
+                            else
+                                Debug.DrawLine(target.position, endPoint, Color.yellow);
+                        }
+
+
+                        // Move the camera forward and backward based on the whiskers and stuff
+                        newLocalPos.z = Mathf.Max(-minDist + 1, newLocalPos.z);
+                        camera.localPosition = newLocalPos;
+
+
+
+                        // Raise and lower the dolly to look over the player's shoulder when the camera is close
                         Vector3 newPos = new Vector3(0, Mathf.Lerp(2f, 0f, distanceInvLerp), 0);
                         dolly.localPosition = newPos + (shake.shakeOffset * OptionsManager.cameraShakeStrength);
 
@@ -533,9 +606,9 @@ public class CameraManager : MonoBehaviour
             // Assign
             float percent = 1f - (timeLeft / goalTime);
 
-            transform.position = Vector3.LerpUnclamped(oldPos, newPos, percent);
+            transform.position = new Vector3(Mathf.SmoothStep(oldPos.x, newPos.x, percent), Mathf.SmoothStep(oldPos.y, newPos.y, percent), Mathf.SmoothStep(oldPos.z, newPos.z, percent));
             dolly.rotation = Quaternion.Slerp(oldAngle, newAngle, percent);
-            camera.localPosition = Vector3.Lerp(oldOffset, newOffset, percent);
+            camera.localPosition = new Vector3(Mathf.SmoothStep(oldOffset.x, newOffset.x, percent), Mathf.SmoothStep(oldOffset.y, newOffset.y, percent), Mathf.SmoothStep(oldOffset.z, newOffset.z, percent));
 
             timeLeft -= Time.deltaTime;
 
