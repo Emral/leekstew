@@ -282,7 +282,7 @@ MonoBehaviour:
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
     index: 0
   - key: Scene_Sublevel_1
-    name: Cookie Corridor
+    name: Candy Cove
     creator: Enjl
     isHub: 0
     isIncluded: 1
