@@ -85,11 +85,14 @@ public class Generator : PlacementTool
     {
         // Cleanup list
         currentSpawned = 0;
-        for (int i = projectilePool.Length-1; i >= 0; i--)
+        if (spawnProjectiles)
         {
-            if (projectilePool[i].activeSelf)
+            for (int i = projectilePool.Length - 1; i >= 0; i--)
             {
-                currentSpawned += 1;
+                if (projectilePool[i].activeSelf)
+                {
+                    currentSpawned += 1;
+                }
             }
         }
 
