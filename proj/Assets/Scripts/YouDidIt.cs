@@ -11,7 +11,7 @@ public class YouDidIt : MonoBehaviour
     void Start ()
     {
         GameManager.youDidIt++;
-        AudioSource aud = UIManager.canvasObj.GetComponent<AudioSource>();
+        AudioSource aud = UIManager.instance.canvasObj.GetComponent<AudioSource>();
 
         AudioClip randYouDidIt;
         if (GameManager.youDidIt > fixedYouDidIts.Length-1)

@@ -158,12 +158,12 @@ public class GameManager : MonoBehaviour
 
 
             // Update the input module for the UI accordingly
-            if (UIManager.inputModule != null)
+            if (UIManager.instance.inputModule != null)
             {
-                UIManager.inputModule.horizontalAxis = controllerTypeStr + " Walk X";
-                UIManager.inputModule.verticalAxis = controllerTypeStr + " Walk Y";
-                UIManager.inputModule.cancelButton = controllerTypeStr + " Run";
-                UIManager.inputModule.submitButton = controllerTypeStr + " Jump";
+                UIManager.instance.inputModule.horizontalAxis = controllerTypeStr + " Walk X";
+                UIManager.instance.inputModule.verticalAxis = controllerTypeStr + " Walk Y";
+                UIManager.instance.inputModule.cancelButton = controllerTypeStr + " Run";
+                UIManager.instance.inputModule.submitButton = controllerTypeStr + " Jump";
             }
         }
     #endregion

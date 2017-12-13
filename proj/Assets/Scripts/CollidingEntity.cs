@@ -58,12 +58,15 @@ public class CollidingEntity : MonoBehaviour
 
     public virtual void Update()
     {
-        UpdateReferences();
-
         if (!GameManager.isGamePaused)
         {
             UpdateGroundInfo();
         }
+    }
+    public virtual void Start()
+    {
+
+        UpdateReferences();
     }
 
     public virtual void LateUpdate()

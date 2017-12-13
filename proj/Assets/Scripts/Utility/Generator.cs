@@ -14,6 +14,7 @@ public class Generator : PlacementTool
     public float spawnCooldown = 2f;
     public float spawnDelay = 0.5f;
     public bool spawnInWaves = false;
+    public bool useRelativeDirection = false;
 
     public PrewarmType prewarm = PrewarmType.Full;
     public float spawnRadius = 0f;
@@ -133,8 +134,7 @@ public class Generator : PlacementTool
         Vector3 randomPos = Random.insideUnitSphere*spawnRadius;
         randomPos.y = 0f;
 
-
-        // Spawn the effect
+            // Spawn the effect
         if (spawnEffect != null)
         {
             GameObject.Instantiate(spawnEffect, transform.position + randomPos, Quaternion.identity);
@@ -146,7 +146,12 @@ public class Generator : PlacementTool
         if (spawnProjectiles && projectileProperties.Length > 0)
         {
             Projectile projectileScr = spawnedInstance.AddComponent<Projectile>();
-            projectileScr.properties = projectileProperties[Random.Range(0, projectileProperties.Length - 1)];
+            projectileScr.properties = new ProjectileProperties(projectileProperties[Random.Range(0, projectileProperties.Length - 1)]);
+            if (useRelativeDirection)
+            {
+                Debug.Log(projectileProperties[0].speed);
+                projectileScr.properties.speed = transform.InverseTransformDirection(projectileScr.properties.speed);
+            }
         }
         spawnedObjs.Add(spawnedInstance.transform);
         yield return new WaitForSeconds(spawnCooldown);

@@ -16,6 +16,9 @@ public class ColShift : MonoBehaviour {
     public bool paused = false;
     public bool shared = false;
 
+    private Battery b;
+    public bool useBatteryIfAvailable = true;
+
 	// Use this for initialization
 	void Start () {
         if (shared)
@@ -34,6 +37,13 @@ public class ColShift : MonoBehaviour {
         {
             length = 0.0001f;
         }
+
+        b = GetComponent<Battery>();
+
+        if (b != null && useBatteryIfAvailable)
+        {
+            paused = b.GetActive();
+        }
     }
 
     private void UpdateColor()
@@ -46,7 +56,12 @@ public class ColShift : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
+        if (b != null && useBatteryIfAvailable)
+        {
+            paused = !b.GetActive();
+        }
         if (!paused)
         {
             UpdateColor();

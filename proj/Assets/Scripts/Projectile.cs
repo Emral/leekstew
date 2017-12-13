@@ -14,6 +14,17 @@ public class ProjectileProperties
     public float lifetime = 0f;
 
     public GameObject deathEffect;
+
+    public ProjectileProperties(ProjectileProperties p)
+    {
+        speed = p.speed;
+        acceleration = p.acceleration;
+        speedMax = p.speedMax;
+        speedMin = p.speedMin;
+        magnitudeLimit = p.magnitudeLimit;
+        lifetime = p.lifetime;
+        deathEffect = p.deathEffect;
+    }
 }
 
 

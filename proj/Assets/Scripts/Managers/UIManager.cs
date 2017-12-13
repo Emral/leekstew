@@ -19,37 +19,34 @@ public class UIManager : MonoBehaviour
 
     public static float screenFadeAmount = 1f;
     public static float letterboxFadeAmount = 0f;
-
-
-    public static GameObject levelIntroObj;
-    public static CanvasGroup levelIntroGroup;
-    public static GameObject letterboxObj;
+    
+    public CanvasGroup levelIntroGroup;
+    public GameObject letterboxObj;
 
     public static float pickupFadeCounter = 2f;
-    public static GameObject pickupBarObj;
-    public static CanvasGroup pickupBarGroup;
-    public static int currentTeethShown;
+    public CanvasGroup pickupBarGroup;
+    public int currentTeethShown;
 
     public static float hpFadeCounter = 2f;
-    public static GameObject hpBarObj;
-    public static CanvasGroup hpBarGroup;
+    public CanvasGroup hpBarGroup;
 
     public static float musicFadeCounter = 0f;
-    public static GameObject musicCreditsObj;
-    public static CanvasGroup musicCreditsGroup;
+    public CanvasGroup musicCreditsGroup;
+    public RectTransform musicCreditsObj;
+    public Text songInfo;
 
-    public static GameObject saveTextObj;
-    public static CanvasGroup saveTextGroup;
+    public GameObject saveTextObj;
+    public CanvasGroup saveTextGroup;
 
-    public static GameObject canvasObj;
-    public static GameObject pauseMenuObj;
-    public static GameObject optionsMenuObj;
-    public static GameObject exitMenuObj;
-    public static GameObject currentMenuObj;
+    public GameObject canvasObj;
+    public GameObject pauseMenuObj;
+    public GameObject optionsMenuObj;
+    public GameObject exitMenuObj;
+    public GameObject currentMenuObj;
+    public Image screenFadeScr;
 
-
-    public static UnityEngine.EventSystems.StandaloneInputModule inputModule;
-    public static UnityEngine.EventSystems.EventSystem eventSystem;
+    public UnityEngine.EventSystems.StandaloneInputModule inputModule;
+    public UnityEngine.EventSystems.EventSystem eventSystem;
 
 
 
@@ -66,7 +63,6 @@ public class UIManager : MonoBehaviour
     }
     void Update()
     {
-        UpdateRefs();
         UpdateUI();
         UpdateMenus();
     }
@@ -79,25 +75,22 @@ public class UIManager : MonoBehaviour
             musicFadeCounter = 0f;
             pickupFadeCounter = 0f;
         }
-
-        if (hpBarObj != null)
         {
             bool shouldFade = hpFadeCounter < 7f || (GameManager.timeSinceInput <= 1f && GameManager.player.health.currentHp >= GameManager.player.health.hp);
-            hpFadeCounter += (shouldFade ? 1 : -1)* Time.deltaTime;
+            hpFadeCounter += (shouldFade ? 1 : -1) * Time.deltaTime;
             hpFadeCounter = Mathf.Max(hpFadeCounter, 0f);
             if (hpFadeCounter >= 7f)
                 hpFadeCounter = Mathf.Clamp(hpFadeCounter, 7f, 8f);
 
             hpBarGroup.alpha = 8f - hpFadeCounter;
         }
+        
+        Text teethCounter = GameObject.Find("TeethCounter").GetComponent("Text") as Text;
+        Text leekCounter = GameObject.Find("LeekCounter").GetComponent("Text") as Text;
+        teethCounter.text = currentTeethShown.ToString();
+        leekCounter.text = SaveManager.currentSave.TotalLeeks.ToString();
 
-        if (pickupBarObj != null)
         {
-            Text teethCounter = GameObject.Find("TeethCounter").GetComponent("Text") as Text;
-            Text leekCounter = GameObject.Find("LeekCounter").GetComponent("Text") as Text;
-            teethCounter.text = currentTeethShown.ToString();
-            leekCounter.text = SaveManager.currentSave.TotalLeeks.ToString();
-
             bool shouldFade = (GameManager.timeSinceInput <= 1f || pickupFadeCounter < 7f);
             pickupFadeCounter += (shouldFade ? 1 : -1) * Time.deltaTime;
             pickupFadeCounter = Mathf.Max(pickupFadeCounter, 0f);
@@ -107,116 +100,35 @@ public class UIManager : MonoBehaviour
             pickupBarGroup.alpha = 8f - pickupFadeCounter;
         }
 
-        if (musicCreditsObj != null)
+        if (AudioManager.currentSong != null)
         {
-            RectTransform musicCreditsBox = musicCreditsObj.GetComponent<RectTransform>();
-            Text songInfo = GameObject.Find("SongInfo").GetComponent("Text") as Text;
-
-            if (AudioManager.currentSong != null)
-            {
-                songInfo.text = AudioManager.currentSong.name + (AudioManager.currentSong.artist==null?"":"\n" + AudioManager.currentSong.artist) + (AudioManager.currentSong.album==null?"":"\n" + AudioManager.currentSong.album);
-                musicCreditsBox.sizeDelta = new Vector2(songInfo.preferredWidth + 20f, songInfo.preferredHeight + 8f);
-            }
-
-            musicFadeCounter += Time.deltaTime;
-            musicFadeCounter = Mathf.Clamp(musicFadeCounter, 0f, 8f);
-
-            if (!OptionsManager.showMusicCredits && !GameManager.isGamePaused)
-                musicFadeCounter = 8f;
-
-            musicCreditsGroup.alpha = 8f - musicFadeCounter;
+            songInfo.text = AudioManager.currentSong.name + (AudioManager.currentSong.artist==null?"":"\n" + AudioManager.currentSong.artist) + (AudioManager.currentSong.album==null?"":"\n" + AudioManager.currentSong.album);
+            musicCreditsObj.sizeDelta = new Vector2(songInfo.preferredWidth + 20f, songInfo.preferredHeight + 8f);
         }
 
-        GameObject screenFadeObj = GameObject.Find("UI_ScreenFade");
-        if (screenFadeObj != null)
+        musicFadeCounter += Time.deltaTime;
+        musicFadeCounter = Mathf.Clamp(musicFadeCounter, 0f, 8f);
+
+        if (!OptionsManager.showMusicCredits && !GameManager.isGamePaused)
+            musicFadeCounter = 8f;
+
+        musicCreditsGroup.alpha = 8f - musicFadeCounter;
         {
-            Image screenFadeScr = screenFadeObj.GetComponent("Image") as Image;
             Color tempColor = screenFadeScr.color;
             tempColor.a = GameManager.isGamePaused ? 0.5f : screenFadeAmount;
             screenFadeScr.color = tempColor;
         }
-
-        if (letterboxObj != null)
+        
+        Image[] barScrs = letterboxObj.GetComponentsInChildren<Image>();
+        foreach (Image bar in barScrs)
         {
-            Image[] barScrs = letterboxObj.GetComponentsInChildren<Image>();
-            foreach (Image bar in barScrs)
-            {
-                Color tempColor = bar.color;
-                tempColor.a = letterboxFadeAmount;
-                bar.color = tempColor;
-            }
+            Color tempColor = bar.color;
+            tempColor.a = letterboxFadeAmount;
+            bar.color = tempColor;
         }
     }
     #endregion
-
-    #region update
-    public static void UpdateRefs()
-    {
-        // HP Bar
-        hpBarObj = GameObject.Find("UI_PlayerHP");
-        if (hpBarObj != null)
-            hpBarGroup = hpBarObj.GetComponent<CanvasGroup>();
-
-        // Pickup counters
-        pickupBarObj = GameObject.Find("UI_CollectionCounters");
-        if (pickupBarObj != null)
-            pickupBarGroup = pickupBarObj.GetComponent<CanvasGroup>();
-
-        // Music credits
-        musicCreditsObj = GameObject.Find("UI_MusicCredits");
-        if (musicCreditsObj != null)
-            musicCreditsGroup = musicCreditsObj.GetComponent<CanvasGroup>();
-
-        // Letterbox
-        letterboxObj = GameObject.Find("UI_Letterbox");
-
-        // Level intro stuff
-        levelIntroObj = GameObject.Find("UI_LevelIntro");
-        if (levelIntroObj != null)
-            levelIntroGroup = levelIntroObj.GetComponent<CanvasGroup>();
-
-        // Menu references
-        currentMenuObj = null;
-        canvasObj = GameObject.Find("Canvas");
-        if (canvasObj != null)
-        {
-            foreach (GameObject menu in GameObject.FindGameObjectsWithTag("Menu"))
-            {
-                if (menu.activeInHierarchy)
-                    currentMenuObj = menu;
-            }
-        }
-
-        if (pauseMenuObj == null)
-        {
-            pauseMenuObj = GameObject.Find("Menu_Pause");
-            if (pauseMenuObj != null)
-                pauseMenuObj.SetActive(false);
-        }
-
-        if (exitMenuObj == null)
-        {
-            exitMenuObj = GameObject.Find("Menu_Exit");
-            if (exitMenuObj != null)
-                exitMenuObj.SetActive(false);
-        }
-
-        if (optionsMenuObj == null)
-        {
-            optionsMenuObj = GameObject.Find("Menu_Options");
-            if (optionsMenuObj != null)
-                optionsMenuObj.SetActive(false);
-        }
-
-
-        // UI event stuff
-        GameObject eventSystemObj = GameObject.Find("EventSystem");
-        if (eventSystemObj != null)
-        {
-            inputModule = eventSystemObj.GetComponent("StandaloneInputModule") as UnityEngine.EventSystems.StandaloneInputModule;
-            eventSystem = eventSystemObj.GetComponent("EventSystem") as UnityEngine.EventSystems.EventSystem;
-        }
-    }
+    
     void UpdateUI()
     {
         // Letterbox

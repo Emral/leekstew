@@ -230,10 +230,10 @@ public class LevelManager : MonoBehaviour
 
         // Level intro stuff
         // Intro text
-        UIManager.UpdateRefs();
+        UIManager.instance.UpdateRefs();
         if (beginningLevel)
         {
-            if (currentLevel != null && UIManager.levelIntroObj != null)
+            if (currentLevel != null && UIManager.instance.levelIntroObj != null)
             {
                 Text introName = GameObject.Find("LevelIntroName").GetComponentInChildren<Text>();
                 Text introCreator = GameObject.Find("LevelIntroCreator").GetComponentInChildren<Text>();
@@ -243,13 +243,13 @@ public class LevelManager : MonoBehaviour
                 introThumbnail.texture = currentLevel.thumbnail;
 
                 yield return new WaitForSeconds(1f);
-                UIManager.DoFadeCanvasGroup(UIManager.levelIntroGroup, 0f, 1f);
+                UIManager.DoFadeCanvasGroup(UIManager.instance.levelIntroGroup, 0f, 1f);
             }
             yield return new WaitForSeconds(0.5f);
         }
-        else if (UIManager.levelIntroObj != null)
+        else if (UIManager.instance != null)
         {
-            UIManager.levelIntroObj.SetActive(false);
+            UIManager.instance.levelIntroObj.SetActive(false);
         }
 
 

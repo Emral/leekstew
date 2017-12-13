@@ -68,7 +68,7 @@ public class AudioManager : MonoBehaviour
 
     public static AudioSource PlaySound(AudioClip clip, float volume = 1f, float pitch = 1f)
     {
-        AudioSource source = UIManager.canvasObj.GetComponent<AudioSource>();
+        AudioSource source = UIManager.instance.canvasObj.GetComponent<AudioSource>();
 
         source.pitch = pitch;
         source.PlayOneShot(clip, volume);
