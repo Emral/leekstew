@@ -289,6 +289,7 @@ public class UIManager : MonoBehaviour
         GameObject AddUISprite(Sprite sprite, Transform parent, Vector3 offset, Vector3 scale)
         {
             GameObject newObj = new GameObject();
+            //newObj.name = "Spawned by UIManager";
             Image newImage = newObj.AddComponent<Image>();
             newImage.sprite = sprite;
             newObj.GetComponent<RectTransform>().SetParent(parent);

@@ -230,6 +230,7 @@ public class PolyPlateau : MonoBehaviour
 
                     GameObject planeA = GameObject.CreatePrimitive(PrimitiveType.Quad);
                     planeA.name = "Top Wall " + i.ToString();
+                    planeA.layer = 9;
                     planeA.transform.parent = wallsTrans;
                     planeA.transform.localRotation = wallDirection;
 
@@ -244,6 +245,7 @@ public class PolyPlateau : MonoBehaviour
 
                         GameObject planeB = GameObject.CreatePrimitive(PrimitiveType.Quad);
                         planeB.name = "Wall " + i.ToString();
+                        planeB.layer = 9;
                         planeB.transform.parent = wallsTrans;
                         planeB.transform.localPosition = wallMidPoint + (Vector3.up * (height - 1f) * 0.5f);
                         planeB.transform.localScale = new Vector3(segmentLength, height - 1f, 1f);

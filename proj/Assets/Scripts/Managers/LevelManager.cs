@@ -41,6 +41,34 @@ public class LevelManager : MonoBehaviour
     public static Dictionary<int, string> roomNames;
     public static Dictionary<int, AudioClip> roomMusic;
 
+    public static GameObject CurrentRoomObject
+    {
+        get
+        {
+            if (roomObjects != null)
+            {
+                if (roomObjects.Length > 0)
+                {
+                    return roomObjects[currentRoom];
+                }
+            }
+            return null;
+        }
+    }
+
+    public static Room CurrentRoomScript
+    {
+        get
+        {
+            GameObject _currRoom = CurrentRoomObject;
+            if (_currRoom != null)
+            {
+                return _currRoom.GetComponent<Room>();
+            }
+            return null;
+        }
+    }
+
     // This feature doesn't work yet 
     [HideInInspector] public bool checkToAddScenesToBuildList = false;
 
