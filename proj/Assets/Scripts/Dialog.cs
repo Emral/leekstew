@@ -48,7 +48,7 @@ public class Dialog : MonoBehaviour {
         Camera cam = Camera.current;
         float distance = 999f;
         
-        distance = Vector3.Distance(transform.position, GameManager.instance.player.transform.position);
+        distance = Vector3.Distance(transform.position, GameManager.player.transform.position);
 
         // Handle animation percent
         if (passive)

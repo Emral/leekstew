@@ -18,7 +18,7 @@ public class Collectible_Leek : Collectible
         UIManager.pickupFadeCounter = 0f;
 
         if (collectEndSound != null)
-            GameManager.instance.player.PlaySound(collectEndSound, 1f);
+            GameManager.player.PlaySound(collectEndSound, 1f);
         if (collectStartEffect != null)
         {
             GameObject effect = GameObject.Instantiate(collectEndEffect, transform.position, Quaternion.identity);

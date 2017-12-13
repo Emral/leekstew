@@ -136,7 +136,9 @@ public class LevelManager : MonoBehaviour
     #region methods
     public static LevelData GetLevelInfo(string sceneName)
     {
-        return levelDict[sceneName];
+        if (levelDict.ContainsKey(sceneName))
+            return levelDict[sceneName];
+        return null;
     }
     public void LoadScene(string scene, bool resetCheckpoints=true)
     {
@@ -149,7 +151,7 @@ public class LevelManager : MonoBehaviour
         UIManager.instance.StopAllCoroutines();
         GameManager.instance.StopAllCoroutines();
 
-        if (levelDict[scene] != null)
+        if (levelDict.ContainsKey(scene))
         {
             currentLevel = levelDict[scene];
         }
@@ -206,25 +208,25 @@ public class LevelManager : MonoBehaviour
     public IEnumerator LevelLoadSequence()
     {
         // Wait until the player reference is valid
-        while (GameManager.instance.player == null)
+        while (GameManager.player == null || GameManager.camera == null)
         {
             yield return null;
         }
 
         // Reset the player's health
-        GameManager.instance.player.UpdateReferences();
-        GameManager.instance.player.health.currentHp = 2;
-        GameManager.instance.player.inputActive = false;
+        GameManager.player.UpdateReferences();
+        GameManager.player.health.currentHp = 2;
+        GameManager.player.inputActive = false;
 
         // Set the camera's target to the player if a preset target doesn't exist
-        if (GameManager.instance.camera.target == null)
-            GameManager.instance.camera.target = GameManager.instance.player.transform;
+        if (GameManager.camera.target == null)
+            GameManager.camera.target = GameManager.player.transform;
 
         // Place the player at the warp destination
         if (isWarping)
         {
             isWarping = false;
-            GameManager.instance.player.transform.position = warpDestination;
+            GameManager.player.transform.position = warpDestination;
         }
         else
         {
@@ -245,7 +247,7 @@ public class LevelManager : MonoBehaviour
             if (scr.checkpointID == currentCheckpoint)
             {
                 scr.SetCurrent();
-                GameManager.instance.player.transform.position = checkpoint.transform.position + Vector3.up * 0.5f;
+                GameManager.player.transform.position = checkpoint.transform.position + Vector3.up * 0.5f;
             }
         }
 
@@ -264,6 +266,7 @@ public class LevelManager : MonoBehaviour
         // Intro text
         if (beginningLevel)
         {
+            UIManager.DoFadeCanvasGroup(UIManager.instance.levelIntroGroup, 1f, 0f);
             if (currentLevel != null && UIManager.instance != null)
             {
                 levelIntroName.text = currentLevel.name;
@@ -291,7 +294,7 @@ public class LevelManager : MonoBehaviour
         ui.StartCoroutine(ui.ScreenFadeChange(0f, 1f));
         yield return new WaitForSeconds(0.5f);
 
-        GameManager.instance.player.inputActive = true;
+        GameManager.player.inputActive = true;
         beginningLevel = false;
     }
     #endregion

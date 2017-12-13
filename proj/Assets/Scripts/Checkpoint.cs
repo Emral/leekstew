@@ -27,7 +27,7 @@ public class Checkpoint : MonoBehaviour
             dialog.dialogEnabled = IsCurrent();
         }
 
-        Player playerScr = GameManager.instance.player;
+        Player playerScr = GameManager.player;
         if (playerScr != null)
         {
             Transform playerTrans = playerScr.transform;

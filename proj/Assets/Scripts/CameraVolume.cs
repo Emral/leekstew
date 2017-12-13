@@ -12,7 +12,7 @@ public class CameraVolume : MonoBehaviour
     // Use this for initialization
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == GameManager.instance.player.gameObject)
+        if (other.gameObject == GameManager.player.gameObject)
         {
             //CameraManager.instance.StopAllCoroutines();
             CameraManager.DoShiftToNewShot(cameraProps);
@@ -21,7 +21,7 @@ public class CameraVolume : MonoBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject == GameManager.instance.player.gameObject && CameraManager.currentBehavior == cameraProps)
+        if (other.gameObject == GameManager.player.gameObject && CameraManager.currentBehavior == cameraProps)
         {
             CameraManager.instance.StopAllCoroutines();
             CameraManager.DoShiftToNewShot(cameraProps);

@@ -789,7 +789,7 @@ GameObject:
   m_Component:
   - component: {fileID: 224067303992065322}
   - component: {fileID: 222089658644419460}
-  - component: {fileID: 114999856772457384}
+  - component: {fileID: 114967903203114904}
   m_Layer: 5
   m_Name: ToothImg
   m_TagString: Untagged
@@ -1146,7 +1146,7 @@ GameObject:
   m_Component:
   - component: {fileID: 224274102883987372}
   - component: {fileID: 222260274401173764}
-  - component: {fileID: 114216881983397478}
+  - component: {fileID: 114027448175634280}
   m_Layer: 5
   m_Name: LeekImg
   m_TagString: Untagged
@@ -1869,7 +1869,7 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -2031,6 +2031,33 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: SOUND VOLUME
+--- !u!114 &114027448175634280
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1661841043384918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 21300000, guid: a3003a3f7879a674493d483950279d2c, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
 --- !u!114 &114038002979117400
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2097,12 +2124,12 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: RestartLevel
-        m_Mode: 1
+      - m_Target: {fileID: 82811809413358086}
+        m_MethodName: PlayOneShot
+        m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2126,7 +2153,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -2316,7 +2343,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -2594,7 +2621,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -2685,7 +2712,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -2733,32 +2760,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 00
---- !u!114 &114216881983397478
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1661841043384918}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -98529514, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Texture: {fileID: 8400000, guid: 43639d0101470b942b1fde6ef016ea3b, type: 2}
-  m_UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
 --- !u!114 &114232479056291916
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2805,7 +2806,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 82811809413358086}
         m_MethodName: PlayOneShot
         m_Mode: 2
         m_Arguments:
@@ -2976,7 +2977,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -3074,8 +3075,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bb515edc02c6154c85439236e180f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  camera: {fileID: 0}
 --- !u!114 &114304333623202258
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3152,7 +3151,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -3270,7 +3269,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -3328,7 +3327,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -3515,7 +3514,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -3919,7 +3918,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -4128,7 +4127,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -4230,7 +4229,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -4641,6 +4640,18 @@ MonoBehaviour:
     name: Frozen Citadel
     artist: Yonowaaru
     album: A 2nd Mario Thing OST
+    loopStart: 0
+    loopEnd: 0
+  - key: {fileID: 8300000, guid: 0494b125592efd1499428723029cc5b9, type: 3}
+    name: ADD
+    artist: Generic CAW
+    album: 
+    loopStart: 0
+    loopEnd: 0
+  - key: {fileID: 8300000, guid: ce230081f9f806b429605eb15e00409a, type: 3}
+    name: God Rest Ye Merry Gentlemen
+    artist: Generic CAW
+    album: 
     loopStart: 0
     loopEnd: 0
   - key: {fileID: 8300000, guid: f5e04a6d2bdbe574b8326b9d6c2b42df, type: 3}
@@ -5179,7 +5190,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -5423,7 +5434,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -5967,6 +5978,33 @@ MonoBehaviour:
     thumbnail: {fileID: 0}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
     index: 0
+--- !u!114 &114967903203114904
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1501352784210024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 21300004, guid: a3003a3f7879a674493d483950279d2c, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
 --- !u!114 &114974772451663938
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5983,6 +6021,11 @@ MonoBehaviour:
   heartSprite: {fileID: 21300000, guid: 27fab4ca5c2edc94880f3385ba7ef1f2, type: 3}
   soulHeartSprite: {fileID: 21300002, guid: 27fab4ca5c2edc94880f3385ba7ef1f2, type: 3}
   emptyHeartSprite: {fileID: 21300004, guid: 27fab4ca5c2edc94880f3385ba7ef1f2, type: 3}
+  collectibleSprites:
+  - {fileID: 21300004, guid: a3003a3f7879a674493d483950279d2c, type: 3}
+  - {fileID: 21300000, guid: a3003a3f7879a674493d483950279d2c, type: 3}
+  - {fileID: 21300006, guid: a3003a3f7879a674493d483950279d2c, type: 3}
+  - {fileID: 21300002, guid: a3003a3f7879a674493d483950279d2c, type: 3}
   dialogFont: {fileID: 12800000, guid: c3b0e3bbcdf8a4b4092b61aacbbce416, type: 3}
   dialogTexture: {fileID: 2800000, guid: 6dc88d61e9f14f74299e408b2876b629, type: 3}
   levelIntroGroup: {fileID: 225750739811401604}
@@ -6019,7 +6062,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 82811809413358086}
           m_MethodName: PlayOneShot
           m_Mode: 2
           m_Arguments:
@@ -6034,32 +6077,6 @@ MonoBehaviour:
       m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
         Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   delegates: []
---- !u!114 &114999856772457384
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1501352784210024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -98529514, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Texture: {fileID: 8400000, guid: eac682ee6abd3d3408523e58c8c7d03b, type: 2}
-  m_UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
 --- !u!222 &222007070359047192
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -6688,7 +6705,7 @@ RectTransform:
   m_GameObject: {fileID: 1501352784210024}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 26.055946, y: 52.99999, z: 0}
-  m_LocalScale: {x: 0.37584186, y: 0.3758419, z: 0.3758419}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children: []
   m_Father: {fileID: 224882045988601664}
   m_RootOrder: 3
@@ -6968,7 +6985,7 @@ RectTransform:
   m_GameObject: {fileID: 1661841043384918}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 25.93, y: 16.999989, z: 0}
-  m_LocalScale: {x: 0.33637124, y: 0.33637124, z: 0.33637124}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children: []
   m_Father: {fileID: 224882045988601664}
   m_RootOrder: 2

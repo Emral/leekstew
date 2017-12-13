@@ -2,6 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+
+/*
+[System.Serializable]
+public class GamepadButtonImage
+{
+    public string name;
+    public Sprite image;
+    public bool flip;
+    public bool rotate;
+}
+*/
+
 
 public class UIManager : MonoBehaviour
 {
@@ -13,6 +27,8 @@ public class UIManager : MonoBehaviour
     public Sprite heartSprite;
     public Sprite soulHeartSprite;
     public Sprite emptyHeartSprite;
+
+    public Sprite[] collectibleSprites;
 
     public Font dialogFont;
     public Texture2D dialogTexture;
@@ -48,6 +64,11 @@ public class UIManager : MonoBehaviour
     public UnityEngine.EventSystems.StandaloneInputModule inputModule;
     public UnityEngine.EventSystems.EventSystem eventSystem;
 
+    //public GamepadButtonImage[] gamepadButtonImages;
+    //private Dictionary<string, Sprite> gamepadButtonImageDict;
+
+    //public Sprite keyboardNineSliceSprite;
+
 
 
     #region monobehavior events
@@ -56,6 +77,11 @@ public class UIManager : MonoBehaviour
         if (instance == null)
             instance = this;
     }
+    private void Start()
+    {
+
+    }
+
     public static void InitUI()
     {
         instance.StartCoroutine(instance.UpdateHPBar());
@@ -75,8 +101,22 @@ public class UIManager : MonoBehaviour
             musicFadeCounter = 0f;
             pickupFadeCounter = 0f;
         }
+
+        if (!GameManager.playerExists)
         {
-            bool shouldFade = hpFadeCounter < 7f || (GameManager.timeSinceInput <= 1f && GameManager.instance.player.health.currentHp >= GameManager.instance.player.health.hp);
+            hpFadeCounter = 8f;
+            pickupFadeCounter = 8f;
+            //musicFadeCounter = 8f;
+        }
+
+        {
+            bool playerHpCheck = true;
+            if (GameManager.playerExists)
+            {
+                playerHpCheck = GameManager.player.health.currentHp >= GameManager.player.health.hp;
+            }
+
+            bool shouldFade = hpFadeCounter < 7f || (GameManager.timeSinceInput <= 1f && playerHpCheck);
             hpFadeCounter += (shouldFade ? 1 : -1) * Time.deltaTime;
             hpFadeCounter = Mathf.Max(hpFadeCounter, 0f);
             if (hpFadeCounter >= 7f)
@@ -216,6 +256,11 @@ public class UIManager : MonoBehaviour
     #region coroutines
     public IEnumerator UpdateHPBar()
     {
+        while (GameManager.player == null)
+        {
+            yield return null;
+        }
+
         print("STARTING HP COROUTINE");
 
         print("HP BAR OBJECT FOUND");
@@ -223,7 +268,7 @@ public class UIManager : MonoBehaviour
         // References and vars
         RectTransform panel;
         panel = hpBarGroup.GetComponent<RectTransform>();
-        HealthPoints playerHP = GameManager.instance.player.health;
+        HealthPoints playerHP = GameManager.player.health;
 
         // Health variables
         int currentHP = 2;
@@ -249,7 +294,7 @@ public class UIManager : MonoBehaviour
 
             hpBarGroup.transform.SetParent(canvasObj.transform);
                 
-            playerHP = GameManager.instance.player.health;
+            playerHP = GameManager.player.health;
 
             bool barExists = hpBarGroup != null;
             bool hpExists = playerHP != null;

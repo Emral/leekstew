@@ -24,8 +24,15 @@ public class GameManager : MonoBehaviour
     public static int leeksCollected = 0;
 
     public static GameManager instance = null;              //Static instance of GameManager which allows it to be accessed by any other script.
-    public Player player = null;                     //Static reference to the Player script
-    public CameraManager camera = null;              //Static reference to the CameraManager script
+
+    public static Player player = null;                     //Static reference to the Player script
+    public static bool playerExists = false;
+    public static GameObject playerObject = null;
+
+    public static CameraManager camera = null;              //Static reference to the CameraManager script
+    public static bool cameraExists = false;
+    public static GameObject cameraObject = null;
+
     public static UIManager ui = null;
 
     public static bool isGamePaused = false;
@@ -33,9 +40,49 @@ public class GameManager : MonoBehaviour
 
     public static float timeSinceInput = 0f;
 
+
     public static int youDidIt = -1;
 
     public static float timeRate = 1f;
+
+
+    #region manual scene change event stuff
+    void OnEnable()
+    {
+        //Tell our 'OnLevelFinishedLoading' function to start listening for a scene change as soon as this script is enabled.
+        SceneManager.sceneLoaded += OnLevelFinishedLoading;
+    }
+
+    void OnDisable()
+    {
+        //Tell our 'OnLevelFinishedLoading' function to stop listening for a scene change as soon as this script is disabled. Remember to always have an unsubscription for every delegate you subscribe to!
+        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
+    }
+
+    void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
+    {
+        Debug.Log("Level Loaded: " + scene.name + ", " + mode);
+
+        player = null;
+        camera = null;
+
+        playerObject = GameObject.Find("Obj_Player");
+        playerExists = (playerObject != null);
+        if (playerExists)
+        {
+            player = playerObject.GetComponent<Player>();
+        }
+
+        cameraObject = GameObject.Find("Obj_Camera");
+        cameraExists = (cameraObject != null);
+        if (playerExists)
+        {
+            camera = cameraObject.GetComponent<CameraManager>();
+        }
+
+        LevelManager.InitLevel();
+    }
+    #endregion
 
 
     #region monobehavior events
@@ -168,7 +215,7 @@ public class GameManager : MonoBehaviour
         }
         public static void ScreenShake(float strength)
         {
-            instance.camera.StartCoroutine(instance.camera.DelayedShake(strength));
+            camera.StartCoroutine(camera.DelayedShake(strength));
         }
     #endregion
 

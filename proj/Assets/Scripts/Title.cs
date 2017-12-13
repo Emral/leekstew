@@ -31,6 +31,6 @@ public class Title : MonoBehaviour {
         yield return ui.StartCoroutine(ui.ScreenFadeChange(1f, 1f));
         yield return new WaitForSeconds(1f);
 
-        LevelManager.EnterLevel("Scene_Test1");
+        LevelManager.EnterLevel("Scene_Hub");
     }
 }

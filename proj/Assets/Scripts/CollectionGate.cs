@@ -19,8 +19,8 @@ public class CollectionGate : NPC
     private Transform cubeTrans;
     private Transform numberTrans;
 
-    private TextMesh numberText;
-    private MeshRenderer iconRenderer;
+    private Text numberText;
+    private Image iconRenderer;
 
 
     public void Start ()
@@ -55,17 +55,17 @@ public class CollectionGate : NPC
 
     public void UpdateRefs()
     {
-        if (iconTrans == null)
-            iconTrans = transform.Find("icon");
-
         if (cubeTrans == null)
             cubeTrans = transform.Find("cube");
 
-        if (numberTrans == null)
-            numberTrans = transform.Find("numbertext");
+        if (iconTrans == null)
+            iconTrans = transform.Find("displaycanvas/icon");
 
-        iconRenderer = iconTrans.GetComponent<MeshRenderer>();
-        numberText = numberTrans.GetComponent<TextMesh>();
+        if (numberTrans == null)
+            numberTrans = transform.Find("displaycanvas/numbertext");
+
+        iconRenderer = iconTrans.GetComponent<Image>();
+        numberText = numberTrans.GetComponent<Text>();
     }
 
     public void UpdateDisplay()
@@ -80,13 +80,13 @@ public class CollectionGate : NPC
             switch (type)
             {
                 case (CollectibleType.Tooth):
-                    iconRenderer.material.mainTextureOffset = Vector2.zero;
+                    iconRenderer.sprite = UIManager.instance.collectibleSprites[0];
                     break;
                 case (CollectibleType.GreenTooth):
-                    iconRenderer.material.mainTextureOffset = Vector2.zero;
+                    iconRenderer.sprite = UIManager.instance.collectibleSprites[0];
                     break;
                 case (CollectibleType.Leek):
-                    iconRenderer.material.mainTextureOffset = Vector2.up * 0.5f;
+                    iconRenderer.sprite = UIManager.instance.collectibleSprites[1];
                     break;
             }
         }
@@ -160,19 +160,13 @@ public class CollectionGate : NPC
         {
             float percent = timeRemaining / totalTime;
 
-            newPos = numberTrans.localPosition;
-            newPos.y = Mathf.Lerp(-1.5f, -1.2f, percent);
-            numberTrans.localPosition = newPos;
-            numberText.fontSize = Mathf.RoundToInt(Mathf.Lerp(600f, 370f, percent));
-            numberText.color = Color.Lerp(Color.magenta, Color.black, percent);
+            numberText.fontSize = Mathf.RoundToInt(Mathf.Lerp(125f, 100f, percent));
+            numberText.color = Color.Lerp(Color.magenta, Color.white, percent);
             timeRemaining += Time.deltaTime;
             yield return null;
         }
-        numberText.fontSize = 370;
-        numberText.color = Color.black;
-
-        newPos.y = -1.2f;
-        numberTrans.localPosition = newPos;
+        numberText.fontSize = 100;
+        numberText.color = Color.white;
     }
 
 
@@ -197,9 +191,10 @@ public class CollectionGate : NPC
         // Start zooming in
         AudioSource quakeSource = AudioManager.PlaySound(AudioManager.instance.quakeSound, 1f, (gatesUnlockedThisSession+1f));
         CameraBehavior newShot = CameraManager.CaptureCurrentShot();
+        CameraBehavior origShot = CameraManager.CaptureCurrentShot();
         newShot.yaw = 180 + transform.rotation.eulerAngles.y;
         newShot.pitch = 0f;
-        newShot.zoom = -8.5f;
+        newShot.zoom = -8.5f - 7f*(transform.lossyScale.x-1f);
         //newShot.panY = -1;
         newShot.target = transform;
 
@@ -216,8 +211,16 @@ public class CollectionGate : NPC
         AudioManager.PlayPopSound();
         yield return new WaitForSeconds(1f / (gatesUnlockedThisSession + 1f));
 
-        CameraManager.DoGradualReset(1f / (gatesUnlockedThisSession + 1f));
-        yield return new WaitForSeconds(0.5f / (gatesUnlockedThisSession + 1f));
+        UIManager.DoScreenFadeChange(1f, 0.5f);
+        //CameraManager.defaultBehavior.zoom = origShot.zoom;
+        //CameraManager.defaultBehavior.pitch = origShot.pitch;
+        //CameraManager.defaultBehavior.yaw = origShot.yaw;
+        //CameraManager.defaultBehavior.position = origShot.position;
+        yield return new WaitForSeconds(0.5f);
+        CameraManager.DoGradualReset(0.01f);
+        yield return new WaitForSeconds(0.1f);
+        UIManager.DoScreenFadeChange(0f, 0.5f);
+        yield return new WaitForSeconds(0.25f);
 
         // Return to gameplay
         GameManager.cutsceneMode = false;

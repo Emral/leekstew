@@ -148,7 +148,7 @@ public class SaveManager : MonoBehaviour
     {
         get
         {
-            return Application.persistentDataPath + "/savefile"+saveSlot.ToString()+".sav";
+            return Application.persistentDataPath + "/savefile" + saveSlot.ToString() + ".sav";
         }
     }
 
@@ -158,7 +158,10 @@ public class SaveManager : MonoBehaviour
 
     public void Update()
     {
-        currentSave.currentLevelIndex = LevelManager.currentLevel.index;
+        if (LevelManager.currentLevel != null)
+        {
+            currentSave.currentLevelIndex = LevelManager.currentLevel.index;
+        }
         /*
         print("CURRENT GLOBAL SAVE DATA: " + currentSave.ToString());
         if (CurrentLevelSave != null)
