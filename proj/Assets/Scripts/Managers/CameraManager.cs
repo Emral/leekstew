@@ -6,21 +6,26 @@ using UnityEngine;
 
 [System.Flags] public enum CameraProperties
 {
-    None     = 0,
-    Yaw      = 1,
-    Pitch    = 2,
-    XPan     = 4,
-    YPan     = 8,
-    Zoom     = 16,
-    Target   = 32,
-    Position = 64,
-    Region   = 128
+    None          = 0,
+    Yaw           = 1,
+    Pitch         = 2,
+    XPan          = 4,
+    YPan          = 8,
+    Zoom          = 16,
+    Target        = 32,
+    Position      = 64,
+    Region        = 128,
+    PlayerControl = 256
 }
 
 [System.Serializable]
 public class CameraBehavior
 {
+    public float easeTime = 1f;
+    public int priority = 0;
+
     [EnumFlag] public CameraProperties changedProperties;
+
     public float yaw;
     public float pitch;
     public float panX;
@@ -74,9 +79,19 @@ public class CameraManager : MonoBehaviour
 
     public bool getBehindPlayer = false;
 
-
-
     private CameraBehavior defaultBehavior;
+    private CameraBehavior roomBehavior;
+
+    public static int CurrentPriority
+    {
+        get
+        {
+            if (currentBehavior != null)
+                return currentBehavior.priority;
+
+            return 0;
+        }
+    }
 
     public void UpdateRefs()
     {
@@ -85,6 +100,13 @@ public class CameraManager : MonoBehaviour
         camera = dolly.Find("Main Camera");
         shake = dolly.gameObject.GetComponent<Shake>();
         skybox = Camera.main.gameObject.GetComponent<Skybox>();
+
+        Room currentRoomScr = LevelManager.CurrentRoomScript;
+        if (currentRoomScr != null)
+        {
+            if (currentRoomScr.changeCamera)
+                roomBehavior = currentRoomScr.newCamera;
+        }
 
         if (defaultBehavior != null)
         {
@@ -157,10 +179,12 @@ public class CameraManager : MonoBehaviour
 
             if (!shifting)
             {
-                if (currentBehavior != null)
-                {
-                    ApplyCurrentBehavior();
-                }
+                // Shift to behaviors in camera volumes
+
+
+                // Apply current behavior
+                CameraBehavior behaviorToApply = currentBehavior != null ? currentBehavior : (roomBehavior != null ? roomBehavior : null);
+                ApplyBehavior(behaviorToApply);
 
                 if (target != null)
                     transform.position = target.position;  //transform.position = Vector3.Lerp(transform.position, target.position, 0.25f);
@@ -407,86 +431,89 @@ public class CameraManager : MonoBehaviour
     }
 
 
-    public static void ApplyCurrentBehavior()
+    public static void ApplyBehavior(CameraBehavior behavior)
     {
-        print("APPLYING CAMERA BEHAVIOR");
-
-        Vector3 oldPos = instance.transform.position;
-        Quaternion oldAngle = dolly.rotation;
-        Vector3 oldOffset = camera.localPosition;
-
-        CameraProperties chProps = currentBehavior.changedProperties;
-
-        bool targetChanged = FlagsHelper.IsSet(chProps, CameraProperties.Target);
-        bool positionChanged = FlagsHelper.IsSet(chProps, CameraProperties.Position);
-        bool pitchChanged = FlagsHelper.IsSet(chProps, CameraProperties.Pitch);
-        bool yawChanged = FlagsHelper.IsSet(chProps, CameraProperties.Yaw);
-        bool xPanChanged = FlagsHelper.IsSet(chProps, CameraProperties.XPan);
-        bool yPanChanged = FlagsHelper.IsSet(chProps, CameraProperties.YPan);
-        bool zoomChanged = FlagsHelper.IsSet(chProps, CameraProperties.Zoom);
-        bool regionChanged = FlagsHelper.IsSet(chProps, CameraProperties.Region);
-
-
-        // Position
-        Vector3 newPos = oldPos + Vector3.zero;
-
-        if (targetChanged)
+        if (behavior != null)
         {
-            newPos = currentBehavior.target.position;
-        }
-        else if (positionChanged)
-        {
-            newPos = currentBehavior.position;
-        }
+            print("APPLYING CAMERA BEHAVIOR");
 
-        if (regionChanged)
-        {
-            newPos = new Vector3(Mathf.Clamp(newPos.x, currentBehavior.regionMin.x, currentBehavior.regionMax.x),
-                                 Mathf.Clamp(newPos.y, currentBehavior.regionMin.y, currentBehavior.regionMax.y),
-                                 Mathf.Clamp(newPos.z, currentBehavior.regionMin.z, currentBehavior.regionMax.z));
+            Vector3 oldPos = instance.transform.position;
+            Quaternion oldAngle = dolly.rotation;
+            Vector3 oldOffset = camera.localPosition;
+
+            CameraProperties chProps = behavior.changedProperties;
+
+            bool targetChanged = FlagsHelper.IsSet(chProps, CameraProperties.Target);
+            bool positionChanged = FlagsHelper.IsSet(chProps, CameraProperties.Position);
+            bool pitchChanged = FlagsHelper.IsSet(chProps, CameraProperties.Pitch);
+            bool yawChanged = FlagsHelper.IsSet(chProps, CameraProperties.Yaw);
+            bool xPanChanged = FlagsHelper.IsSet(chProps, CameraProperties.XPan);
+            bool yPanChanged = FlagsHelper.IsSet(chProps, CameraProperties.YPan);
+            bool zoomChanged = FlagsHelper.IsSet(chProps, CameraProperties.Zoom);
+            bool regionChanged = FlagsHelper.IsSet(chProps, CameraProperties.Region);
+
+
+            // Position
+            Vector3 newPos = oldPos + Vector3.zero;
+
+            if (targetChanged)
+            {
+                newPos = behavior.target.position;
+            }
+            else if (positionChanged)
+            {
+                newPos = behavior.position;
+            }
+
+            if (regionChanged)
+            {
+                newPos = new Vector3(Mathf.Clamp(newPos.x, behavior.regionMin.x, behavior.regionMax.x),
+                                     Mathf.Clamp(newPos.y, behavior.regionMin.y, behavior.regionMax.y),
+                                     Mathf.Clamp(newPos.z, behavior.regionMin.z, behavior.regionMax.z));
+            }
+
+
+            // Orbit angle
+            Quaternion newAngle = oldAngle;
+
+            if (yawChanged || pitchChanged)
+            {
+                Vector3 newAngleEuler = oldAngle.eulerAngles;
+                if (yawChanged)
+                    newAngleEuler.y = behavior.yaw;
+                if (pitchChanged)
+                    newAngleEuler.x = behavior.pitch;
+
+                newAngle = Quaternion.Euler(newAngleEuler);
+            }
+
+            // Panning and zoom
+            Vector3 newOffset = oldOffset + Vector3.zero;
+            if (xPanChanged)
+            {
+                newOffset.x = behavior.panX;
+            }
+            if (yPanChanged)
+            {
+                newOffset.y = behavior.panY;
+            }
+            if (zoomChanged)
+            {
+                newOffset.z = behavior.zoom;
+            }
+
+            // Assign
+            instance.transform.position = newPos;
+            dolly.rotation = newAngle;
+            camera.localPosition = newOffset;
         }
-
-
-        // Orbit angle
-        Quaternion newAngle = oldAngle;
-
-        if (yawChanged || pitchChanged)
-        {
-            Vector3 newAngleEuler = oldAngle.eulerAngles;
-            if (yawChanged)
-                newAngleEuler.y = currentBehavior.yaw;
-            if (pitchChanged)
-                newAngleEuler.x = currentBehavior.pitch;
-
-            newAngle = Quaternion.Euler(newAngleEuler);
-        }
-
-        // Panning and zoom
-        Vector3 newOffset = oldOffset + Vector3.zero;
-        if (xPanChanged)
-        {
-            newOffset.x = currentBehavior.panX;
-        }
-        if (yPanChanged)
-        {
-            newOffset.y = currentBehavior.panY;
-        }
-        if (zoomChanged)
-        {
-            newOffset.z = currentBehavior.zoom;
-        }
-
-        // Assign
-        instance.transform.position = newPos;
-        dolly.rotation = newAngle;
-        camera.localPosition = newOffset;
     }
 
 
 
-    public static void DoShiftToNewShot(CameraBehavior newBehavior, float goalTime = 1f)
+    public static void DoShiftToNewShot(CameraBehavior newBehavior, float goalTime = 0f, int priority = 0)
     {
-        instance.StartCoroutine(instance.ShiftToNewShot(newBehavior, goalTime));
+        instance.StartCoroutine(instance.ShiftToNewShot(newBehavior, goalTime, priority));
     }
     public static void DoGradualReset(float goalTime = 1f)
     {
@@ -503,129 +530,143 @@ public class CameraManager : MonoBehaviour
         shake.effectAmount = strength;
     }
 
-    public IEnumerator ShiftToNewShot(CameraBehavior newBehavior, float goalTime = 1f)
+    public IEnumerator ShiftToNewShot(CameraBehavior newBehavior, float goalTime = 0f, int priority = 0)
     {
-        Vector3 oldPos = transform.position;
-        Quaternion oldAngle = dolly.rotation;
-        Vector3 oldOffset = camera.localPosition;
+        if (priority == 0)
+            priority = newBehavior.priority;
 
-
-        bool targetChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Target);
-        bool positionChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Position);
-        bool pitchChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Pitch);
-        bool yawChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Yaw);
-        bool xPanChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.XPan);
-        bool yPanChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.YPan);
-        bool zoomChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Zoom);
-        bool regionChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Region);
-
-        /*
-        if (currentBehavior != null)
-            print("SHIFTING TO " + newBehavior.ToString()+" FROM "+currentBehavior.ToString());
-        else
-            print("SHIFTING TO "+newBehavior.ToString());
-
-
-        int numChanged = 0;
-        bool[] allFlags = { targetChanged, positionChanged, pitchChanged, yawChanged, xPanChanged, yPanChanged, zoomChanged, regionChanged };
-        foreach (bool flag in allFlags)
+        if (priority >= CurrentPriority && currentBehavior != newBehavior && !shifting)
         {
-            if (flag)
-                numChanged++;
-        }
-        print("CHANGED FLAGS: " + numChanged.ToString());
-        */
 
-        target = null;
-        currentBehavior = newBehavior;
-        shifting = true;
+            Vector3 oldPos = transform.position;
+            Quaternion oldAngle = dolly.rotation;
+            Vector3 oldOffset = camera.localPosition;
 
-        float timeLeft = goalTime;
-        while (timeLeft > 0f)
-        {
-            // Position
-            Vector3 newPos = oldPos + Vector3.zero;
+            if (goalTime == 0)
+                goalTime = newBehavior.easeTime;
+
+            bool targetChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Target);
+            bool positionChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Position);
+            bool pitchChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Pitch);
+            bool yawChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Yaw);
+            bool xPanChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.XPan);
+            bool yPanChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.YPan);
+            bool zoomChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Zoom);
+            bool regionChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Region);
+
+            //*
+            if (currentBehavior != null)
+                print("SHIFTING TO " + newBehavior.ToString()+" FROM "+currentBehavior.ToString());
+            else
+                print("SHIFTING TO "+newBehavior.ToString());
+
+
+            int numChanged = 0;
+            bool[] allFlags = { targetChanged, positionChanged, pitchChanged, yawChanged, xPanChanged, yPanChanged, zoomChanged, regionChanged };
+            foreach (bool flag in allFlags)
+            {
+                if (flag)
+                    numChanged++;
+            }
+            print("CHANGED FLAGS: " + numChanged.ToString());
+            //*/
+
+            target = null;
+            currentBehavior = newBehavior;
+            shifting = true;
+
+            float timeLeft = goalTime;
+            while (timeLeft > 0f)
+            {
+                // Position
+                Vector3 newPos = oldPos + Vector3.zero;
+
+                if (targetChanged)
+                {
+                    newPos = newBehavior.target.position;
+                }
+                else if (positionChanged)
+                {
+                    newPos = newBehavior.position;
+                }
+
+                if (regionChanged)
+                {
+                    //print("regionChanged");
+                    newPos = new Vector3(Mathf.Clamp(newPos.x, newBehavior.regionMin.x, newBehavior.regionMax.x),
+                                         Mathf.Clamp(newPos.y, newBehavior.regionMin.y, newBehavior.regionMax.y),
+                                         Mathf.Clamp(newPos.z, newBehavior.regionMin.z, newBehavior.regionMax.z));
+                }
+
+
+                // Orbit angle
+                Quaternion newAngle = oldAngle;
+
+                if (yawChanged || pitchChanged)
+                {
+                    Vector3 newAngleEuler = oldAngle.eulerAngles;
+                    if (yawChanged)
+                        newAngleEuler.y = newBehavior.yaw;
+                    if (pitchChanged)
+                        newAngleEuler.x = newBehavior.pitch;
+
+                    newAngle = Quaternion.Euler(newAngleEuler);
+                }
+
+                // Panning and zoom
+                Vector3 newOffset = oldOffset + Vector3.zero;
+                if (xPanChanged)
+                {
+                    newOffset.x = newBehavior.panX;
+                }
+                if (yPanChanged)
+                {
+                    newOffset.y = newBehavior.panY;
+                }
+                if (zoomChanged)
+                {
+                    newOffset.z = newBehavior.zoom;
+                }
+
+                /*
+                if (Vector3.Equals(oldPos, newPos))
+                    print("POSITIONS ARE THE SAME");
+                if (Vector3.Equals(oldOffset, newOffset))
+                    print("OFFSETS ARE THE SAME");
+                if (Quaternion.Equals(oldAngle, newAngle))
+                    print("ROTATIONS ARE THE SAME");
+                */
+
+
+                // Assign
+                float percent = 1f - (timeLeft / goalTime);
+
+                transform.position = new Vector3(Mathf.SmoothStep(oldPos.x, newPos.x, percent), Mathf.SmoothStep(oldPos.y, newPos.y, percent), Mathf.SmoothStep(oldPos.z, newPos.z, percent));
+                dolly.rotation = Quaternion.Slerp(oldAngle, newAngle, percent);
+                camera.localPosition = new Vector3(Mathf.SmoothStep(oldOffset.x, newOffset.x, percent), Mathf.SmoothStep(oldOffset.y, newOffset.y, percent), Mathf.SmoothStep(oldOffset.z, newOffset.z, percent));
+
+                //print("NEW POSITION: "+newPos.ToString());
+
+
+                timeLeft -= Time.deltaTime;
+
+                yield return null;
+            }
 
             if (targetChanged)
             {
-                newPos = newBehavior.target.position;
+                target = newBehavior.target;
             }
-            else if (positionChanged)
-            {
-                newPos = newBehavior.position;
-            }
-
-            if (regionChanged)
-            {
-                //print("regionChanged");
-                newPos = new Vector3(Mathf.Clamp(newPos.x, newBehavior.regionMin.x, newBehavior.regionMax.x),
-                                     Mathf.Clamp(newPos.y, newBehavior.regionMin.y, newBehavior.regionMax.y),
-                                     Mathf.Clamp(newPos.z, newBehavior.regionMin.z, newBehavior.regionMax.z));
-            }
-
-
-            // Orbit angle
-            Quaternion newAngle = oldAngle;
-
-            if (yawChanged || pitchChanged)
-            {
-                Vector3 newAngleEuler = oldAngle.eulerAngles;
-                if (yawChanged)
-                    newAngleEuler.y = newBehavior.yaw;
-                if (pitchChanged)
-                    newAngleEuler.x = newBehavior.pitch;
-
-                newAngle = Quaternion.Euler(newAngleEuler);
-            }
-
-            // Panning and zoom
-            Vector3 newOffset = oldOffset + Vector3.zero;
-            if (xPanChanged)
-            {
-                newOffset.x = newBehavior.panX;
-            }
-            if (yPanChanged)
-            {
-                newOffset.y = newBehavior.panY;
-            }
-            if (zoomChanged)
-            {
-                newOffset.z = newBehavior.zoom;
-            }
-
-            /*
-            if (Vector3.Equals(oldPos, newPos))
-                print("POSITIONS ARE THE SAME");
-            if (Vector3.Equals(oldOffset, newOffset))
-                print("OFFSETS ARE THE SAME");
-            if (Quaternion.Equals(oldAngle, newAngle))
-                print("ROTATIONS ARE THE SAME");
-            */
-
-
-            // Assign
-            float percent = 1f - (timeLeft / goalTime);
-
-            transform.position = new Vector3(Mathf.SmoothStep(oldPos.x, newPos.x, percent), Mathf.SmoothStep(oldPos.y, newPos.y, percent), Mathf.SmoothStep(oldPos.z, newPos.z, percent));
-            dolly.rotation = Quaternion.Slerp(oldAngle, newAngle, percent);
-            camera.localPosition = new Vector3(Mathf.SmoothStep(oldOffset.x, newOffset.x, percent), Mathf.SmoothStep(oldOffset.y, newOffset.y, percent), Mathf.SmoothStep(oldOffset.z, newOffset.z, percent));
-
-            timeLeft -= Time.deltaTime;
-
+            behaviorHistory.Insert(0, newBehavior);
+            shifting = false;
+        }
+        else
             yield return null;
-        }
-
-        if (targetChanged)
-        {
-            target = newBehavior.target;
-        }
-        behaviorHistory.Insert(0,newBehavior);
-        shifting = false;
     }
 
     public IEnumerator GraduallyResetShot(float goalTime = 1f)
     {
-        yield return StartCoroutine(ShiftToNewShot(defaultBehavior, goalTime));
+        yield return StartCoroutine(ShiftToNewShot(roomBehavior != null ? roomBehavior : defaultBehavior, goalTime, 9999));
         currentBehavior = null;
     }
 }

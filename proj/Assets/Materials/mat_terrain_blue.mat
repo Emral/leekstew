@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: mat_terrain_blue
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 4800000, guid: b56c75590651fe14aafa3be91eb325f2, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -54,11 +54,25 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ShadowBrushMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecBrushMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
+    - _Cull: 2
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _FresPower: 8
     - _GlossMapScale: 1
     - _Glossiness: 0
     - _GlossyReflections: 1
@@ -66,7 +80,21 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _ShadowDepth: 1
+    - _ShadowDotDensity: 0.8
+    - _ShadowDotRadius: 0.01
+    - _ShadowLineDensity: 0.5
+    - _ShadowLineStroke: 50
+    - _ShadowOffset: 0
+    - _ShadowSaturation: 1
+    - _ShadowSharpness: 80
     - _SmoothnessTextureChannel: 0
+    - _SpecDotDensity: 0.8
+    - _SpecDotRadius: 0.01
+    - _SpecLevels: 2
+    - _SpecLineDensity: 0.5
+    - _SpecLineStroke: 50
+    - _SpecSharpness: 80
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
@@ -74,3 +102,6 @@ Material:
     m_Colors:
     - _Color: {r: 0.1397059, g: 0.8220079, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _FresColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
+    - _ShadowHue: {r: 0, g: 0.16790059, b: 0.5661765, a: 1}
+    - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}

@@ -11,6 +11,12 @@ public class PathedObjects : ObjectGroup
     public bool closed = false;
     public bool orientToPath = false;
     public bool objectsHaveCollision = true;
+
+    public bool useCollisionQuads = false;
+    public float collisionQuadWidth = 0f;
+    public bool collisionQuadsDoubleSided = false;
+    public Vector3 collisionQuadsUp = Vector3.up;
+
     [HideInInspector] public int cachedCount = 0;
 
     [ReorderableList] public Vector3[] points;
@@ -45,8 +51,11 @@ public class PathedObjects : ObjectGroup
         if (orientToPath)
         {
             Vector3 lookDir = endPt-startPt;
-            GameObject lookAtParent = GameObject.Instantiate(new GameObject(), spawned.transform.position, Quaternion.identity, transform);
-            lookAtParent.name = "I Shouldn't Exist, Please Delete Me";
+            GameObject lookAtParent = new GameObject();
+            lookAtParent.transform.position = spawned.transform.position;
+            lookAtParent.transform.parent = transform;
+
+            lookAtParent.name = "Spawned by "+gameObject.name;
             spawned.transform.parent = lookAtParent.transform;
             lookAtParent.transform.rotation = Quaternion.LookRotation(lookDir);
             spawned.transform.parent = transform;
@@ -67,6 +76,8 @@ public class PathedObjects : ObjectGroup
     }
 
 
+
+
     public override void Recreate()
     {
         base.Recreate();
@@ -78,6 +89,21 @@ public class PathedObjects : ObjectGroup
         if (points.Length > 1 && prefabs.Length > 0 && gap > 0)
         {
             bool validClosed = (closed && points.Length > 2);
+
+
+            // If adding collision quads, make a parent for them
+            GameObject collideParent;
+            Transform collideTrans = transform;
+            if (collisionQuadWidth > 0  &&  useCollisionQuads)
+            {
+                // Create a new walls container child
+                collideParent = new GameObject();
+                collideParent.name = "Collision";
+                collideParent.transform.parent = transform;
+                collideTrans = collideParent.transform;
+                collideTrans.localPosition = Vector3.zero;
+            }
+
 
             // Set up a copy array for the sake of closed path stuff
             Vector3[] tempPoints;
@@ -104,14 +130,43 @@ public class PathedObjects : ObjectGroup
             for (int i = 0; i < tempPoints.Length - 1; i++)
             {
                 startPt = tempPoints[i];
-                endPt = tempPoints[i+1];
-                float dist = Vector3.Distance(startPt, endPt);
+                endPt = tempPoints[i + 1];
 
+                // Place the prefab instances
+                float dist = Vector3.Distance(startPt, endPt);
                 float numInstances = Mathf.Floor(dist / gap);
                 for (int j = 0; j < numInstances; j++)
                 {
-                    PlacePrefab(Vector3.Lerp(startPt, endPt, j/numInstances) + offset, (cachedCount + 1).ToString() + " --");
+                    PlacePrefab(Vector3.Lerp(startPt, endPt, j / numInstances) + offset, (cachedCount + 1).ToString() + " --");
                     cachedCount++;
+                }
+
+                // Place the collision objects
+                if (useCollisionQuads && collisionQuadWidth > 0f)
+                {
+                    Vector3 segmentDir = endPt - startPt;
+                    Vector3 midPt = 0.5f * (startPt + endPt);
+                    GameObject quadA = GameObject.CreatePrimitive(PrimitiveType.Quad);
+
+                    quadA.layer = 9;
+                    quadA.name = "top side " + i.ToString();
+                    Vector3 localScale = new Vector3(collisionQuadWidth, Mathf.Abs(segmentDir.magnitude), 1f);
+                    quadA.transform.localScale = localScale;
+
+                    quadA.transform.parent = collideTrans;
+                    quadA.transform.localPosition = midPt;
+
+                    Vector3 leftDir = Vector3.Cross(segmentDir, -collisionQuadsUp);
+                    quadA.transform.localRotation = Quaternion.LookRotation(Vector3.Cross(leftDir, segmentDir), -segmentDir);
+                    quadA.GetComponent<Renderer>().enabled = false;
+
+                    if (collisionQuadsDoubleSided)
+                    {
+                        GameObject quadB = GameObject.Instantiate(quadA, quadA.transform.position, quadA.transform.localRotation, collideTrans);
+                        quadB.name = "bottom side " + i.ToString();
+                        localScale.z = -1f;
+                        quadB.transform.localScale = localScale;
+                    }
                 }
             }
 

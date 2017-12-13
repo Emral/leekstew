@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: mat_solid_beige
-  m_Shader: {fileID: 4800000, guid: 5e16a6970fe65fc4e9b9c0af20142bc8, type: 3}
+  m_Shader: {fileID: 4800000, guid: b56c75590651fe14aafa3be91eb325f2, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -116,5 +116,5 @@ Material:
     - _HColor: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 0}
     - _SColor: {r: 0.3602941, g: 0.1721811, b: 0.050335187, a: 1}
-    - _ShadowHue: {r: 0, g: 0, b: 0, a: 0}
-    - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
+    - _ShadowHue: {r: 1, g: 0.8206896, b: 0.2352941, a: 0.666}
+    - _SpecColor: {r: 0.8161765, g: 0.73042, b: 0.37208048, a: 0.5}

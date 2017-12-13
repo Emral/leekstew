@@ -107,6 +107,7 @@ public class ObjectGroup : PlacementTool
         for (int i = 0; i < transform.childCount; i++)
         {
             Transform child = transform.GetChild(i);
+            child.gameObject.name = "I should be destroyed";
             DestroyImmediate(child.gameObject);
         }
     }
