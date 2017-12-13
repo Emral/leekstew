@@ -45,7 +45,7 @@ public class ObjectGroup : PlacementTool
             {
                 hasBeenCleared = true;
                 if (clearEffect != null)
-                    GameObject.Instantiate(clearEffect, GameManager.player.transform.position, Quaternion.identity);
+                    GameObject.Instantiate(clearEffect, GameManager.instance.player.transform.position, Quaternion.identity);
 
                 if (clearPowerCharges.Length > 0)
                 {

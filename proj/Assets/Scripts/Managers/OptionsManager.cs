@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;       //Allows us to use Lists.
+using UnityEngine.UI;
 
 public class OptionsManager : MonoBehaviour
 {
@@ -19,41 +20,33 @@ public class OptionsManager : MonoBehaviour
     public static bool autosave = true;
 
 
+    public Slider CamXSlider;
+    public Slider CamYSlider;
+    public Slider CamShakeSlider;
+
+    public Slider SoundSlider;
+    public Slider MusicSlider;
+
+    public Toggle CamXToggle;
+    public Toggle CamYToggle;
+
+
     void Awake ()
     {
         if (instance == null)
             instance = this;
     }
 
-    void ConnectSlider(string objName, ref float optionVar)
-    {
-        GameObject sliderObj = GameObject.Find(objName);
-        if (sliderObj != null)
-        {
-            UnityEngine.UI.Slider sliderScr = sliderObj.GetComponent("Slider") as UnityEngine.UI.Slider;
-            optionVar = sliderScr.value;
-        }
-    }
-    void ConnectToggle(string objName, ref bool optionVar)
-    {
-        GameObject toggleObj = GameObject.Find(objName);
-        if (toggleObj != null)
-        {
-            UnityEngine.UI.Toggle toggleScr = toggleObj.GetComponent("Toggle") as UnityEngine.UI.Toggle;
-            optionVar = toggleScr.isOn;
-        }
-    }
-
     void Update ()
     {
-        ConnectSlider("UI_CamXSlider", ref cameraSpeedX);
-        ConnectSlider("UI_CamYSlider", ref cameraSpeedY);
-        ConnectSlider("UI_CamShakeSlider", ref cameraShakeStrength);
+        cameraSpeedX = CamXSlider.value;
+        cameraSpeedY = CamYSlider.value;
+        cameraShakeStrength = CamShakeSlider.value;
 
-        ConnectToggle("UI_CamXToggle", ref cameraInvertedX);
-        ConnectToggle("UI_CamYToggle", ref cameraInvertedY);
+        cameraInvertedX = CamXToggle.isOn;
+        cameraInvertedY = CamYToggle.isOn;
 
-        ConnectSlider("UI_SoundVolumeSlider", ref soundVolume);
-        ConnectSlider("UI_MusicVolumeSlider", ref musicVolume);
+        soundVolume = SoundSlider.value;
+        musicVolume = MusicSlider.value;
     }
 }

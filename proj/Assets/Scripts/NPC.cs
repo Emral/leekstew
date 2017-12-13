@@ -13,8 +13,7 @@ public class NPC : MonoBehaviour
 
     public virtual void Update()
     {
-        if (GameManager.player != null)
-            distToPlayer = Vector3.Distance(transform.position, GameManager.player.transform.position);
+        distToPlayer = Vector3.Distance(transform.position, GameManager.instance.player.transform.position);
 
         if (distToPlayer < talkDist && GameManager.inputPress["Run"] && !GameManager.cutsceneMode && talkCooldown <= 0f)
         {

@@ -24,8 +24,8 @@ public class GameManager : MonoBehaviour
     public static int leeksCollected = 0;
 
     public static GameManager instance = null;              //Static instance of GameManager which allows it to be accessed by any other script.
-    public static Player player = null;                     //Static reference to the Player script
-    public static CameraManager camera = null;              //Static reference to the CameraManager script
+    public Player player = null;                     //Static reference to the Player script
+    public CameraManager camera = null;              //Static reference to the CameraManager script
     public static UIManager ui = null;
 
     public static bool isGamePaused = false;
@@ -58,9 +58,9 @@ public class GameManager : MonoBehaviour
 
         //Call the InitGame function to initialize the first level 
         InitGame();
-        LevelManager.InitLevel();
         SaveManager.InitSave();
         UIManager.InitUI();
+        LevelManager.InitLevel();
     }
     void Update()
     {
@@ -89,20 +89,6 @@ public class GameManager : MonoBehaviour
     #region update
         void UpdateRefs()
         {
-            // Player
-            GameObject playerObj = GameObject.Find("Obj_Player");
-            if (playerObj != null)
-            {
-                player = playerObj.GetComponent("Player") as Player;
-            }
-
-            // Camera
-            GameObject cameraObj = GameObject.Find("Obj_Camera");
-            if (cameraObj != null)
-            {
-                camera = cameraObj.GetComponent("CameraManager") as CameraManager;
-            }
-
             // UI manager
             ui = gameObject.GetComponent<UIManager>();
         }
@@ -182,7 +168,7 @@ public class GameManager : MonoBehaviour
         }
         public static void ScreenShake(float strength)
         {
-            camera.StartCoroutine(camera.DelayedShake(strength));
+            instance.camera.StartCoroutine(instance.camera.DelayedShake(strength));
         }
     #endregion
 

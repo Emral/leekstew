@@ -41,6 +41,10 @@ public class LevelManager : MonoBehaviour
     public static Dictionary<int, string> roomNames;
     public static Dictionary<int, AudioClip> roomMusic;
 
+    public Text levelIntroName;
+    public Text levelIntroCreator;
+    public RawImage introThumbnail;
+
     public static GameObject CurrentRoomObject
     {
         get
@@ -202,25 +206,25 @@ public class LevelManager : MonoBehaviour
     public IEnumerator LevelLoadSequence()
     {
         // Wait until the player reference is valid
-        while (GameManager.player == null)
+        while (GameManager.instance.player == null)
         {
             yield return null;
         }
 
         // Reset the player's health
-        GameManager.player.UpdateReferences();
-        GameManager.player.health.currentHp = 2;
-        GameManager.player.inputActive = false;
+        GameManager.instance.player.UpdateReferences();
+        GameManager.instance.player.health.currentHp = 2;
+        GameManager.instance.player.inputActive = false;
 
         // Set the camera's target to the player if a preset target doesn't exist
-        if (GameManager.camera.target == null)
-            GameManager.camera.target = GameManager.player.transform;
+        if (GameManager.instance.camera.target == null)
+            GameManager.instance.camera.target = GameManager.instance.player.transform;
 
         // Place the player at the warp destination
         if (isWarping)
         {
             isWarping = false;
-            GameManager.player.transform.position = warpDestination;
+            GameManager.instance.player.transform.position = warpDestination;
         }
         else
         {
@@ -241,7 +245,7 @@ public class LevelManager : MonoBehaviour
             if (scr.checkpointID == currentCheckpoint)
             {
                 scr.SetCurrent();
-                GameManager.player.transform.position = checkpoint.transform.position + Vector3.up * 0.5f;
+                GameManager.instance.player.transform.position = checkpoint.transform.position + Vector3.up * 0.5f;
             }
         }
 
@@ -258,16 +262,12 @@ public class LevelManager : MonoBehaviour
 
         // Level intro stuff
         // Intro text
-        UIManager.instance.UpdateRefs();
         if (beginningLevel)
         {
-            if (currentLevel != null && UIManager.instance.levelIntroObj != null)
+            if (currentLevel != null && UIManager.instance != null)
             {
-                Text introName = GameObject.Find("LevelIntroName").GetComponentInChildren<Text>();
-                Text introCreator = GameObject.Find("LevelIntroCreator").GetComponentInChildren<Text>();
-                RawImage introThumbnail = GameObject.Find("LevelIntroThumbnail").GetComponentInChildren<RawImage>();
-                introName.text = currentLevel.name;
-                introCreator.text = currentLevel.creator;
+                levelIntroName.text = currentLevel.name;
+                levelIntroCreator.text = currentLevel.creator;
                 introThumbnail.texture = currentLevel.thumbnail;
 
                 yield return new WaitForSeconds(1f);
@@ -277,7 +277,7 @@ public class LevelManager : MonoBehaviour
         }
         else if (UIManager.instance != null)
         {
-            UIManager.instance.levelIntroObj.SetActive(false);
+            UIManager.instance.levelIntroGroup.gameObject.SetActive(false);
         }
 
 
@@ -291,7 +291,7 @@ public class LevelManager : MonoBehaviour
         ui.StartCoroutine(ui.ScreenFadeChange(0f, 1f));
         yield return new WaitForSeconds(0.5f);
 
-        GameManager.player.inputActive = true;
+        GameManager.instance.player.inputActive = true;
         beginningLevel = false;
     }
     #endregion

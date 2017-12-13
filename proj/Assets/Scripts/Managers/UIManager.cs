@@ -19,30 +19,30 @@ public class UIManager : MonoBehaviour
 
     public static float screenFadeAmount = 1f;
     public static float letterboxFadeAmount = 0f;
-    
+
     public CanvasGroup levelIntroGroup;
     public GameObject letterboxObj;
 
     public static float pickupFadeCounter = 2f;
     public CanvasGroup pickupBarGroup;
+    public Text teethCounter;
+    public Text leekCounter;
+    [HideInInspector]
     public int currentTeethShown;
 
     public static float hpFadeCounter = 2f;
-    public CanvasGroup hpBarGroup;
 
     public static float musicFadeCounter = 0f;
     public CanvasGroup musicCreditsGroup;
     public RectTransform musicCreditsObj;
     public Text songInfo;
 
-    public GameObject saveTextObj;
-    public CanvasGroup saveTextGroup;
-
+    //public Text saveTextObj;
+    //public CanvasGroup saveTextGroup;
+    public CanvasGroup hpBarGroup;
     public GameObject canvasObj;
     public GameObject pauseMenuObj;
-    public GameObject optionsMenuObj;
-    public GameObject exitMenuObj;
-    public GameObject currentMenuObj;
+    public GameObject[] otherMenuObjs;
     public Image screenFadeScr;
 
     public UnityEngine.EventSystems.StandaloneInputModule inputModule;
@@ -53,8 +53,8 @@ public class UIManager : MonoBehaviour
     #region monobehavior events
     private void Awake()
     {
-    if (instance == null)
-        instance = this;
+        if (instance == null)
+            instance = this;
     }
     public static void InitUI()
     {
@@ -76,7 +76,7 @@ public class UIManager : MonoBehaviour
             pickupFadeCounter = 0f;
         }
         {
-            bool shouldFade = hpFadeCounter < 7f || (GameManager.timeSinceInput <= 1f && GameManager.player.health.currentHp >= GameManager.player.health.hp);
+            bool shouldFade = hpFadeCounter < 7f || (GameManager.timeSinceInput <= 1f && GameManager.instance.player.health.currentHp >= GameManager.instance.player.health.hp);
             hpFadeCounter += (shouldFade ? 1 : -1) * Time.deltaTime;
             hpFadeCounter = Mathf.Max(hpFadeCounter, 0f);
             if (hpFadeCounter >= 7f)
@@ -85,8 +85,6 @@ public class UIManager : MonoBehaviour
             hpBarGroup.alpha = 8f - hpFadeCounter;
         }
         
-        Text teethCounter = GameObject.Find("TeethCounter").GetComponent("Text") as Text;
-        Text leekCounter = GameObject.Find("LeekCounter").GetComponent("Text") as Text;
         teethCounter.text = currentTeethShown.ToString();
         leekCounter.text = SaveManager.currentSave.TotalLeeks.ToString();
 
@@ -142,43 +140,44 @@ public class UIManager : MonoBehaviour
     {
         // Handle pausing
         GameManager.isGamePaused = true;
-        if (currentMenuObj != null)
-        {
-            //print("CURRENT MENU: " + currentMenuObj.name);
-            switch (currentMenuObj.name)
-            {
-                case "Menu_Pause":
-                    if (GameManager.inputRelease["Pause"])
-                        UnpauseGame();
-                    break;
 
-                default:
-                    if (GameManager.inputRelease["Pause"] || GameManager.inputRelease["Run"])
-                    { 
-                        currentMenuObj.SetActive(false);
-                        PauseGame();
-                    }
-                    break;
+        GameObject activeObj = null;
+
+        foreach (GameObject g in otherMenuObjs)
+        {
+            if (g.activeInHierarchy)
+            {
+                activeObj = g;
             }
         }
-        else
+        if (pauseMenuObj.activeInHierarchy)
+        {
+            if (GameManager.inputRelease["Pause"])
+            {
+                UnpauseGame();
+            }
+        } else if (activeObj != null)
+        {
+            if (GameManager.inputRelease["Pause"] || GameManager.inputRelease["Run"])
+            {
+                activeObj.SetActive(false);
+                PauseGame();
+            }
+
+        } else
         {
             GameManager.isGamePaused = false;
             if (GameManager.inputRelease["Pause"])
                 PauseGame();
         }
     }
-    #endregion
 
     #region methods
     void PauseGame()
     {
-        if (pauseMenuObj != null)
-        {
-            Time.timeScale = 0;
-            pauseMenuObj.SetActive(true);
-            eventSystem.SetSelectedGameObject(GameObject.Find("UI_PauseMenu_Button1"));
-        }
+        Time.timeScale = 0;
+        pauseMenuObj.SetActive(true);
+        eventSystem.SetSelectedGameObject(GameObject.Find("UI_PauseMenu_Button1"));
     }
     void UnpauseGame()
     {
@@ -219,17 +218,12 @@ public class UIManager : MonoBehaviour
     {
         print("STARTING HP COROUTINE");
 
-        while (hpBarObj == null)
-        {
-            yield return null;
-        }
-
         print("HP BAR OBJECT FOUND");
 
         // References and vars
         RectTransform panel;
-        panel = hpBarObj.GetComponent<RectTransform>();
-        HealthPoints playerHP = GameManager.player.health;
+        panel = hpBarGroup.GetComponent<RectTransform>();
+        HealthPoints playerHP = GameManager.instance.player.health;
 
         // Health variables
         int currentHP = 2;
@@ -252,18 +246,12 @@ public class UIManager : MonoBehaviour
         // Loop
         while (true)
         {
-            while (hpBarObj == null)
-            {
-                yield return null;
-            }
 
-            hpBarObj.transform.SetParent(canvasObj.transform);
+            hpBarGroup.transform.SetParent(canvasObj.transform);
                 
-            playerHP = GameManager.player.health;
-            hpBarObj = GameObject.Find("UI_PlayerHP");
-            panel = hpBarObj.GetComponent<RectTransform>();
+            playerHP = GameManager.instance.player.health;
 
-            bool barExists = hpBarObj != null;
+            bool barExists = hpBarGroup != null;
             bool hpExists = playerHP != null;
             bool panelExists = panel != null;
 
@@ -274,12 +262,12 @@ public class UIManager : MonoBehaviour
             {
 
                 // Repopulate the HP objects
-                if (hpBarObj.transform.GetChildCount() == 0)
+                if (hpBarGroup.transform.childCount == 0)
                 {
                     hps.Clear();
                     for (int i = 0; i < 50; i++)
                     {
-                        hps.Add(AddUISprite(emptyHeartSprite, hpBarObj.transform, new Vector3(0, -0.5f * imageSize, 0), Vector3.one / 3f));
+                        hps.Add(AddUISprite(emptyHeartSprite, hpBarGroup.transform, new Vector3(0, -0.5f * imageSize, 0), Vector3.one / 3f));
                     }
                 }
 
@@ -304,25 +292,22 @@ public class UIManager : MonoBehaviour
                 // Loop through each sprite object and do stuffs
                 for (int i = 0; i < Mathf.Min(hps.Count, currentHeartCount + 1); i++)
                 {
-
-                    GameObject hpObj = hps[i];
-
-                    if (hpObj != null)
+                    if (hps[i] != null)
                     {
 
                         // Position the object based on the current panel width
-                        hpObj.transform.localPosition = new Vector3(-0.5f * currentWidth + i * (imageSize + gapWidth) + 0.5f * imageSize + 16f, hpObj.transform.localPosition.y, 0f);
+                        hps[i].transform.localPosition = new Vector3(-0.5f * currentWidth + i * (imageSize + gapWidth) + 0.5f * imageSize + 16f, hps[i].transform.localPosition.y, 0f);
 
                         //Determine whether to use the object
                         if (i >= currentHeartCount)
                         {
-                            hpObj.SetActive(false);
+                            hps[i].SetActive(false);
                         }
 
                         else
                         {
                             // If the object is used, determine the sprite
-                            hpObj.SetActive(true);
+                            hps[i].SetActive(true);
                             Sprite currentSprite = emptyHeartSprite;
                             if (i < targetHP)
                             {
@@ -331,7 +316,7 @@ public class UIManager : MonoBehaviour
                                     currentSprite = soulHeartSprite;
                             }
 
-                            Image image = hpObj.GetComponent("Image") as Image;
+                            Image image = hps[i].GetComponent<Image>();
                             image.sprite = currentSprite;
                         }
                     }
@@ -394,19 +379,17 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public IEnumerator ShowSaving()
+    /*public IEnumerator ShowSaving()
     {
-        Text saveText = saveTextObj.GetComponent<Text>();
-        saveText.text = "Saving...";
+        saveTextObj.text = "Saving...";
         yield return FadeCanvasGroup(saveTextGroup, 1, 0.5f);
     }
     public IEnumerator ShowSaveFinished()
     {
-        Text saveText = saveTextObj.GetComponent<Text>();
-        saveText.text = "Game Saved!";
+        saveTextObj.text = "Game Saved!";
         yield return new WaitForSeconds(1f);
         yield return FadeCanvasGroup(saveTextGroup, 1, 1f);
-    }
+    }*/
 
     public IEnumerator ScreenFadeChange(float goal, float goalTime, float delay = 0f)
     {

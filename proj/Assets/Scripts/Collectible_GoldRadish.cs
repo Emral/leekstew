@@ -12,7 +12,7 @@ public class Collectible_GoldRadish : Collectible_Radish
     // Update is called once per frame
     public override IEnumerator OnCollectEnd()
     {
-        GameManager.player.health.hp++;
+        GameManager.instance.player.health.hp++;
         base.OnCollectEnd();
         yield return null;
     }

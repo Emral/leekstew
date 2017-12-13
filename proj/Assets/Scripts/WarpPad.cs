@@ -69,7 +69,7 @@ public class WarpPad : NPC
         }
         else
         {
-            GameManager.player.inputActive = false;
+            GameManager.instance.player.inputActive = false;
             if (destinationWarpPad != null)
                 LevelManager.warpDestination = destinationWarpPad.position + Vector3.up * 0.1f;
 
@@ -93,9 +93,9 @@ public class WarpPad : NPC
                     SaveManager.CurrentLevelSave.warpPadsActivated.Add(destPadScr.instanceID);
                 }
 
-                GameManager.player.transform.position = LevelManager.warpDestination;
+                GameManager.instance.transform.position = LevelManager.warpDestination;
                 LevelManager.ChangeRoom(room);
-                GameManager.player.inputActive = true;
+                GameManager.instance.player.inputActive = true;
                 AudioManager.SetMusic(LevelManager.roomMusic[room]);
                 yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(0f, 0.5f));
             }

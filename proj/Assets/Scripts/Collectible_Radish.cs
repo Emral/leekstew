@@ -15,7 +15,7 @@ public class Collectible_Radish : Collectible
     public override IEnumerator OnCollectEnd()
     {
         base.OnCollectEnd();
-        GameManager.player.health.ChangeHP(1, addSoulHearts);
+        GameManager.instance.player.health.ChangeHP(1, addSoulHearts);
         UIManager.hpFadeCounter = 0f;
         yield return null;
     }

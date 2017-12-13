@@ -188,10 +188,8 @@ public class CameraManager : MonoBehaviour
 
                 if (target != null)
                     transform.position = target.position;  //transform.position = Vector3.Lerp(transform.position, target.position, 0.25f);
-
-                if (GameManager.player != null)
-                {
-                    if (target == GameManager.player.transform && currentBehavior == null)
+                
+                    if (target == GameManager.instance.player.transform && currentBehavior == null)
                     {
                         // Player camera control stick
                         moveX = GameManager.inputVals["Cam X"] * OptionsManager.cameraSpeedX * 0.5f * (OptionsManager.cameraInvertedX ? -1 : 1) * (GameManager.cutsceneMode ? 0 : 1);
@@ -257,7 +255,7 @@ public class CameraManager : MonoBehaviour
 
                         // Main raycast for whiskers
                         float minDist = 999f;
-                        if (Physics.Linecast(GameManager.player.transform.position, camera.position + Vector3.up, out hit, avoidMask))
+                        if (Physics.Linecast(GameManager.instance.player.transform.position, camera.position + Vector3.up, out hit, avoidMask))
                         {
                             minDist = hit.distance;
                         }
@@ -311,13 +309,13 @@ public class CameraManager : MonoBehaviour
                         // Camera snap
                         if (GameManager.inputVals["Cam Focus"] > 0.5)
                         {
-                            dolly.rotation = Quaternion.Lerp(dolly.rotation, GameManager.player.transform.rotation, 0.03f);
+                            dolly.rotation = Quaternion.Lerp(dolly.rotation, GameManager.instance.player.transform.rotation, 0.03f);
                         }
 
 
                         // Player camera automation
-                        float rotRate = (GameManager.player.GetGrounded()) ? 0.01f : 0.00625f;
-                        Vector3 playerRotEuler = GameManager.player.transform.rotation.eulerAngles;
+                        float rotRate = (GameManager.instance.player.GetGrounded()) ? 0.01f : 0.00625f;
+                        Vector3 playerRotEuler = GameManager.instance.player.transform.rotation.eulerAngles;
                         Vector3 dollyEuler = dolly.rotation.eulerAngles;
 
                         // Avoidance
@@ -391,11 +389,11 @@ public class CameraManager : MonoBehaviour
                         */
 
                         // Look down when falling
-                        if (GameManager.player.groundDistance > 3)
+                        if (GameManager.instance.player.groundDistance > 3)
                         {
                             playerRotEuler.x += 55;
                         }
-                        if (GameManager.player.groundDistance > 5)
+                        if (GameManager.instance.player.groundDistance > 5)
                         {
                             playerRotEuler.x += 22;
                         }
@@ -417,7 +415,7 @@ public class CameraManager : MonoBehaviour
 
 
                         // Rotate when moving
-                        CharacterController playercc = GameManager.player.GetCharacterController();
+                        CharacterController playercc = GameManager.instance.player.GetCharacterController();
                         if (playercc.velocity.magnitude > 0 && moveX == 0 && moveY == 0 && Quaternion.Angle(Quaternion.Euler(0f, playerRotEuler.y, 0f), dolly.rotation) < 120f)
                         {
                             dolly.rotation = Quaternion.Lerp(dolly.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, playerRotEuler.z), rotRate);
@@ -425,7 +423,6 @@ public class CameraManager : MonoBehaviour
 
                         //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, -playerRotEuler.z), 0.005f);
                     }
-                }
             }
         }
     }

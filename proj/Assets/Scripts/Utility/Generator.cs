@@ -29,16 +29,18 @@ public class Generator : PlacementTool
 
     // Control vars
     private int totalSpawned = 0;
-    private List<Transform> spawnedObjs = new List<Transform>();
+    private int currentSpawned = 0;
 
     private bool exhausted = false;
     private bool full = false;
     private bool waveActive = false;
     private int waveSpawnCount = 0;
 
+    public int poolSize = 20;
 
-
-
+    private GameObject[] projectilePool;
+    private GameObject[] spawnEffectPool;
+    private GameObject[] deathEffectPool;
 
     #region monobehavior events
     public override void Reset()
@@ -48,16 +50,47 @@ public class Generator : PlacementTool
 
     void Start()
     {
+        if (simultaneousLimit >= 0 && simultaneousLimit < poolSize)
+        {
+            poolSize = simultaneousLimit;
+        }
+        projectilePool = new GameObject[poolSize];
+        spawnEffectPool = new GameObject[poolSize];
+        deathEffectPool = new GameObject[poolSize];
+
+        for (int i = 0; i < poolSize; i++)
+        {
+            if (spawnProjectiles && projectileProperties.Length > 0 && prefabs.Length > 0)
+            {
+                projectilePool[i] = Instantiate(prefabs[0]);
+                projectilePool[i].SetActive(false);
+                projectilePool[i].transform.parent = transform;
+                GameObject deathEffect = projectileProperties[Random.Range(0, projectileProperties.Length - 1)].deathEffect;
+                if (deathEffect != null)
+                {
+                    deathEffectPool[i] = Instantiate(deathEffect);
+                    deathEffectPool[i].SetActive(false);
+                    deathEffectPool[i].transform.parent = transform;
+                }
+            }
+            spawnEffectPool[i] = Instantiate(spawnEffect);
+            spawnEffectPool[i].SetActive(false);
+            spawnEffectPool[i].transform.parent = transform;
+        }
+
         StartCoroutine(GeneratorInit());
     }
 
     public override void Update()
     {
         // Cleanup list
-        for (int i = spawnedObjs.Count-1; i >= 0; i--)
+        currentSpawned = 0;
+        for (int i = projectilePool.Length-1; i >= 0; i--)
         {
-            if (spawnedObjs[i] == null)
-                spawnedObjs.RemoveAt(i);
+            if (projectilePool[i].activeSelf)
+            {
+                currentSpawned += 1;
+            }
         }
 
         // Manage spawn monitoring flags
@@ -67,13 +100,13 @@ public class Generator : PlacementTool
         bool bothLimits = (lifeLimited && simulLimited);
 
         exhausted = (lifeLimited && totalSpawned >= totalLimit);
-        full = (simulLimited && spawnedObjs.Count >= simultaneousLimit);
+        full = (simulLimited && currentSpawned >= simultaneousLimit);
 
 
         // Change name
         typeName = "Generator"
             + (isLimited ? ": " : "")
-            + (simulLimited ? spawnedObjs.Count.ToString() + "/" + simultaneousLimit.ToString() + " spawned" : "")
+            + (simulLimited ? currentSpawned.ToString() + "/" + simultaneousLimit.ToString() + " spawned" : "")
             + (bothLimits ? ", " : "")
             + (lifeLimited ? totalSpawned.ToString() + "/" + totalLimit.ToString() + " total" : "");
         ChangeName();
@@ -92,7 +125,7 @@ public class Generator : PlacementTool
     #region methods
     public override int PlacedCount()
     {
-        return spawnedObjs.Count;
+        return currentSpawned;
     }
 
     public void StartGenerator()
@@ -125,6 +158,31 @@ public class Generator : PlacementTool
         StartCoroutine(SpawnLoop());
     }
 
+    private GameObject returnFirstInactive(GameObject[] pool, out int position)
+    {
+        GameObject result = null;
+        position = 0;
+
+
+        for (int i = 0; i < pool.Length; i++)
+        {
+            if (!pool[i].activeSelf)
+            {
+                result = pool[i];
+                position = i;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    private GameObject returnFirstInactive(GameObject[] pool)
+    {
+        int a;
+        return returnFirstInactive(pool, out a);
+    }
+
     public IEnumerator Spawn ()
     {
         // Increment the total counter
@@ -137,23 +195,41 @@ public class Generator : PlacementTool
             // Spawn the effect
         if (spawnEffect != null)
         {
-            GameObject.Instantiate(spawnEffect, transform.position + randomPos, Quaternion.identity);
+            GameObject spawnedInstance = returnFirstInactive(spawnEffectPool);
+            if (spawnedInstance != null)
+            {
+                spawnedInstance.SetActive(true);
+                spawnedInstance.transform.position = transform.position + randomPos;
+                spawnedInstance.transform.rotation = Quaternion.identity;
+            }
             yield return new WaitForSeconds(spawnDelay);
         }
 
         // Add the new prefab intance
-        GameObject spawnedInstance = GameObject.Instantiate(RandomPrefab(), transform.position + randomPos, Quaternion.identity);
         if (spawnProjectiles && projectileProperties.Length > 0)
         {
-            Projectile projectileScr = spawnedInstance.AddComponent<Projectile>();
-            projectileScr.properties = new ProjectileProperties(projectileProperties[Random.Range(0, projectileProperties.Length - 1)]);
-            if (useRelativeDirection)
+            int pos = 0;
+            GameObject spawnedInstance = returnFirstInactive(projectilePool, out pos);
+            if (spawnedInstance != null)
             {
-                Debug.Log(projectileProperties[0].speed);
-                projectileScr.properties.speed = transform.InverseTransformDirection(projectileScr.properties.speed);
+                spawnedInstance.transform.position = transform.position + randomPos;
+                spawnedInstance.transform.rotation = Quaternion.identity;
+                Projectile projectileScr = spawnedInstance.GetComponent<Projectile>();
+                if (projectileScr == null)
+                {
+                    projectileScr = spawnedInstance.AddComponent<Projectile>();
+                }
+                projectileScr.deathEffect = deathEffectPool[pos];
+                projectileScr.properties = new ProjectileProperties(projectileProperties[Random.Range(0, projectileProperties.Length - 1)]);
+                if (useRelativeDirection)
+                {
+                    Debug.Log(projectileScr.properties.speed);
+                    projectileScr.properties.speed = transform.InverseTransformDirection(projectileScr.properties.speed);
+                }
+                spawnedInstance.SetActive(true);
+                projectileScr.Start();
             }
         }
-        spawnedObjs.Add(spawnedInstance.transform);
         yield return new WaitForSeconds(spawnCooldown);
 
         // If spawning in waves

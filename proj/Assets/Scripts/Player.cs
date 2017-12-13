@@ -115,6 +115,7 @@ public class Player : CollidingEntity
         carryStates.Add(CarryState.NotCarrying);
 
         startPos = transform.position;
+        UpdateReferences();
         //thisBetterBeWorthIt = transform.GetComponent("ThirdPersonCharacter") as UnityStandardAssets.Characters.ThirdPerson.ThirdPersonCharacter;
     }
 
@@ -144,7 +145,6 @@ public class Player : CollidingEntity
     //   okay yeah this project's codebase needs better reference management overall
     public CharacterController GetCharacterController()
     {
-        UpdateReferences();
         return controller;
     }
 

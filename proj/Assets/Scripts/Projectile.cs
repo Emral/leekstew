@@ -34,10 +34,13 @@ public class Projectile : MonoBehaviour
     private Vector3 speed = Vector3.zero;
     private float timePassed = 0f;
 
+    public GameObject deathEffect;
+
 
     public void Start()
     {
         speed = properties.speed;
+        timePassed = 0;
     }
 
     public virtual void UpdateMovement()
@@ -61,10 +64,13 @@ public class Projectile : MonoBehaviour
         timePassed += Time.deltaTime;
         if (timePassed >= properties.lifetime && properties.lifetime > 0f)
         {
-            if (properties.deathEffect != null)
-                GameObject.Instantiate(properties.deathEffect, transform.position, Quaternion.identity);
-
-            GameObject.Destroy(this.gameObject);
+            if (deathEffect != null)
+            {
+                deathEffect.SetActive(true);
+                deathEffect.transform.position = transform.position;
+            }
+            timePassed = 0;
+            gameObject.SetActive(false);
         }
     }
 

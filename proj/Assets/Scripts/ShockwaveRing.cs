@@ -18,7 +18,7 @@ public class ShockwaveRing : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        Vector3 playerPos = GameManager.player.transform.position;
+        Vector3 playerPos = GameManager.instance.player.transform.position;
         Vector3 pos = transform.position;
 
         float yDist = Mathf.Abs(playerPos.y - pos.y);
@@ -36,7 +36,7 @@ public class ShockwaveRing : MonoBehaviour {
 
         // If the shockwave crossed the player's path, hurt the player
         if (xDist > cachedRadius && xDist < shape.radius && yDist < 0.5f)
-            GameManager.player.ReceiveHarm(CollideDir.Down, null, transform, GameManager.player.transform.position, Vector3.up);
+            GameManager.instance.player.ReceiveHarm(CollideDir.Down, null, transform, GameManager.instance.player.transform.position, Vector3.up);
 
 
         cachedRadius = radiusSize;
