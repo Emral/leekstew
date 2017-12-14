@@ -215,7 +215,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f1e8879036d8b41bec2e9c19886dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelName: model_tooth
+  hover: {fileID: 4680532564001732}
+  toothModel: {fileID: 0}
 --- !u!114 &114850705137601192
 MonoBehaviour:
   m_ObjectHideFlags: 1

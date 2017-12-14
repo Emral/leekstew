@@ -194,4 +194,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f1e8879036d8b41bec2e9c19886dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelName: model_tooth
+  hover: {fileID: 4911056391463728}
+  toothModel: {fileID: 4327064535981026}

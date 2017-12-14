@@ -1170,6 +1170,10 @@ MonoBehaviour:
   wallJumpParticle: {fileID: 100002, guid: 428712205a5dd624db98a8906a5c5ad4, type: 2}
   jumpsPerformed: 0
   jumpsSinceGround: 
+  model: {fileID: 4061989159686532}
+  modelCenter: {fileID: 4708325290572170}
+  animator: {fileID: 95583990763422626}
+  squash: {fileID: 0}
   directionalMomentum: {x: 0, y: 0, z: 0}
 --- !u!114 &114620696221021948
 MonoBehaviour:

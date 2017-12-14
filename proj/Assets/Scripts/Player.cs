@@ -76,10 +76,10 @@ public class Player : CollidingEntity
     private bool touchingMovingSurface = false;
 
     // References
-    private Transform model;
-    private Transform modelCenter;
-    private Animator animator;
-    private SquashAndStretch squash;
+    public Transform model;
+    public Transform modelCenter;
+    public Animator animator;
+    public SquashAndStretch squash;
 
     // State values
     private MoveState moveState = MoveState.Grounded;
@@ -116,25 +116,8 @@ public class Player : CollidingEntity
         carryStates.Add(CarryState.NotCarrying);
 
         //startPos = transform.position;
-        UpdateReferences();
     }
-
-    public override void UpdateReferences()
-    {
-        base.UpdateReferences();
-
-        if (animator == null)
-            animator = transform.GetComponentInChildren<Animator>();
-
-        if (squash == null)
-            squash = transform.GetComponentInChildren<SquashAndStretch>();
-
-        if (model == null)
-            model = GameObject.Find("animmodel_demo").transform;
-
-        if (modelCenter == null)
-            modelCenter = transform.Find("modelCentered");
-    }
+    
 
 
 
@@ -350,13 +333,13 @@ public class Player : CollidingEntity
                     }
 
                     // Handling for moving over a ledge
-                    if (!controller.isGrounded && groundDistance > 1f && groundedCompensation) //&& Mathf.Abs(controller.velocity.y) > 1f)
+                    if (!controller.isGrounded && groundDistance > 1f && groundedCompensation && Mathf.Abs(controller.velocity.y) > 1f)
                     {
                         moveState = MoveState.Airborn;
                         airbornStates[0] = AirbornState.Falling;
                         groundedCompensation = false;
                         jumpLenienceTimer = jumpLenienceSeconds;
-                        print("LEAVING THE GROUND YO");
+                        //print("LEAVING THE GROUND YO");
                     }
 
                     // Jumping
@@ -498,7 +481,7 @@ public class Player : CollidingEntity
 
                     // Change the animation state to jumping or falling
                     string newState = controller.velocity.y > 0 ? "jumping" : "falling";
-                    SetAnimState(newState, 0.5f);
+                    //SetAnimState(newState, 0.5f);
 
 
                     // Reset some wall sliding stuff if not wall sliding
@@ -524,7 +507,6 @@ public class Player : CollidingEntity
                         case (AirbornState.Launched):
                             break;
                         case (AirbornState.WallSliding):
-
                             // Special rotation
                             modelCenter.localRotation = Quaternion.Lerp(modelCenter.localRotation, Quaternion.Euler(0f, 100f, 0f), 0.5f);
 
@@ -628,7 +610,7 @@ public class Player : CollidingEntity
         {
             wallNormal = normal;
             wallPoint = point;
-            print("wall point updated");
+            //print("wall point updated");
 
             if (!groundedCompensation && groundDistance > 0.2f && directionalMomentum.y < 0f)
             {

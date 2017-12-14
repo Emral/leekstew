@@ -5954,24 +5954,8 @@ MonoBehaviour:
     thumbnail: {fileID: 0}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
     index: 0
-  - key: Scene_Sublevel_2
-    name: Spicy Stove
-    creator: Enjl
-    isHub: 0
-    isIncluded: 1
-    thumbnail: {fileID: 0}
-    music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
-    index: 0
   - key: Scene_Sublevel_3
     name: Sorbet Sky
-    creator: Enjl
-    isHub: 0
-    isIncluded: 1
-    thumbnail: {fileID: 0}
-    music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
-    index: 0
-  - key: Scene_Sublevel_4
-    name: Princess raocow's Secret Slide
     creator: Enjl
     isHub: 0
     isIncluded: 1

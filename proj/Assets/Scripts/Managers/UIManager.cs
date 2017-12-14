@@ -157,13 +157,13 @@ public class UIManager : MonoBehaviour
             screenFadeScr.color = tempColor;
         }
         
-        Image[] barScrs = letterboxObj.GetComponentsInChildren<Image>();
-        foreach (Image bar in barScrs)
-        {
-            Color tempColor = bar.color;
-            tempColor.a = letterboxFadeAmount;
-            bar.color = tempColor;
-        }
+        //Image[] barScrs = letterboxObj.GetComponentsInChildren<Image>();
+        //foreach (Image bar in barScrs)
+        //{
+        //    Color tempColor = bar.color;
+        //    tempColor.a = letterboxFadeAmount;
+        //    bar.color = tempColor;
+        //}
     }
     #endregion
     

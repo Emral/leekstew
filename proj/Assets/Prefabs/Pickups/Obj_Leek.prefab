@@ -438,7 +438,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f1e8879036d8b41bec2e9c19886dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelName: model_leek
+  hover: {fileID: 4224786246481956}
+  toothModel: {fileID: 4229895527554226}
 --- !u!114 &114612419138435968
 MonoBehaviour:
   m_ObjectHideFlags: 1

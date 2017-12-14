@@ -140,14 +140,11 @@ public class CollidingEntity : MonoBehaviour
         PlaySound(clip, 1f);
     }
 
-    public virtual void ProcessCollision(Transform otherTrans, Vector3 point, Vector3 normal)
+    public virtual void ProcessCollision(Transform otherTrans, Vector3 point, Vector3 normal, CollidingEntity otherScr)
     {
         // Debug
         //print(otherTrans.gameObject.name + " touched " + gameObject.name + "from the " + collisionSide.ToString());
-
-        // Process collision effects
-        CollidingEntity otherScr = otherTrans.GetComponent<CollidingEntity>();
-
+        
         if (otherScr != null)
         {
             // Kill
@@ -216,9 +213,10 @@ public class CollidingEntity : MonoBehaviour
     {
         // Reset the current collison side
         collisionSide = CollideDir.None;
+        CollidingEntity otherScr = collision.transform.GetComponent<CollidingEntity>();
 
         // Go through each hit
-        foreach(ContactPoint hit in collision.contacts)
+        foreach (ContactPoint hit in collision.contacts)
         {
             // Store top collision
             if (Vector3.Angle(hit.normal, -transform.up) < 45)
@@ -269,18 +267,18 @@ public class CollidingEntity : MonoBehaviour
             }
 
             // Now process the collision for this hit
-            ProcessCollision (hit.otherCollider.transform, hit.point, hit.normal);
+            ProcessCollision (hit.otherCollider.transform, hit.point, hit.normal, otherScr);
         }
     }
 
     public virtual void OnControllerColliderHit(ControllerColliderHit hit)
     {
         // Reset the current collison side
-        collisionSide = CollideDir.None;
-        CollidingEntity other = hit.transform.gameObject.GetComponent<CollidingEntity>();
 
         if (controller != null)
         {
+            collisionSide = CollideDir.None;
+            CollidingEntity other = hit.transform.gameObject.GetComponent<CollidingEntity>();
             // Store top collision
             if (FlagsHelper.IsSet(controller.collisionFlags, CollisionFlags.Above))
             {
@@ -354,10 +352,10 @@ public class CollidingEntity : MonoBehaviour
             }
 
             // Now process the collision for this hit
-            ProcessCollision (hit.transform, hit.point, hit.normal);
+            ProcessCollision (hit.transform, hit.point, hit.normal, other);
             if (other != null)
             {
-                other.ProcessCollision(transform, hit.point, hit.normal);
+                other.ProcessCollision(transform, hit.point, hit.normal, this);
             }
         }
     }
