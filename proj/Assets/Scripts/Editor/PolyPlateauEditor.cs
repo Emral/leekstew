@@ -6,7 +6,7 @@ using UnityEditor;
 [CustomEditor(typeof(PolyPlateau))]
 public class PolyPlateauEditor : Editor
 {
-    int currentPoint = 0;
+    //int currentPoint = 0;   // related to a feature that'd be too complicated to implement
 
     private int[] controlIds;
 
@@ -16,7 +16,7 @@ public class PolyPlateauEditor : Editor
 
     void OnEnable()
     {
-        currentPoint = 0;
+        //currentPoint = 0;
 
         lastTool = Tools.current;
         Tools.current = Tool.None;

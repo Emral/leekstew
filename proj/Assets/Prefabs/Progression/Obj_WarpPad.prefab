@@ -232,7 +232,7 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1967462336630556}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
@@ -266,7 +266,7 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1896629041122062}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
@@ -300,7 +300,7 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1849669530873770}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
@@ -379,6 +379,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d54703ec5dd6ba049b22c5942c54868f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  instanceID: 0
   talkDist: 0.75
   talkIconHeight: 2.5
   talkCooldown: 0
@@ -386,6 +387,8 @@ MonoBehaviour:
   room: 0
   destinationOffset: {x: 0, y: 0, z: 0}
   destinationWarpPad: {fileID: 0}
+  locked: 0
+  unlockDestinationWarpPad: 0
 --- !u!198 &198711077971544556
 ParticleSystem:
   m_ObjectHideFlags: 1

@@ -10,7 +10,6 @@ public class PathedObjects : ObjectGroup
     public bool relative = true;
     public bool closed = false;
     public bool orientToPath = false;
-    public bool objectsHaveCollision = true;
 
     public bool useCollisionQuads = false;
     public float collisionQuadWidth = 0f;
@@ -23,7 +22,7 @@ public class PathedObjects : ObjectGroup
 
     private Vector3 startPt;
     private Vector3 endPt;
-    private Vector3 posOffsetPt;
+    //private Vector3 posOffsetPt;
 
 
     public override void Reset()
@@ -63,15 +62,6 @@ public class PathedObjects : ObjectGroup
             GameObject.DestroyImmediate(lookAtParent);
         }
 
-        if (!objectsHaveCollision)
-        {
-            Collider[] colliders = spawned.GetComponentsInChildren<Collider>(true);
-            foreach(Collider collider in colliders)
-            {
-                collider.enabled = false;
-            }
-        }
-
         return spawned;
     }
 
@@ -82,7 +72,7 @@ public class PathedObjects : ObjectGroup
     {
         base.Recreate();
         Vector3 offset = relative ? transform.position : Vector3.zero;
-        posOffsetPt = offset;
+        //posOffsetPt = offset;
 
         typeName = "Path";
 

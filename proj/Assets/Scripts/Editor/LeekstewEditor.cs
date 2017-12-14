@@ -26,7 +26,7 @@ public class LeekstewEditor : Editor
     {
         if (enclose)
         {
-            Rect r = (Rect)EditorGUILayout.BeginVertical(GUI.skin.box);
+            EditorGUILayout.BeginVertical(GUI.skin.box);
         }
 
         if (groupName != "")
@@ -71,7 +71,7 @@ public class LeekstewEditor : Editor
 
         if (enclose)
         {
-            Rect r = (Rect)EditorGUILayout.BeginVertical(GUI.skin.box);
+            EditorGUILayout.BeginVertical(GUI.skin.box);
         }
 
         toggleBool.target = EditorGUILayout.ToggleLeft(groupName, toggleBool.target);
@@ -99,7 +99,7 @@ public class LeekstewEditor : Editor
 
     public void FoldingDefaultInspector()
     {
-        Rect r = (Rect)EditorGUILayout.BeginVertical(GUI.skin.box);
+        EditorGUILayout.BeginVertical(GUI.skin.box);
 
         m_ShowDefaultInspector.target = EditorGUILayout.ToggleLeft("Show Default Inspector", m_ShowDefaultInspector.target);
 

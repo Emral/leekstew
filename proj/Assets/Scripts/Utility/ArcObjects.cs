@@ -51,7 +51,7 @@ public class ArcObjects : ObjectGroup
 
         typeName = "Arc";
 
-        if (endPoint != null && controlPoint != null && gap > 0)
+        if (gap > 0)
         {
             if  (checkToCenterControlPoint)
             {

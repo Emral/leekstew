@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Checkpoint : MonoBehaviour
 {
-    Collider collider;
     public bool checkpointActive = false;
     public GameObject activateEffect;
     public GameObject passiveEffect;

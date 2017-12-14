@@ -120,7 +120,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.01
+  near clip plane: 0.2
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -183,7 +183,6 @@ MonoBehaviour:
   decayRate: 0.05
   interval: 0
   activeWhenPaused: 0
-  squashScale: {x: 1, y: 1, z: 1}
   shakeOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &114753073157757604
 MonoBehaviour:

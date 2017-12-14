@@ -6,8 +6,8 @@ public class CameraVolume : MonoBehaviour
 {
     public CameraBehavior cameraProps;
 
-    private bool cachedPlayerInside;
-    private bool active = false;
+    //private bool cachedPlayerInside;
+    //private bool active = false;
 
     // Use this for initialization
     private void OnTriggerEnter(Collider other)

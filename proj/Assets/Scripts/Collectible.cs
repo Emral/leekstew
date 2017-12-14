@@ -16,7 +16,7 @@ public class Collectible : MonoBehaviour
 
     private static Transform playerTrans;
     private float distanceToPlayer;
-    private float hDistanceToPlayer;
+    //private float hDistanceToPlayer;
     private float collectRange;
     private bool collecting = false;
 
@@ -37,7 +37,8 @@ public class Collectible : MonoBehaviour
             GameManager.player.PlaySound(collectStartSound, Random.Range(0.75f, 1.25f));
         if (collectStartEffect != null)
         {
-            GameObject effect = GameObject.Instantiate(collectStartEffect, transform.position, Quaternion.identity);
+
+            GameObject.Instantiate(collectStartEffect, transform.position, Quaternion.identity);
             //effect.transform.localScale = new Vector3(3f, 3f, 3f);
         }
 
@@ -49,7 +50,7 @@ public class Collectible : MonoBehaviour
             GameManager.player.PlaySound(collectEndSound, Random.Range(0.75f, 1.25f));
         if (collectEndEffect != null)
         {
-            GameObject effect = GameObject.Instantiate(collectEndEffect, transform.position, Quaternion.identity);
+            GameObject.Instantiate(collectEndEffect, transform.position, Quaternion.identity);
             //effect.transform.localScale = new Vector3(3f, 3f, 3f);
         }
         yield return null;
@@ -97,7 +98,7 @@ public class Collectible : MonoBehaviour
         {
             playerTrans = playerScr.transform;
 
-            hDistanceToPlayer = Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(playerTrans.position.x, 0, playerTrans.position.z));
+            //hDistanceToPlayer = Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(playerTrans.position.x, 0, playerTrans.position.z));
             distanceToPlayer = Vector3.Distance(transform.position, playerTrans.position);
 
             collectRange = gravitate ? collectDistance + 1.5f : collectDistance;

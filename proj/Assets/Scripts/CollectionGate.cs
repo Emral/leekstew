@@ -191,7 +191,7 @@ public class CollectionGate : NPC
         // Start zooming in
         AudioSource quakeSource = AudioManager.PlaySound(AudioManager.instance.quakeSound, 1f, (gatesUnlockedThisSession+1f));
         CameraBehavior newShot = CameraManager.CaptureCurrentShot();
-        CameraBehavior origShot = CameraManager.CaptureCurrentShot();
+        //CameraBehavior origShot = CameraManager.CaptureCurrentShot();
         newShot.yaw = 180 + transform.rotation.eulerAngles.y;
         newShot.pitch = 0f;
         newShot.zoom = -8.5f - 7f*(transform.lossyScale.x-1f);

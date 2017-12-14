@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public enum DamageState { Vulnerable, Mercy, Hurt, Dying, Dead };
 public enum MoveState { Grounded, Airborn };
 public enum GroundedState { Standing, Walking, Sliding };
-public enum AirbornState { Jumping, Launched, Falling, WallSliding, KnockedBack };
+public enum AirbornState { Jumping, Launched, Falling, WallJumping, WallSliding, SlideJumping, KnockedBack };
 public enum CarryState { NotCarrying, Pluck, Pickup, Holding, Throwing };
 
 public enum JumpType { Jump, DoubleJump, WallJump, Bop, Spring};
@@ -21,6 +21,7 @@ public class Player : CollidingEntity
     public float jumpStrength = 18f;
     public int jumpLimit = 2;
     public float jumpDecayRate = 0.75f;
+    public float jumpLenienceSeconds = 0.3f;
 
     // Sound effects
     public AudioClip[] jumpSounds;
@@ -32,7 +33,7 @@ public class Player : CollidingEntity
     public Texture2D hurtTexture;
 
     // Misc
-    public int jumpLenienceTimer = -1;
+    public float jumpLenienceTimer = -1f;
 
     [HideInInspector] public bool inputActive = true;
 
@@ -41,8 +42,8 @@ public class Player : CollidingEntity
     private Vector3 wallPoint;
 
     // Wall jumping
-    private bool wallSliding = false;
-    private bool wallJumping = false;
+    //private bool wallSliding = false;
+    //private bool wallJumping = false;
     private int wallSlidingCounter = 0;
     private float wallSlidingTime = 0f;
 
@@ -68,7 +69,7 @@ public class Player : CollidingEntity
     public int jumpsPerformed = 0;
     public List<JumpType> jumpsSinceGround = new List<JumpType>();
 
-    private Vector3 startPos;
+    //private Vector3 startPos;
 
     private bool releasedJump = false;
     private bool groundedCompensation = false;
@@ -105,7 +106,7 @@ public class Player : CollidingEntity
 
 
 
-    void Start ()
+    public override void Start ()
     {
         // Initialize the state lists
         moveState = MoveState.Airborn;
@@ -114,9 +115,8 @@ public class Player : CollidingEntity
         airbornStates.Add(AirbornState.Falling);
         carryStates.Add(CarryState.NotCarrying);
 
-        startPos = transform.position;
+        //startPos = transform.position;
         UpdateReferences();
-        //thisBetterBeWorthIt = transform.GetComponent("ThirdPersonCharacter") as UnityStandardAssets.Characters.ThirdPerson.ThirdPersonCharacter;
     }
 
     public override void UpdateReferences()
@@ -170,10 +170,12 @@ public class Player : CollidingEntity
     }
 
 
-    void OnCollisionEnter(Collision collision)
+    /*
+    public override void OnCollisionEnter(Collision collision)
     {
 
     }
+    */
 
     public override void OnControllerColliderHit(ControllerColliderHit hit)
     {
@@ -353,7 +355,7 @@ public class Player : CollidingEntity
                         moveState = MoveState.Airborn;
                         airbornStates[0] = AirbornState.Falling;
                         groundedCompensation = false;
-                        jumpLenienceTimer = 20;
+                        jumpLenienceTimer = jumpLenienceSeconds;
                         print("LEAVING THE GROUND YO");
                     }
 
@@ -392,6 +394,7 @@ public class Player : CollidingEntity
 
                             if (slopeTooSteep)
                             {
+                                /*
                                 if (walkingUphill)
                                     slidingTimer -= Time.deltaTime;
                                 else
@@ -402,6 +405,7 @@ public class Player : CollidingEntity
                                 directionalMomentum = directionalMomentum * (slidingDelayTime - slidingTimer);
                                 directionalMomentum.y = tempYVal;
                                 if (slidingTimer <= 0)
+                                    */
                                 {
                                     directionalMomentum = Vector3.zero;
                                     groundedStates[0] = GroundedState.Sliding;
@@ -476,8 +480,9 @@ public class Player : CollidingEntity
                     }
 
                     // Jump leniency handling
-                    jumpLenienceTimer = Mathf.Max(-1, jumpLenienceTimer - 1);
-                    if (jumpLenienceTimer == 0)
+                    float lastLenienceTimer = jumpLenienceTimer;
+                    jumpLenienceTimer = Mathf.Max(-1f, jumpLenienceTimer - Time.deltaTime);
+                    if (jumpLenienceTimer <= 0f && lastLenienceTimer > 0f)
                     {
                         jumpsSinceGround.Add(JumpType.Jump);
                         jumpsPerformed = Mathf.Max(jumpsPerformed, 1);
@@ -547,8 +552,12 @@ public class Player : CollidingEntity
 
                     // Double jump yo
                     if (GameManager.inputPress["Jump"] && canDoubleJump && !GameManager.cutsceneMode)
-                        PerformDoubleJump();
-
+                    {
+                        if (jumpLenienceTimer > 0f)
+                            PerformGenericJump(JumpType.Jump);
+                        else
+                            PerformDoubleJump();
+                    }
                     break;
             }
 
@@ -562,14 +571,22 @@ public class Player : CollidingEntity
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnRate*rotRateMult);
 
             // Commit movement
+            controller.Move((directionalMomentum) * Time.deltaTime * 60f);
+            if (moveState == MoveState.Grounded && shouldShiftDown)
+            {
+                ShiftToGround();
+            }
+
+            /*
             if (moveState == MoveState.Grounded)
             {
-                controller.SimpleMove((directionalMomentum) * 50f);
+                controller.SimpleMove((directionalMomentum) * 50f * Time.deltaTime);
                 if (shouldShiftDown)
                     ShiftToGround();
             }
             else
-                controller.Move(directionalMomentum);
+                controller.Move(directionalMomentum * Time.deltaTime);
+            */
 
 
             // Restart at the last checkpoint position if fallen off the level
@@ -662,8 +679,6 @@ public class Player : CollidingEntity
         float timeLeft = totalTime;
         while (timeLeft > 0)
         {
-            float percentMult = timeLeft / totalTime;
-                
             modelCenter.localRotation = Quaternion.Euler(-22f, 0f, 0f);
 
             tempMomentum = new Vector3(directionalMomentum.x != 0 ? directionalMomentum.x : tempMomentum.x,
@@ -743,7 +758,8 @@ public class Player : CollidingEntity
     IEnumerator WallJumpVelocity()
     {
         GameObject.Instantiate(wallJumpParticle, wallPoint, Quaternion.identity);
-        wallJumping = true;
+        airbornStates[0] = AirbornState.WallJumping; 
+        //wallJumping = true;
         SetAnimState("walljumping", 0f);
         lockedAnimState = true;
         transform.rotation = Quaternion.LookRotation(wallNormal, Vector3.up);
@@ -757,7 +773,8 @@ public class Player : CollidingEntity
             yield return null;
         }
         lockedAnimState = false;
-        wallJumping = false;
+        airbornStates[0] = AirbornState.Falling;
+        //wallJumping = false;
     }
     IEnumerator DoubleJumpFlip()
     {

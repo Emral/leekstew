@@ -1,17 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
 
 public class ObjectGroup : PlacementTool
 {
     public bool updateAutomatically = false;
     public bool isDirty = false;
+
     public int firstInstanceID;
     public Vector3 rotOffset;
     public Vector3 rotRandom;
     public Vector3 posRandom;
     [HideInInspector] public int idAssigned;
-    private int isDirtyCounter = 0;
+    //private int isDirtyCounter = 0;
+
+    public bool objectsHaveCollision = true;
 
     public GameObject clearEffect;
     public BatteryCharge[] clearPowerCharges;
@@ -36,9 +42,6 @@ public class ObjectGroup : PlacementTool
 
     public override void Update()
     {
-        if (isDirty && !Application.isPlaying)
-            Clear();
-
         if (Application.isPlaying)
         {
             if (playerStartedClearing && !hasBeenCleared && cachedChildCount == 0)
@@ -60,8 +63,13 @@ public class ObjectGroup : PlacementTool
             {
                 playerStartedClearing = true;
             }
-            
+
             cachedChildCount = transform.childCount;
+        }
+        else
+        {
+            if (isDirty && !Application.isPlaying)
+                Clear();
         }
     }
 
@@ -81,13 +89,39 @@ public class ObjectGroup : PlacementTool
         Vector3 newPos = position + new Vector3(Random.Range(-posRandom.x, posRandom.x), Random.Range(-posRandom.y, posRandom.y), Random.Range(-posRandom.z, posRandom.z));
         Quaternion newRot = Quaternion.Euler(rotation + rotOffset + new Vector3(Random.Range(-rotRandom.x, rotRandom.x), Random.Range(-rotRandom.y, rotRandom.y), Random.Range(-rotRandom.z, rotRandom.z)));
 
+        // Spawn a prefab instance if in the editor or an instantiated clone during runtime
         GameObject selected = RandomPrefab();
-        GameObject spawned = GameObject.Instantiate(selected, newPos, newRot, transform);
+        GameObject spawned;
+        #if UNITY_EDITOR
+            spawned = (GameObject)PrefabUtility.InstantiatePrefab(selected);
+            spawned.transform.position = newPos;
+            spawned.transform.rotation = newRot;
+            spawned.transform.parent = transform;
+        #else
+            spawned = GameObject.Instantiate(selected, newPos, newRot, transform);
+        #endif
         spawned.transform.SetAsFirstSibling();
 
+        // Disable the collision if configured to do so
+        if (!objectsHaveCollision)
+        {
+            Collider[] colliders = spawned.GetComponentsInChildren<Collider>(true);
+            CollidingEntity[] collidingEntities = spawned.GetComponentsInChildren<CollidingEntity>(true);
+            foreach (Collider collider in colliders)
+            {
+                collider.enabled = false;
+            }
+            foreach (CollidingEntity collidEn in collidingEntities)
+            {
+                collidEn.enabled = false;
+            }
+        }
+
+        // Rename the generated instance
         if (!label.Equals(""))
             spawned.name = label + " " + selected.name;
 
+        // Set the prefab's instance ID if it has such a variable (currently only works with Collectibles)
         Collectible collectScr = spawned.GetComponent<Collectible>();
         if (collectScr != null)
         {
@@ -100,6 +134,7 @@ public class ObjectGroup : PlacementTool
     {
         return PlacePrefab(position, Vector3.zero, label);
     }
+
 
     public virtual void Clear()
     {

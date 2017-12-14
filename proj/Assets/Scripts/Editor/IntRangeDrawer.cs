@@ -34,10 +34,9 @@ public class IntRangeInspector : PropertyDrawer
 
         float indentWidth = EditorGUIUtility.labelWidth;
         float zeroedMin = minProp.intValue + 0f - tMinVal;
-        float zeroedMax = maxProp.intValue + 0f - tMinVal;
         float zeroedTMax = tMaxVal - tMinVal;
 
-        Rect rNumbers = new Rect(rFull.left + indentWidth + (zeroedMin/zeroedTMax)*(rFull.width-indentWidth), position.yMin, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+        Rect rNumbers = new Rect(rFull.xMin + indentWidth + (zeroedMin/zeroedTMax)*(rFull.width-indentWidth), position.yMin, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
         EditorGUI.LabelField(rNumbers, minProp.intValue.ToString() + "-" + maxProp.intValue.ToString());
         
         EditorGUI.EndProperty();

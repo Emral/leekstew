@@ -34,7 +34,7 @@ public class Generator : PlacementTool
     private bool exhausted = false;
     private bool full = false;
     private bool waveActive = false;
-    private int waveSpawnCount = 0;
+    //private int waveSpawnCount = 0;
 
     public int poolSize = 20;
 
@@ -55,6 +55,7 @@ public class Generator : PlacementTool
             poolSize = simultaneousLimit;
         }
         projectilePool = new GameObject[poolSize];
+
         spawnEffectPool = new GameObject[poolSize];
         deathEffectPool = new GameObject[poolSize];
 
@@ -73,9 +74,13 @@ public class Generator : PlacementTool
                     deathEffectPool[i].transform.parent = transform;
                 }
             }
-            spawnEffectPool[i] = Instantiate(spawnEffect);
-            spawnEffectPool[i].SetActive(false);
-            spawnEffectPool[i].transform.parent = transform;
+
+            if (spawnEffect != null)
+            {
+                spawnEffectPool[i] = Instantiate(spawnEffect);
+                spawnEffectPool[i].SetActive(false);
+                spawnEffectPool[i].transform.parent = transform;
+            }
         }
 
         StartCoroutine(GeneratorInit());

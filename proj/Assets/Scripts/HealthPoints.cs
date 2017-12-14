@@ -24,6 +24,7 @@ public class HealthPoints : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        startPosition = transform.position;
         //currentHp = hp;
 	}
 	

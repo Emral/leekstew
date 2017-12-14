@@ -33,7 +33,7 @@ public class CollidingEntity : MonoBehaviour
     [EnumFlag] public CollideDir toggleFlags;
 
     [HideInInspector] public CharacterController controller;
-    [HideInInspector] public Collider collider;
+    [HideInInspector] public Collider myCollider;
     [HideInInspector] public HealthPoints health;
     [HideInInspector] public AudioSource sound;
 
@@ -47,7 +47,7 @@ public class CollidingEntity : MonoBehaviour
     [HideInInspector] public bool bounceFlagsUsed;
     [HideInInspector] public bool powerFlagsUsed;
 
-    public float gravityRate = 0.01f;
+    public float gravityRate = 0.0f;
 
     public bool bounceRestoresDoubleJump = false;
     public float bounceStrength = 18;
@@ -65,7 +65,6 @@ public class CollidingEntity : MonoBehaviour
     }
     public virtual void Start()
     {
-
         UpdateReferences();
     }
 
@@ -103,8 +102,8 @@ public class CollidingEntity : MonoBehaviour
     {
         if (controller == null)
             controller = GetComponent<CharacterController>();
-        if (collider == null)
-            collider = GetComponent<Collider>();
+        if (myCollider == null)
+            myCollider = GetComponent<Collider>();
         if (health == null)
             health = GetComponent<HealthPoints>();
         if (sound == null)

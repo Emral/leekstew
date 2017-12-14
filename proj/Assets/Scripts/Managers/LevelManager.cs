@@ -208,7 +208,7 @@ public class LevelManager : MonoBehaviour
     public IEnumerator LevelLoadSequence()
     {
         // Wait until the player reference is valid
-        while (GameManager.player == null || GameManager.camera == null)
+        while (GameManager.player == null || CameraManager.instance == null)
         {
             yield return null;
         }
@@ -219,8 +219,8 @@ public class LevelManager : MonoBehaviour
         GameManager.player.inputActive = false;
 
         // Set the camera's target to the player if a preset target doesn't exist
-        if (GameManager.camera.target == null)
-            GameManager.camera.target = GameManager.player.transform;
+        if (CameraManager.instance.target == null)
+            CameraManager.instance.target = GameManager.player.transform;
 
         // Place the player at the warp destination
         if (isWarping)

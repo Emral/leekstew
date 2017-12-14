@@ -79,7 +79,7 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1548783974672870}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
@@ -146,7 +146,7 @@ MonoBehaviour:
   powerOffFlags: 0
   toggleFlags: 0
   controller: {fileID: 0}
-  collider: {fileID: 0}
+  myCollider: {fileID: 0}
   health: {fileID: 0}
   sound: {fileID: 0}
   collisionSides: 0

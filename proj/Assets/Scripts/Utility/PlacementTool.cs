@@ -36,11 +36,11 @@ public class PlacementTool : MonoBehaviour
 
     public virtual int PlacedCount()
     {
-        return transform.GetChildCount();
+        return transform.childCount;
     }
 
     public virtual void ChangeName()
     {
-        gameObject.name = PrefabsName() + (PlacedCount() > 1 ? " x" + PlacedCount().ToString() : "") + " (" + typeName + ")";
+        gameObject.name = PrefabsName() + (transform.childCount > 1 ? " x" + transform.childCount.ToString() : "") + " (" + typeName + ")";
     }
 }

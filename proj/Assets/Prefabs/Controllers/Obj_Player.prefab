@@ -1122,8 +1122,11 @@ MonoBehaviour:
   blockFlags: 0
   pushFlags: 0
   bounceFlags: 0
+  powerOnFlags: 0
+  powerOffFlags: 0
+  toggleFlags: 0
   controller: {fileID: 0}
-  collider: {fileID: 0}
+  myCollider: {fileID: 0}
   health: {fileID: 0}
   sound: {fileID: 0}
   collisionSides: 0
@@ -1131,12 +1134,21 @@ MonoBehaviour:
   groundNormal: {x: 0, y: 1, z: 0}
   groundDistance: 0
   groundPoint: {x: 0, y: 0, z: 0}
+  bounceFlagsUsed: 0
+  powerFlagsUsed: 0
+  gravityRate: 0.01
+  bounceRestoresDoubleJump: 0
+  bounceStrength: 18
+  canPower: 1
+  powerCooldown: 0
+  powerTargets: []
   walkSpeed: 0.0625
-  runSpeed: 0.125
-  turnRate: 10
-  jumpStrength: 18
+  runSpeed: 0.1
+  turnRate: 20
+  jumpStrength: 12
   jumpLimit: 2
   jumpDecayRate: 0.8
+  jumpLenienceSeconds: 0.3
   jumpSounds:
   - {fileID: 8300000, guid: f46fcca49186d67469b56cac0a3437a6, type: 3}
   doublejumpSounds:
@@ -1150,12 +1162,14 @@ MonoBehaviour:
   hurtTexture: {fileID: 2800000, guid: 8a29bde6089cf824c98f3c6da56ccfe1, type: 3}
   jumpLenienceTimer: -1
   inputActive: 1
+  slidingDelayTime: 2
   hurtParticle: {fileID: 1267753406698814, guid: 56807b3431fc3eb46be4cc5e23a040b6,
     type: 2}
   wallSlideParticle: {fileID: 1956448841426210, guid: 72a1c1a8461668b4f96cc8e40a6989a4,
     type: 2}
   wallJumpParticle: {fileID: 100002, guid: 428712205a5dd624db98a8906a5c5ad4, type: 2}
   jumpsPerformed: 0
+  jumpsSinceGround: 
   directionalMomentum: {x: 0, y: 0, z: 0}
 --- !u!114 &114620696221021948
 MonoBehaviour:

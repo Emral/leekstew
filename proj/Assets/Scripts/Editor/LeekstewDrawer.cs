@@ -20,7 +20,7 @@ public class LeekstewDrawer : PropertyDrawer
     {
         if (enclose)
         {
-            Rect r = (Rect)EditorGUILayout.BeginVertical(GUI.skin.box);
+            EditorGUILayout.BeginVertical(GUI.skin.box);
         }
 
         if (groupName != "")
@@ -63,7 +63,7 @@ public class LeekstewDrawer : PropertyDrawer
     {
         if (enclose)
         {
-            Rect r = (Rect)EditorGUILayout.BeginVertical(GUI.skin.box);
+            EditorGUILayout.BeginVertical(GUI.skin.box);
         }
 
         toggleBool.target = EditorGUILayout.ToggleLeft(groupName, toggleBool.target);

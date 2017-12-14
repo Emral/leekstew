@@ -143,7 +143,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1881888619686566}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.75, y: 0.75, z: 0.75}
@@ -180,7 +180,7 @@ MonoBehaviour:
   powerOffFlags: 0
   toggleFlags: 0
   controller: {fileID: 0}
-  collider: {fileID: 0}
+  myCollider: {fileID: 0}
   health: {fileID: 0}
   sound: {fileID: 0}
   collisionSides: 0

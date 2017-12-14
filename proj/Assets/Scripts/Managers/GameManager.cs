@@ -29,7 +29,6 @@ public class GameManager : MonoBehaviour
     public static bool playerExists = false;
     public static GameObject playerObject = null;
 
-    public static CameraManager camera = null;              //Static reference to the CameraManager script
     public static bool cameraExists = false;
     public static GameObject cameraObject = null;
 
@@ -64,7 +63,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Level Loaded: " + scene.name + ", " + mode);
 
         player = null;
-        camera = null;
 
         playerObject = GameObject.Find("Obj_Player");
         playerExists = (playerObject != null);
@@ -75,10 +73,6 @@ public class GameManager : MonoBehaviour
 
         cameraObject = GameObject.Find("Obj_Camera");
         cameraExists = (cameraObject != null);
-        if (playerExists)
-        {
-            camera = cameraObject.GetComponent<CameraManager>();
-        }
 
         LevelManager.InitLevel();
     }
@@ -215,7 +209,7 @@ public class GameManager : MonoBehaviour
         }
         public static void ScreenShake(float strength)
         {
-            camera.StartCoroutine(camera.DelayedShake(strength));
+            CameraManager.instance.StartCoroutine(CameraManager.instance.DelayedShake(strength));
         }
     #endregion
 

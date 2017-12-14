@@ -31,9 +31,6 @@ public class PolyPlateau : MonoBehaviour
     private int cachedPointCount = 0;
     private int cachedSkipsCount = 0;
 
-    private MeshFilter floorFilter;
-    private MeshFilter ceilingFilter;
-
     private GameObject[] wallQuads;
 
     private Mesh groundMesh;
@@ -112,9 +109,6 @@ public class PolyPlateau : MonoBehaviour
         floorTrans = transform.Find("floor");
         ceilingTrans = transform.Find("ceiling");
         wallsTrans = transform.Find("walls");
-
-        floorFilter = floorTrans.GetComponent<MeshFilter>();
-        ceilingFilter = ceilingTrans.GetComponent<MeshFilter>();
 
         if (groundMesh == null)
             groundMesh = new Mesh();

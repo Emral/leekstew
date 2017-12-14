@@ -14,8 +14,6 @@ public class TransformEffect : MonoBehaviour
 
     public bool activeWhenPaused = false;
 
-    [HideInInspector] public Vector3 squashScale = Vector3.one;
-
 
     // Use this for initialization
     void Start ()

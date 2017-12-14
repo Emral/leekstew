@@ -21,7 +21,7 @@ public class Collectible_Leek : Collectible
             GameManager.player.PlaySound(collectEndSound, 1f);
         if (collectStartEffect != null)
         {
-            GameObject effect = GameObject.Instantiate(collectEndEffect, transform.position, Quaternion.identity);
+            GameObject.Instantiate(collectEndEffect, transform.position, Quaternion.identity);
         }
 
         SaveManager.CurrentLevelSave.leeksCollected.Add(instanceID);
