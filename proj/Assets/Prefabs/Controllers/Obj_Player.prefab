@@ -673,15 +673,15 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1065892614473708}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: 0.99999285, z: -0, w: -0.0037914617}
+  m_LocalPosition: {x: -121.73, y: 17.47, z: 21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4708325290572170}
   - {fileID: 4614052620649134}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180.43399, z: 0}
 --- !u!4 &4356892841150542
 Transform:
   m_ObjectHideFlags: 1
@@ -1145,7 +1145,7 @@ MonoBehaviour:
   walkSpeed: 0.0625
   runSpeed: 0.1
   turnRate: 20
-  jumpStrength: 12
+  jumpStrength: 15
   jumpLimit: 2
   jumpDecayRate: 0.8
   jumpLenienceSeconds: 0.3
@@ -1203,7 +1203,7 @@ Projector:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1798886853676960}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_NearClipPlane: 0.1
   m_FarClipPlane: 20

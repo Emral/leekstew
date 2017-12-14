@@ -231,7 +231,6 @@ public class Generator : PlacementTool
                 projectileScr.properties = new ProjectileProperties(projectileProperties[Random.Range(0, projectileProperties.Length - 1)]);
                 if (useRelativeDirection)
                 {
-                    Debug.Log(projectileScr.properties.speed);
                     projectileScr.properties.speed = transform.InverseTransformDirection(projectileScr.properties.speed);
                 }
                 spawnedInstance.SetActive(true);

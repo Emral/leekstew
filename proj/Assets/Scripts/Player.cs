@@ -449,7 +449,7 @@ public class Player : CollidingEntity
 
 
                     // Different momentum in the air because PHYSIIIIIICS YOOOOOOOO
-                    Vector3 airSteering = moveDir * walkSpeed * 0.125f;
+                    Vector3 airSteering = moveDir * walkSpeed * 0.135f;
                     Vector2 newHorzVel = Vector2.ClampMagnitude(new Vector2(directionalMomentum.x + airSteering.x, directionalMomentum.z + airSteering.z), runSpeed);
                     directionalMomentum = new Vector3(newHorzVel.x, directionalMomentum.y, newHorzVel.y);
 

@@ -10,7 +10,7 @@ Material:
   m_Shader: {fileID: 4800000, guid: b56c75590651fe14aafa3be91eb325f2, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 1
+  m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -39,7 +39,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 892c05a5bad579248bb20d7bef3f1d62, type: 3}
+        m_Texture: {fileID: 2800000, guid: 396a943327cf68746a989f7b1c864732, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -79,8 +79,6 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OutlineSpace: 0
-    - _OutlineWidth: 0.01
     - _Parallax: 0.02
     - _ShadowDepth: 1
     - _ShadowDotDensity: 0.8
@@ -88,7 +86,7 @@ Material:
     - _ShadowLineDensity: 0.5
     - _ShadowLineStroke: 50
     - _ShadowOffset: 0
-    - _ShadowSaturation: 1
+    - _ShadowSaturation: 1.22
     - _ShadowSharpness: 80
     - _SmoothnessTextureChannel: 0
     - _SpecDotDensity: 0.8
@@ -102,9 +100,8 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.27205884, g: 1, b: 0.81926984, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FresColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 0}
     - _ShadowHue: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
