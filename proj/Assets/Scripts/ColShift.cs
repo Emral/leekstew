@@ -52,6 +52,7 @@ public class ColShift : MonoBehaviour {
         for (int i = 0; i < m.Length; i++)
         {
             m[i].color = newColor.Evaluate((t / length) % 1);
+            m[i].color *= 0.75f;
         }
     }
 	
