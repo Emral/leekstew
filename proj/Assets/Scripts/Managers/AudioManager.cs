@@ -18,6 +18,7 @@ public class SongData
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance = null;
+    public static float musicPitch = 1f;
 
     public UnityEngine.Audio.AudioMixer mixer;
     [SerializeField] [ReorderableList] public List<SongData> songs;
@@ -61,7 +62,7 @@ public class AudioManager : MonoBehaviour
         {
             currentMusic = source.clip;
             currentSong = songDict[currentMusic];
-            source.pitch = Time.timeScale;
+            source.pitch = Time.timeScale*musicPitch;
         }
     }
 

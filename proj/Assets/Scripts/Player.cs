@@ -92,7 +92,6 @@ public class Player : CollidingEntity
     // Movement-related
     private Vector3 moveDir;
     private float forwardMomentum;
-    public Vector3 directionalMomentum;
     private Quaternion targetRotation;
     private bool walkingUphill;
 
@@ -268,10 +267,8 @@ public class Player : CollidingEntity
 
 
     // Update is called once per frame
-    public override void Update()
+    public override void UpdateAI()
     {
-        base.Update();
-
         // Only update when the game isn't paused
         if (!GameManager.isGamePaused)
         {
@@ -296,7 +293,7 @@ public class Player : CollidingEntity
             float rotRateMult = 1f;
 
             // Should shift down flag
-            bool shouldShiftDown = false;
+            shouldShiftDown = false;
 
             // STATUS EX MACHINA
             switch (moveState)
@@ -552,12 +549,6 @@ public class Player : CollidingEntity
             // Rotate self toward target rotation
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnRate*rotRateMult);
 
-            // Commit movement
-            controller.Move((directionalMomentum) * Time.deltaTime * 60f);
-            if (moveState == MoveState.Grounded && shouldShiftDown)
-            {
-                ShiftToGround();
-            }
 
             /*
             if (moveState == MoveState.Grounded)

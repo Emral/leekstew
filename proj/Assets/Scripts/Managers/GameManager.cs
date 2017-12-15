@@ -101,7 +101,6 @@ public class GameManager : MonoBehaviour
         InitGame();
         SaveManager.InitSave();
         UIManager.InitUI();
-        LevelManager.InitLevel();
     }
     void Update()
     {

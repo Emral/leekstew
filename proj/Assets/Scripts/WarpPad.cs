@@ -13,6 +13,8 @@ public class WarpPad : NPC
     public bool locked;
     public bool unlockDestinationWarpPad = false;
 
+    public bool dontFadeBackIn = false;
+
     private Dialog dialog;
     private bool sameScene = false;
 
@@ -77,7 +79,7 @@ public class WarpPad : NPC
 
 
             // Fade out
-            if (!sameScene || LevelManager.roomMusic[room] != AudioManager.currentMusic)
+            if (!sameScene || LevelManager.roomMusic.ContainsKey(room) && LevelManager.roomMusic[room] != AudioManager.currentMusic)
             {
                 AudioManager.FadeOutMusic(0.5f, true);
             }
@@ -96,12 +98,16 @@ public class WarpPad : NPC
                 GameManager.instance.transform.position = LevelManager.warpDestination;
                 LevelManager.ChangeRoom(room);
                 GameManager.player.inputActive = true;
-                AudioManager.SetMusic(LevelManager.roomMusic[room]);
-                yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(0f, 0.5f));
+                if (LevelManager.roomMusic.ContainsKey(room))
+                    AudioManager.SetMusic(LevelManager.roomMusic[room]);
+
+                if (!dontFadeBackIn)
+                    yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(0f, 0.5f));
             }
             else
             {
                 LevelManager.isWarping = true;
+                LevelManager.dontFadeBackIn = dontFadeBackIn;
                 LevelManager.EnterLevel(scene);
             }
         }

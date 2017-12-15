@@ -26,12 +26,12 @@ public class Battery : MonoBehaviour
     public bool defaultActive = false;
     public BatteryType type = BatteryType.Continuous;
 
-    private void Start()
+    public virtual void Start()
     {
         active = defaultActive;
     }
 
-    private void LateUpdate()
+    public virtual void LateUpdate()
     {
         if (type == BatteryType.Continuous)
         {
@@ -39,7 +39,7 @@ public class Battery : MonoBehaviour
         }
     }
 
-    public void ReceiveCharge(BoolChange signal)
+    public virtual void ReceiveCharge(BoolChange signal)
     {
         if (signal == BoolChange.On)
             PowerOn();
@@ -49,17 +49,17 @@ public class Battery : MonoBehaviour
             TogglePower();
     }
 
-    public void PowerOn()
+    public virtual void PowerOn()
     {
         active = true;
     }
 
-    public void TogglePower()
+    public virtual void TogglePower()
     {
         active = !active;
     }
 
-    public void PowerOff()
+    public virtual void PowerOff()
     {
         active = false;
     }

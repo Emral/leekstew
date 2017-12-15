@@ -47,6 +47,7 @@ public class CollidingEntity : MonoBehaviour
     [HideInInspector] public bool bounceFlagsUsed;
     [HideInInspector] public bool powerFlagsUsed;
 
+    public Vector3 directionalMomentum;
     public float gravityRate = 0.0f;
 
     public bool bounceRestoresDoubleJump = false;
@@ -56,11 +57,16 @@ public class CollidingEntity : MonoBehaviour
     public Battery[] powerTargets;
     private float powerCooldownTimer;
 
+    [HideInInspector] public bool shouldShiftDown;
+
     public virtual void Update()
     {
         if (!GameManager.isGamePaused)
         {
             UpdateGroundInfo();
+            UpdateAI();
+            if (directionalMomentum.magnitude > 0)
+                CommitMovement();
         }
     }
     public virtual void Start()
@@ -95,6 +101,26 @@ public class CollidingEntity : MonoBehaviour
                 groundPoint = transform.position + (Vector3.up * -100f);
                 groundNormal = Vector3.up;
             }
+        }
+    }
+    public virtual void UpdateAI()
+    {}
+
+    public virtual void CommitMovement()
+    {
+        // Commit movement
+        if (controller != null)
+        {
+            controller.Move(directionalMomentum * Time.deltaTime * 60f);
+        }
+        else
+        {
+            transform.Translate(directionalMomentum * Time.deltaTime * 60f);
+        }
+
+        if (shouldShiftDown)
+        {
+            ShiftToGround();
         }
     }
 

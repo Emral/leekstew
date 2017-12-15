@@ -28,6 +28,7 @@ public class LevelManager : MonoBehaviour
 
     private static bool beginningLevel = true;
     public static bool isWarping = false;
+    public static bool dontFadeBackIn = false;
 
     public static Vector3 warpDestination;
     public static int currentRoom = 0;
@@ -51,7 +52,7 @@ public class LevelManager : MonoBehaviour
         {
             if (roomObjects != null)
             {
-                if (roomObjects.Length > 0)
+                if (roomObjects.Length > 0 && roomObjects.Length > currentRoom)
                 {
                     return roomObjects[currentRoom];
                 }
@@ -185,7 +186,8 @@ public class LevelManager : MonoBehaviour
         for (int i = 0;  i < roomObjects.Length;  i++)
         {
             Room scr = roomObjects[i].GetComponent<Room>();
-            roomNames[scr.roomId] = scr.name;
+            print("Catalogued room " + scr.roomName);
+            roomNames[scr.roomId] = scr.roomName;
             roomMusic[scr.roomId] = scr.music;
         }
     }
@@ -201,6 +203,7 @@ public class LevelManager : MonoBehaviour
     {
         currentRoom = newRoom;
         ShowAndHideRooms();
+        print("Changed to room " + CurrentRoomScript.roomName);
     }
     #endregion
 
@@ -290,9 +293,13 @@ public class LevelManager : MonoBehaviour
 
 
         // Fade the screen in
-        UIManager ui = UIManager.instance;
-        ui.StartCoroutine(ui.ScreenFadeChange(0f, 1f));
-        yield return new WaitForSeconds(0.5f);
+        if (!dontFadeBackIn)
+        {
+            UIManager ui = UIManager.instance;
+            ui.StartCoroutine(ui.ScreenFadeChange(0f, 1f));
+            yield return new WaitForSeconds(0.5f);
+        }
+        dontFadeBackIn = false;
 
         GameManager.player.inputActive = true;
         beginningLevel = false;
