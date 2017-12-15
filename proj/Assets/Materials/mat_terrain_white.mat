@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: mat_terrain_white
   m_Shader: {fileID: 4800000, guid: b56c75590651fe14aafa3be91eb325f2, type: 3}
-  m_ShaderKeywords: ANICEL_SPECULAR
+  m_ShaderKeywords: ANICEL_FRESNEL ANICEL_SPECULAR
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -72,7 +72,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FresPower: 8
+    - _FresPower: 2
     - _GlossMapScale: 1
     - _Glossiness: 0
     - _GlossyReflections: 1
@@ -104,7 +104,7 @@ Material:
     m_Colors:
     - _Color: {r: 0.6117647, g: 0.6117647, b: 0.6117647, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FresColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
+    - _FresColor: {r: 1, g: 1, b: 1, a: 0.5019608}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 0}
     - _ShadowHue: {r: 0, g: 0.13519269, b: 0.45588237, a: 1}
-    - _SpecColor: {r: 1, g: 1, b: 1, a: 0.5}
+    - _SpecColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0.5}

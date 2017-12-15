@@ -84,7 +84,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _ShadowDepth: 0.622
+    - _ShadowDepth: 0.8
     - _ShadowDotDensity: 0.8
     - _ShadowDotRadius: 0.01
     - _ShadowLineDensity: 1
@@ -107,5 +107,5 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
     - _FresColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
-    - _ShadowHue: {r: 0.2622729, g: 0.67013407, b: 0.72794116, a: 1}
+    - _ShadowHue: {r: 0.07028547, g: 0.17616932, b: 0.19117647, a: 1}
     - _SpecColor: {r: 0, g: 0.37931037, b: 1, a: 1}
