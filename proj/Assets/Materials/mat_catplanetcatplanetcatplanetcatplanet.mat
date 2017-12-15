@@ -89,7 +89,7 @@ Material:
     - _ShadowDotRadius: 0.01
     - _ShadowLineDensity: 1
     - _ShadowLineStroke: 500
-    - _ShadowOffset: 0.05
+    - _ShadowOffset: 0.25
     - _ShadowSaturation: 1
     - _ShadowSharpness: 0
     - _SmoothnessTextureChannel: 0
