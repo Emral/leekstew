@@ -42,10 +42,11 @@ public class Player : CollidingEntity
     private Vector3 wallPoint;
 
     // Wall jumping
-    //private bool wallSliding = false;
+    private bool continueWallSliding = false;
     //private bool wallJumping = false;
     private int wallSlidingCounter = 0;
     private float wallSlidingTime = 0f;
+    public LayerMask wallSlideLayerMask;
 
     private float lastWalljumpHeight = Mathf.Infinity;
     private Vector3 lastWallNormal = Vector3.zero;
@@ -511,8 +512,8 @@ public class Player : CollidingEntity
                             wallSlidingTime += Time.deltaTime;
 
                             // Restrict momentum based on time spent sliding
-                            velocity.x = 0;
-                            velocity.z = 0;
+                            //velocity.x = 0;
+                            //velocity.z = 0;
                             velocity.y = Mathf.Max(Mathf.Lerp(0f, -0.3f, Mathf.InverseLerp(0f, 1f, wallSlidingTime)), velocity.y);
 
                             // Sliding particles
@@ -525,6 +526,21 @@ public class Player : CollidingEntity
                             canDoubleJump = false;
                             if (GameManager.inputPress["Jump"] && !GameManager.cutsceneMode)
                                 PerformWallJump();
+
+                            // Stop sliding if contact with the wall is lost
+                            if (continueWallSliding)
+                                continueWallSliding = false;
+                            else
+                                airbornStates[0] = AirbornState.Falling;
+
+                            // Stop sliding if wall not detected
+                            /*
+                            RaycastHit hit;
+                            if (!Physics.Linecast(wallPoint+wallNormal, wallPoint-wallNormal, out hit, wallSlideLayerMask))
+                            {
+                                airbornStates[0] = AirbornState.Falling;
+                            }
+                            */
                             break;
                     }
 
@@ -601,7 +617,9 @@ public class Player : CollidingEntity
         {
             wallNormal = normal;
             wallPoint = point;
-            //print("wall point updated");
+
+            continueWallSliding = true;
+
 
             if (!groundedCompensation && groundDistance > 0.2f && velocity.y < 0f)
             {
@@ -786,7 +804,7 @@ public class Player : CollidingEntity
         SetAnimState("flipping", 0.5f);
         lockedAnimState = true;
 
-        SaveManager.currentSave.teethLost += 10;
+        SaveManager.currentSave.teethLost += (int)Mathf.Min(10, SaveManager.currentSave.NetTeeth);
 
         yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(1f, 0.5f));
         yield return new WaitForSeconds(0.5f);

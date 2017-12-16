@@ -294,6 +294,10 @@ public class CollidingEntity : MonoBehaviour
 
             // Now process the collision for this hit
             ProcessCollision (hit.otherCollider.transform, hit.point, hit.normal, otherScr);
+            if (otherScr != null)
+            {
+                otherScr.ProcessCollision(transform, hit.point, hit.normal, this);
+            }
         }
     }
 

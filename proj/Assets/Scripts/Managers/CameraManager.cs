@@ -39,6 +39,22 @@ public class CameraBehavior
 
     public bool valid = false;
 
+    public CameraBehavior()
+    {
+
+    }
+
+    public CameraBehavior(CameraBehavior other)
+    {
+        FieldInfo[] properties = this.GetType().GetFields();
+        foreach (FieldInfo mI in properties)
+        {
+            mI.SetValue(this, mI.GetValue((object)other));
+        }
+
+        this.debugName += " (Copy)";
+    }
+
     public override string ToString()
     {
         string compiled = "(";
@@ -46,7 +62,11 @@ public class CameraBehavior
         FieldInfo[] properties = this.GetType().GetFields();
         foreach (FieldInfo mI in properties)
         {
-            compiled = compiled + mI.Name +": "+ mI.GetValue(this).ToString() + ", ";
+            string valueStr = "null";
+            object value = mI.GetValue(this);
+            if (value != null)
+                valueStr = value.ToString();
+            compiled = compiled + mI.Name +": "+ valueStr + ", ";
         }
         compiled = compiled + ")";
 

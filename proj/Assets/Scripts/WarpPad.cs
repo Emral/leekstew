@@ -96,7 +96,7 @@ public class WarpPad : NPC
                     SaveManager.CurrentLevelSave.warpPadsActivated.Add(destPadScr.instanceID);
                 }
 
-                GameManager.instance.transform.position = LevelManager.warpDestination;
+                GameManager.player.transform.position = LevelManager.warpDestination;
                 LevelManager.ChangeRoom(room);
                 GameManager.player.inputActive = true;
                 if (LevelManager.roomMusic.ContainsKey(room))
