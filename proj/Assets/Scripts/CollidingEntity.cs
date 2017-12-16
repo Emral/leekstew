@@ -301,6 +301,20 @@ public class CollidingEntity : MonoBehaviour
         }
     }
 
+    public virtual void OnTriggerEnter(Collider collision)
+    {
+        // Reset the current collison side
+        collisionSide = (CollideDir) 63;
+        CollidingEntity otherScr = collision.transform.GetComponent<CollidingEntity>();
+        
+        // Now process the collision for this hit
+        ProcessCollision(collision.transform, Vector3.zero, Vector3.zero, otherScr);
+        if (otherScr != null)
+        {
+            otherScr.ProcessCollision(transform, Vector3.zero, Vector3.zero, this);
+        }
+    }
+
     public virtual void OnControllerColliderHit(ControllerColliderHit hit)
     {
         // Reset the current collison side

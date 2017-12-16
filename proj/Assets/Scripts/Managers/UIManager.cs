@@ -311,10 +311,17 @@ public class UIManager : MonoBehaviour
             {
 
                 // Repopulate the HP objects
-                if (hpBarGroup.transform.childCount == 0)
+                if (hps.Count == 0)
                 {
                     hps.Clear();
-                    for (int i = 0; i < 50; i++)
+                    foreach (Transform child in hpBarGroup.GetComponentInChildren<Transform>())
+                    {
+                        if (child != hpBarGroup)
+                        {
+                            hps.Add(child.gameObject);
+                        }
+                    }
+                    for (int i = hps.Count; i < 50; i++)
                     {
                         hps.Add(AddUISprite(emptyHeartSprite, hpBarGroup.transform, new Vector3(0, -0.5f * imageSize, 0), Vector3.one / 3f));
                     }
@@ -336,8 +343,7 @@ public class UIManager : MonoBehaviour
                 panel.pivot = new Vector2(panel.pivot.x, 0f);
                 panel.offsetMin = new Vector2(panel.pivot.x - currentWidth * 0.5f, panel.pivot.y - (imageSize + 8f));
                 panel.offsetMax = new Vector2(panel.pivot.x + currentWidth * 0.5f, panel.pivot.y);
-
-
+                
                 // Loop through each sprite object and do stuffs
                 for (int i = 0; i < Mathf.Min(hps.Count, currentHeartCount + 1); i++)
                 {

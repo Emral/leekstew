@@ -662,7 +662,7 @@ public class Player : CollidingEntity
 
 
         // Momentary freeze to show the player is hurt
-        Vector3 tempMomentum = velocity + Vector3.zero;
+        Vector3 tempMomentum = velocity;
 
         int tempJumpsPerformed = jumpsPerformed;
 
@@ -676,7 +676,7 @@ public class Player : CollidingEntity
                                         velocity.y != 0 ? velocity.y : tempMomentum.y,
                                         velocity.z != 0 ? velocity.z : tempMomentum.z);
 
-            velocity = new Vector3(0f, 0.01f, 0f);
+            velocity = Vector3.zero;
             jumpsPerformed = 99;
             timeLeft -= Time.deltaTime;
             yield return null;
