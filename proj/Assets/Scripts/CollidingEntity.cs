@@ -47,7 +47,7 @@ public class CollidingEntity : MonoBehaviour
     [HideInInspector] public bool bounceFlagsUsed;
     [HideInInspector] public bool powerFlagsUsed;
 
-    public Vector3 directionalMomentum;
+    public Vector3 velocity;
     public float gravityRate = 0.0f;
 
     public bool bounceRestoresDoubleJump = false;
@@ -65,7 +65,7 @@ public class CollidingEntity : MonoBehaviour
         {
             UpdateGroundInfo();
             UpdateAI();
-            if (directionalMomentum.magnitude > 0)
+            if (velocity.magnitude > 0)
                 CommitMovement();
         }
     }
@@ -111,11 +111,11 @@ public class CollidingEntity : MonoBehaviour
         // Commit movement
         if (controller != null)
         {
-            controller.Move(directionalMomentum * Time.deltaTime * 60f);
+            controller.Move(velocity * Time.deltaTime * 60f);
         }
         else
         {
-            transform.Translate(directionalMomentum * Time.deltaTime * 60f);
+            transform.Translate(velocity * Time.deltaTime * 60f);
         }
 
         if (shouldShiftDown)

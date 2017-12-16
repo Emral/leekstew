@@ -6,7 +6,6 @@ using UnityEngine;
 
 [System.Flags] public enum CameraProperties
 {
-    None          = 0,
     Yaw           = 1,
     Pitch         = 2,
     XPan          = 4,
@@ -21,6 +20,8 @@ using UnityEngine;
 [System.Serializable]
 public class CameraBehavior
 {
+    public string debugName;
+
     public float easeTime = 1f;
     public int priority = 0;
 
@@ -35,6 +36,8 @@ public class CameraBehavior
     public Transform target;
     public Vector3 regionMin;
     public Vector3 regionMax;
+
+    public bool valid = false;
 
     public override string ToString()
     {
@@ -55,7 +58,15 @@ public class CameraBehavior
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager instance;
-    public static CameraBehavior currentBehavior;
+
+    [ReadOnly, TextArea(5, 5)] public string defaultBehaviorName;
+    [ReadOnly, TextArea(5, 5)] public string currentBehaviorName;
+    [ReadOnly, TextArea(5, 5)] public string roomBehaviorName;
+    [ReadOnly, TextArea(5, 5)] public string appliedBehaviorName;
+    private static CameraBehavior defaultBehavior = null;
+    private static CameraBehavior currentBehavior = null;
+    private static CameraBehavior roomBehavior = null;
+    private static CameraBehavior appliedBehavior = null;
     public static List<CameraBehavior> behaviorHistory;
 
     public static float targetZoom = 1f;
@@ -63,12 +74,12 @@ public class CameraManager : MonoBehaviour
     public static float zoomSpeed = 0.05f;
 
     public Transform target;
-    [HideInInspector] public static Transform dollyTrans;
-    [HideInInspector] public static Transform cameraTrans;
-    [HideInInspector] public static Shake shake;
-    [HideInInspector] public static Skybox skybox;
+    public static Transform dollyTrans;
+    public static Transform cameraTrans;
+    public static Shake shake;
+    public static Skybox skybox;
 
-    [HideInInspector] public static float constantShake = 0f;
+    public static float constantShake = 0f;
 
     private List<float> leftWhiskerDistances;
     private List<float> rightWhiskerDistances;
@@ -79,8 +90,7 @@ public class CameraManager : MonoBehaviour
 
     public bool getBehindPlayer = false;
 
-    [HideInInspector] public static CameraBehavior defaultBehavior;
-    private CameraBehavior roomBehavior;
+
 
     public static int CurrentPriority
     {
@@ -93,6 +103,11 @@ public class CameraManager : MonoBehaviour
         }
     }
 
+    public static bool CurrentEquals(CameraBehavior behavior)
+    {
+        return (currentBehavior == behavior);
+    }
+
     public void UpdateRefs()
     {
         instance = this;
@@ -101,11 +116,17 @@ public class CameraManager : MonoBehaviour
         shake = dollyTrans.gameObject.GetComponent<Shake>();
         skybox = Camera.main.gameObject.GetComponent<Skybox>();
 
+        roomBehavior = null;
         Room currentRoomScr = LevelManager.CurrentRoomScript;
         if (currentRoomScr != null)
         {
+            if (currentRoomScr.newCamera.debugName == null)
+                currentRoomScr.newCamera.debugName = "[ROOM " + currentRoomScr.roomName + " (" + currentRoomScr.roomId.ToString() + ") BEHAVIOR]";
+
             if (currentRoomScr.changeCamera)
+            {
                 roomBehavior = currentRoomScr.newCamera;
+            }
         }
 
         if (defaultBehavior != null)
@@ -113,6 +134,8 @@ public class CameraManager : MonoBehaviour
             defaultBehavior.zoom = cameraTrans.localPosition.z;
             defaultBehavior.pitch = dollyTrans.localRotation.eulerAngles.x;
             defaultBehavior.yaw = dollyTrans.localRotation.eulerAngles.y;
+            defaultBehavior.debugName = "[DEFAULT BEHAVIOR]";
+            defaultBehavior.valid = true;
         }
 
         if (behaviorHistory != null)
@@ -120,6 +143,13 @@ public class CameraManager : MonoBehaviour
             if (behaviorHistory.Count > 10)
                 behaviorHistory.RemoveAt(10);
         }
+
+        appliedBehavior = currentBehavior != null ? currentBehavior : (roomBehavior != null ? roomBehavior : null);
+
+        defaultBehaviorName = defaultBehavior == null ? "" : defaultBehavior.ToString();
+        currentBehaviorName = currentBehavior == null ? "" : currentBehavior.ToString();
+        roomBehaviorName = roomBehavior == null ? "" : roomBehavior.ToString();
+        appliedBehaviorName = appliedBehavior == null ? "" : appliedBehavior.ToString();
     }
 
     private void Awake()
@@ -148,6 +178,8 @@ public class CameraManager : MonoBehaviour
 
         FlagsHelper.Unset(ref newBehavior.changedProperties, CameraProperties.Region);
 
+        newBehavior.debugName = "[CAPTURED SHOT]";
+        newBehavior.valid = true;
         newBehavior.panX = cameraTrans.localPosition.x;
         newBehavior.panY = cameraTrans.localPosition.y;
         newBehavior.zoom = cameraTrans.localPosition.z;
@@ -179,17 +211,14 @@ public class CameraManager : MonoBehaviour
 
             if (!shifting)
             {
-                // Shift to behaviors in camera volumes
-
-
-                // Apply current behavior
-                CameraBehavior behaviorToApply = currentBehavior != null ? currentBehavior : (roomBehavior != null ? roomBehavior : null);
-                ApplyBehavior(behaviorToApply);
+                // Apply camera behavior
+                ApplyBehavior(appliedBehavior);
 
                 if (target != null)
+                {
                     transform.position = target.position;  //transform.position = Vector3.Lerp(transform.position, target.position, 0.25f);
-                
-                    if (GameManager.player != null && target == GameManager.player.transform && currentBehavior == null)
+
+                    if (GameManager.player != null && target == GameManager.player.transform && appliedBehavior == null)
                     {
                         // Player camera control stick
                         moveX = GameManager.inputVals["Cam X"] * OptionsManager.cameraSpeedX * 0.5f * (OptionsManager.cameraInvertedX ? -1 : 1) * (GameManager.cutsceneMode ? 0 : 1);
@@ -255,13 +284,22 @@ public class CameraManager : MonoBehaviour
 
                         // Main raycast for whiskers
                         float minDist = 999f;
-                        if (Physics.Linecast(GameManager.player.transform.position, cameraTrans.position + Vector3.up, out hit, avoidMask))
+                        if (Physics.Linecast(GameManager.player.transform.position, cameraTrans.position, out hit, avoidMask))
                         {
-                            minDist = hit.distance;
+                            bool noNeedToJump = false;
+                            for (int i = -5; i < 5; i++)
+                            {
+                                noNeedToJump = !Physics.Linecast(GameManager.player.transform.position + Vector3.up * i, cameraTrans.position, out hit, avoidMask);
+                                if (noNeedToJump)
+                                    break;
+                            }
+                            if (!noNeedToJump)
+                                minDist = Mathf.Max(hit.distance, 4f);
                         }
 
 
                         // Side raycasts for whiskers
+                        /*
                         for (int i = 0; i <= 10; i++)
                         {
 
@@ -293,7 +331,7 @@ public class CameraManager : MonoBehaviour
                             else
                                 Debug.DrawLine(target.position, endPoint, Color.yellow);
                         }
-
+                        */
 
                         // Move the camera forward and backward based on the whiskers and stuff
                         newLocalPos.z = Mathf.Max(-minDist + 1, newLocalPos.z);
@@ -389,13 +427,42 @@ public class CameraManager : MonoBehaviour
                         */
 
                         // Look down when falling
-                        if (GameManager.player.groundDistance > 3)
+                        if (GameManager.player.groundDistance > 5)
                         {
                             playerRotEuler.x += 55;
                         }
-                        if (GameManager.player.groundDistance > 5)
+                        if (GameManager.player.groundDistance > 10)
                         {
-                            playerRotEuler.x += 22;
+                            playerRotEuler.x += 55;
+                        }
+
+                        // Look over the edge when standing at cliffs
+                        if (GameManager.player.groundDistance < 0.1f)
+                        {
+                            Vector3 playerFront = GameManager.player.transform.position + GameManager.player.transform.forward * 1.5f;
+                            Vector3 playerFrontGround = playerFront - Vector3.up * 8f;
+                            Physics.Linecast(playerFront, playerFrontGround, out hit, avoidMask);
+
+                            Vector3 floorPoint = playerFrontGround;
+                            if (hit.point != null)
+                                floorPoint = hit.point;
+
+                            if (Physics.Linecast(cameraTrans.position, floorPoint, out hit, avoidMask) && floorPoint.y < GameManager.player.groundPoint.y - 0.25f)
+                                playerRotEuler.x += 55;
+
+                            // Look up and down slopes
+                            float groundAngle = Vector3.Angle(GameManager.player.groundNormal, Vector3.up);
+                            if (groundAngle > 11 && GameManager.player.velocity.magnitude > 0)
+                            {
+                                if (GameManager.player.walkingUphill)
+                                {
+                                    playerRotEuler.x -= 22;
+                                }
+                                else
+                                {
+                                    playerRotEuler.x += 22;
+                                }
+                            }
                         }
 
                         playerRotEuler.y = (playerRotEuler.y) % 360;
@@ -423,6 +490,7 @@ public class CameraManager : MonoBehaviour
 
                         //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, -playerRotEuler.z), 0.005f);
                     }
+                }
             }
         }
     }
@@ -432,7 +500,7 @@ public class CameraManager : MonoBehaviour
     {
         if (behavior != null)
         {
-            //print("APPLYING CAMERA BEHAVIOR");
+            //print("APPLYING CAMERA BEHAVIOR "+behavior.debugName);
 
             Vector3 oldPos = instance.transform.position;
             Quaternion oldAngle = dollyTrans.rotation;
@@ -453,7 +521,7 @@ public class CameraManager : MonoBehaviour
             // Position
             Vector3 newPos = oldPos + Vector3.zero;
 
-            if (targetChanged)
+            if (targetChanged && behavior.target != null)
             {
                 newPos = behavior.target.position;
             }
@@ -578,7 +646,7 @@ public class CameraManager : MonoBehaviour
                 // Position
                 Vector3 newPos = oldPos + Vector3.zero;
 
-                if (targetChanged)
+                if (targetChanged && newBehavior.target != null)
                 {
                     newPos = newBehavior.target.position;
                 }

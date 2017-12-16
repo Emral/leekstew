@@ -38,6 +38,7 @@ public class GlobalSaveData
     public int currentLevelIndex;
     public int teethCollected;
     public int teethSpent;
+    public int teethLost;
     public int greenTeethSpent;
 
     public int TotalGoldRadishes
@@ -69,7 +70,7 @@ public class GlobalSaveData
     {
         get
         {
-            return teethCollected - teethSpent;
+            return (int)Mathf.Max(0f, teethCollected - teethSpent - teethLost);
         }
     }
     public int TotalGreenTeeth

@@ -9,6 +9,8 @@ public class BossA : Battery
     public float jumpTimer = 0f;
     public int jumpsUntilThrash = 0;
 
+    public Transform bossArenaTransform;
+
     private bool bossStarted = false;
 
     private float rotSpeed = 0f;
@@ -26,7 +28,6 @@ public class BossA : Battery
     private IEnumerator Spin(float changeAmt, float changeTime)
     {
         Vector3 oldRot = transform.rotation.eulerAngles;
-        Vector3 newRot = oldRot + Vector3.up * changeAmt;
 
         float elapsedTime = 0;
         while (elapsedTime < changeTime)
@@ -100,6 +101,10 @@ public class BossA : Battery
         }
 
         // Begin fight spin anim
+        CameraBehavior fightShot = new CameraBehavior();
+        fightShot.target = bossArenaTransform;
+        fightShot.yaw = 45;
+
         yield return StartCoroutine(Spin(-22f, 0.5f));
         yield return StartCoroutine(Spin(44f+720f, 1f));
         yield return StartCoroutine(Spin(-22f, 0.25f));
@@ -108,8 +113,7 @@ public class BossA : Battery
         GameManager.cutsceneMode = false;
 
         HealthPoints health = GetComponent<HealthPoints>();
-        CameraBehavior bossShot = new CameraBehavior();
-
+        
         // Phase 1
         while (health.currentHp > 0)
         {

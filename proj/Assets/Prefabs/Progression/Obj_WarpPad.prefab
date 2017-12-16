@@ -72,7 +72,7 @@ GameObject:
   - component: {fileID: 114406176144057452}
   m_Layer: 0
   m_Name: Obj_WarpPad
-  m_TagString: Untagged
+  m_TagString: WarpPad
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -385,10 +385,12 @@ MonoBehaviour:
   talkCooldown: 0
   scene: 
   room: 0
+  destinationTransform: {fileID: 0}
   destinationOffset: {x: 0, y: 0, z: 0}
-  destinationWarpPad: {fileID: 0}
+  useDefaultPosition: 1
   locked: 0
   unlockDestinationWarpPad: 0
+  dontFadeBackIn: 0
 --- !u!198 &198711077971544556
 ParticleSystem:
   m_ObjectHideFlags: 1

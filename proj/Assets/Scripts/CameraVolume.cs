@@ -9,6 +9,17 @@ public class CameraVolume : MonoBehaviour
     //private bool cachedPlayerInside;
     //private bool active = false;
 
+
+    private void OnDrawGizmos()
+    {
+        Color pink = Color.Lerp(Color.red, Color.white, 0.5f);
+        Gizmos.color = pink;
+        Gizmos.DrawWireCube(transform.position, transform.lossyScale);
+        pink.a = 0.5f;
+        Gizmos.color = pink;
+        Gizmos.DrawCube(transform.position, transform.lossyScale);
+    }
+
     // Use this for initialization
     private void OnTriggerEnter(Collider other)
     {
@@ -21,10 +32,10 @@ public class CameraVolume : MonoBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject == GameManager.player.gameObject && CameraManager.currentBehavior == cameraProps)
+        if (other.gameObject == GameManager.player.gameObject && CameraManager.CurrentEquals(cameraProps))
         {
             CameraManager.instance.StopAllCoroutines();
-            CameraManager.DoShiftToNewShot(cameraProps);
+            CameraManager.DoGradualReset(cameraProps.easeTime);
             //active = false;
         }
     }

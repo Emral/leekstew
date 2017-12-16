@@ -345,13 +345,14 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4918592471024796}
+  - component: {fileID: 225675725865023170}
   m_Layer: 5
   m_Name: UI_Letterbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1182438371883038
 GameObject:
   m_ObjectHideFlags: 1
@@ -6014,6 +6015,7 @@ MonoBehaviour:
   dialogTexture: {fileID: 2800000, guid: 6dc88d61e9f14f74299e408b2876b629, type: 3}
   levelIntroGroup: {fileID: 225750739811401604}
   letterboxObj: {fileID: 1161425587418252}
+  letterboxGroup: {fileID: 225675725865023170}
   pickupBarGroup: {fileID: 225717744265050444}
   teethCounter: {fileID: 114910626495253904}
   leekCounter: {fileID: 114206748689191962}
@@ -8436,6 +8438,17 @@ CanvasGroup:
   m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
+--- !u!225 &225675725865023170
+CanvasGroup:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1161425587418252}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
 --- !u!225 &225717744265050444
 CanvasGroup:

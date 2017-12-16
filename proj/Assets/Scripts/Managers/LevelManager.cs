@@ -38,7 +38,7 @@ public class LevelManager : MonoBehaviour
     public static List<int> checkpointsActive = new List<int>();
     public static List<int> warpsActive = new List<int>();
 
-    public static GameObject[] roomObjects;
+    public static Dictionary<int, GameObject> roomObjects;
     public static Dictionary<int, string> roomNames;
     public static Dictionary<int, AudioClip> roomMusic;
 
@@ -52,7 +52,7 @@ public class LevelManager : MonoBehaviour
         {
             if (roomObjects != null)
             {
-                if (roomObjects.Length > 0 && roomObjects.Length > currentRoom)
+                if (roomObjects.ContainsKey(currentRoom))
                 {
                     return roomObjects[currentRoom];
                 }
@@ -179,21 +179,24 @@ public class LevelManager : MonoBehaviour
     }
     public static void CatalogRooms()
     {
-        roomObjects = GameObject.FindGameObjectsWithTag("Room");
+        roomObjects = new Dictionary<int, GameObject>();
         roomNames = new Dictionary<int, string>();
         roomMusic = new Dictionary<int, AudioClip>();
 
-        for (int i = 0;  i < roomObjects.Length;  i++)
+        GameObject[] roomObjectArray = GameObject.FindGameObjectsWithTag("Room");
+
+        foreach (GameObject go in roomObjectArray)
         {
-            Room scr = roomObjects[i].GetComponent<Room>();
-            print("Catalogued room " + scr.roomName);
+            Room scr = go.GetComponent<Room>();
+            print("Catalogued room #" + scr.roomId + ", " + scr.roomName);
+            roomObjects[scr.roomId] = go;
             roomNames[scr.roomId] = scr.roomName;
             roomMusic[scr.roomId] = scr.music;
         }
     }
     public static void ShowAndHideRooms()
     {
-        foreach (GameObject room in roomObjects)
+        foreach (GameObject room in roomObjects.Values)
         {
             Room scr = room.GetComponent<Room>();
             room.SetActive(currentRoom == scr.roomId);

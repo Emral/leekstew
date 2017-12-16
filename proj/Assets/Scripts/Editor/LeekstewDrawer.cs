@@ -9,10 +9,63 @@ using UnityEditor.AnimatedValues;
 public class LeekstewDrawer : PropertyDrawer
 {
     SerializedProperty currentProperty;
-
+    Rect currentPosition;
+    float currentLineY = 0f;
+    private bool[] defaultIncludes = new bool[] { true, true, true, true, true, true, true, true, true, true };
 
     public virtual void OnEnable()
     {
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        return base.GetPropertyHeight(property, label) + currentLineY;
+    }
+
+
+    public void ResetCurrentLine()
+    {
+        currentLineY = 0f;
+    }
+
+    public Rect GetCurrentLine ()
+    {
+        Rect newPos = new Rect(currentPosition);
+        newPos.y += currentLineY;
+        newPos.height = EditorGUIUtility.singleLineHeight;
+        return newPos;
+    }
+    public Rect GetNextLine()
+    {
+        currentLineY += EditorGUIUtility.singleLineHeight;
+        return GetCurrentLine();
+    }
+    public Rect HalfLine()
+    {
+        currentLineY += EditorGUIUtility.singleLineHeight*0.5f;
+        return GetCurrentLine();
+    }
+
+    public void PropertyRow (string[] props, bool[] includeFlags = null)
+    {
+        if (includeFlags == null) {includeFlags = defaultIncludes;}
+
+        bool guiEn = GUI.enabled;
+
+        int numOnRow = props.Length;
+        Rect newPos = GetNextLine();
+        newPos.width /= numOnRow;
+
+        for (int i = 0; i < props.Length; i++)
+        {
+            string rowPropName = props[i];
+            GUI.enabled = includeFlags[i];
+            EditorGUIUtility.labelWidth = GUI.skin.textField.CalcSize(new GUIContent(rowPropName)).x + 20f;
+            EditorGUI.PropertyField(newPos, currentProperty.FindPropertyRelative(rowPropName));
+            newPos.x += newPos.width;
+        }
+
+        GUI.enabled = guiEn;
     }
 
 
@@ -131,6 +184,7 @@ public class LeekstewDrawer : PropertyDrawer
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         currentProperty = property;
+        currentPosition = position;
         CustomDrawer(position, property, label);
     }
 

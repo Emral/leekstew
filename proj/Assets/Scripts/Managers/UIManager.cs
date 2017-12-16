@@ -37,7 +37,9 @@ public class UIManager : MonoBehaviour
     public static float letterboxFadeAmount = 0f;
 
     public CanvasGroup levelIntroGroup;
+
     public GameObject letterboxObj;
+    public CanvasGroup letterboxGroup;
 
     public static float pickupFadeCounter = 2f;
     public CanvasGroup pickupBarGroup;
@@ -156,7 +158,9 @@ public class UIManager : MonoBehaviour
             tempColor.a = GameManager.isGamePaused ? 0.5f : screenFadeAmount;
             screenFadeScr.color = tempColor;
         }
-        
+
+        letterboxGroup.alpha = letterboxFadeAmount;
+
         //Image[] barScrs = letterboxObj.GetComponentsInChildren<Image>();
         //foreach (Image bar in barScrs)
         //{
@@ -166,7 +170,7 @@ public class UIManager : MonoBehaviour
         //}
     }
     #endregion
-    
+
     void UpdateUI()
     {
         // Letterbox

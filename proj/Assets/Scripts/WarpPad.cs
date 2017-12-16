@@ -7,8 +7,9 @@ public class WarpPad : NPC
     public string scene;
 
     public int room;
+    public Transform destinationTransform;
     public Vector3 destinationOffset;
-    public Transform destinationWarpPad;
+    public bool useDefaultPosition;
 
     public bool locked;
     public bool unlockDestinationWarpPad = false;
@@ -72,8 +73,8 @@ public class WarpPad : NPC
         else
         {
             GameManager.player.inputActive = false;
-            if (destinationWarpPad != null)
-                LevelManager.warpDestination = destinationWarpPad.position + Vector3.up * 0.1f;
+            if (destinationTransform != null)
+                LevelManager.warpDestination = destinationTransform.position + Vector3.up * 0.1f;
 
             LevelManager.warpDestination += destinationOffset;
 
@@ -89,9 +90,9 @@ public class WarpPad : NPC
             // If warping to a room in the same scene, just move the player, refresh the rooms and fade back in
             if (sameScene)
             {
-                if (destinationWarpPad != null && unlockDestinationWarpPad)
+                if (destinationTransform != null && unlockDestinationWarpPad)
                 {
-                    WarpPad destPadScr = destinationWarpPad.GetComponent<WarpPad>();
+                    WarpPad destPadScr = destinationTransform.GetComponent<WarpPad>();
                     SaveManager.CurrentLevelSave.warpPadsActivated.Add(destPadScr.instanceID);
                 }
 
@@ -106,7 +107,7 @@ public class WarpPad : NPC
             }
             else
             {
-                LevelManager.isWarping = true;
+                LevelManager.isWarping = !useDefaultPosition;
                 LevelManager.dontFadeBackIn = dontFadeBackIn;
                 LevelManager.EnterLevel(scene);
             }

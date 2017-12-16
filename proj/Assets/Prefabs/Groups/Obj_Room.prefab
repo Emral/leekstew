@@ -313,8 +313,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomId: 0
-  changeCamera: 1
+  changeCamera: 0
   newCamera:
+    debugName: 
     easeTime: 1
     priority: 0
     changedProperties: 0
@@ -327,6 +328,7 @@ MonoBehaviour:
     target: {fileID: 0}
     regionMin: {x: 0, y: 0, z: 0}
     regionMax: {x: 0, y: 0, z: 0}
+    valid: 0
   music: {fileID: 0}
   roomName: 
   skybox: {fileID: 0}

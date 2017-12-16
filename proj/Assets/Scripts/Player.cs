@@ -93,7 +93,7 @@ public class Player : CollidingEntity
     private Vector3 moveDir;
     private float forwardMomentum;
     private Quaternion targetRotation;
-    private bool walkingUphill;
+    [HideInInspector] public bool walkingUphill;
 
     // Animation-related
     private string animState;
@@ -132,7 +132,7 @@ public class Player : CollidingEntity
 
     public Vector3 GetDirMomentum()
     {
-        return directionalMomentum;
+        return velocity;
     }
 
     public bool GetGrounded()
@@ -190,7 +190,7 @@ public class Player : CollidingEntity
             groundedCompensation = true;
             squashAmount = 1f;
             jumpsPerformed = 0;
-            directionalMomentum.y = -0.1f;
+            velocity.y = -0.1f;
             lastWalljumpHeight = Mathf.Infinity;
             lastWallNormal = Vector3.zero;
         }
@@ -249,7 +249,7 @@ public class Player : CollidingEntity
 
         // VERTICAL BOOST
         transform.Translate(Vector3.up * 0.1f);
-        directionalMomentum.y = jumpStrength * 0.015f;
+        velocity.y = jumpStrength * 0.015f;
 
         moveState = MoveState.Airborn;
         groundedCompensation = false;
@@ -316,7 +316,7 @@ public class Player : CollidingEntity
                     // Slope and sliding checks
                     float forwardSlopeAngle = Vector3.Angle(moveDir, groundNormal)-90;
                     float backSlopeAngle = Vector3.Angle(-moveDir, groundNormal)-90;
-                    float momentumSlopeAngle = Vector3.Angle(directionalMomentum, groundNormal)-90;
+                    float momentumSlopeAngle = Vector3.Angle(velocity, groundNormal)-90;
                     float slopeAngle = Vector3.Angle(Vector3.up, groundNormal);
 
                     walkingUphill = forwardSlopeAngle > backSlopeAngle;
@@ -325,7 +325,7 @@ public class Player : CollidingEntity
 
                     if (momentumSlopeAngle < 0)
                     {
-                        //directionalMomentum.y = (1f-groundNormal.y) * -50f;
+                        //velocity.y = (1f-groundNormal.y) * -50f;
                         // * Mathf.Lerp(0f, 1f-groundNormal.y, Mathf.InverseLerp(0f, slopeAngle, momentumSlopeAngle))*20f;
                     }
 
@@ -370,8 +370,8 @@ public class Player : CollidingEntity
                             modelCenter.localPosition = Vector3.up * 0.75f;
 
                             // Reset horizontal momentum to steer vector * run speed
-                            directionalMomentum = Vector3.up*directionalMomentum.y + moveDir * runSpeed; //Vector3.forward * forwardMomentum;
-
+                            velocity = Vector3.up*velocity.y + moveDir * runSpeed; //Vector3.forward * forwardMomentum;
+                             
                             if (slopeTooSteep)
                             {
                                 /*
@@ -380,20 +380,20 @@ public class Player : CollidingEntity
                                 else
                                     slidingTimer = 0f;
 
-                                float tempYVal = directionalMomentum.y;
+                                float tempYVal = velocity.y;
 
-                                directionalMomentum = directionalMomentum * (slidingDelayTime - slidingTimer);
-                                directionalMomentum.y = tempYVal;
+                                velocity = velocity * (slidingDelayTime - slidingTimer);
+                                velocity.y = tempYVal;
                                 if (slidingTimer <= 0)
                                     */
                                 {
-                                    directionalMomentum = Vector3.zero;
+                                    velocity = Vector3.zero;
                                     groundedStates[0] = GroundedState.Sliding;
                                     transform.rotation = Quaternion.LookRotation(groundNormal, Vector3.up);
                                     slideSpeed = 0f;
                                 }
 
-                                //if (directionalMomentum.magnitude += 0.2f * new Vector3(groundNormal.x, 0f, groundNormal.z);
+                                //if (velocity.magnitude += 0.2f * new Vector3(groundNormal.x, 0f, groundNormal.z);
                                 //groundedStates[0] = GroundedState.Sliding;
                             }
                             else
@@ -424,10 +424,10 @@ public class Player : CollidingEntity
                                     groundedStates[0] = GroundedState.Walking;
                                 }
                             }
-                            directionalMomentum.x = slideForwardVector.x * slideSpeed;
-                            directionalMomentum.z = slideForwardVector.z * slideSpeed;
+                            velocity.x = slideForwardVector.x * slideSpeed;
+                            velocity.z = slideForwardVector.z * slideSpeed;
 
-                            Vector3 hDirMom = directionalMomentum*1f;
+                            Vector3 hDirMom = velocity*1f;
                             hDirMom.y = 0f;
                             targetRotation = Quaternion.LookRotation(hDirMom, Vector3.up);
 
@@ -447,11 +447,11 @@ public class Player : CollidingEntity
 
                     // Different momentum in the air because PHYSIIIIIICS YOOOOOOOO
                     Vector3 airSteering = moveDir * walkSpeed * 0.135f;
-                    Vector2 newHorzVel = Vector2.ClampMagnitude(new Vector2(directionalMomentum.x + airSteering.x, directionalMomentum.z + airSteering.z), runSpeed);
-                    directionalMomentum = new Vector3(newHorzVel.x, directionalMomentum.y, newHorzVel.y);
+                    Vector2 newHorzVel = Vector2.ClampMagnitude(new Vector2(velocity.x + airSteering.x, velocity.z + airSteering.z), runSpeed);
+                    velocity = new Vector3(newHorzVel.x, velocity.y, newHorzVel.y);
 
                     // LET THERE BE G̮̰͕̻͇̼Ŕ͜͏̤͚̝̼͇͚A̸̶̻̼̼̫͇͟V̨͏̣̘̞̝̜Į̝̗͖̙̭̪ͅT̲̱̥̥̗͡Y̭̘͍͔̗͖͎
-                    directionalMomentum.y = Mathf.Max(directionalMomentum.y - gravityRate, -2f);
+                    velocity.y = Mathf.Max(velocity.y - gravityRate*Time.deltaTime*60f, -2f);
 
                     // Undo moving platform parenting
                     if (touchingMovingSurface)
@@ -473,7 +473,7 @@ public class Player : CollidingEntity
                     if (GameManager.inputRelease["Jump"] && controller.velocity.y > 0 && !releasedJump && !GameManager.cutsceneMode)
                     {
                         releasedJump = true;
-                        directionalMomentum.y *= 0.5f;
+                        velocity.y *= 0.5f;
                     }
 
                     // Change the animation state to jumping or falling
@@ -511,9 +511,9 @@ public class Player : CollidingEntity
                             wallSlidingTime += Time.deltaTime;
 
                             // Restrict momentum based on time spent sliding
-                            directionalMomentum.x = 0;
-                            directionalMomentum.z = 0;
-                            directionalMomentum.y = Mathf.Max(Mathf.Lerp(0f, -0.3f, Mathf.InverseLerp(0f, 1f, wallSlidingTime)), directionalMomentum.y);
+                            velocity.x = 0;
+                            velocity.z = 0;
+                            velocity.y = Mathf.Max(Mathf.Lerp(0f, -0.3f, Mathf.InverseLerp(0f, 1f, wallSlidingTime)), velocity.y);
 
                             // Sliding particles
                             wallPoint.y = transform.position.y;
@@ -553,12 +553,12 @@ public class Player : CollidingEntity
             /*
             if (moveState == MoveState.Grounded)
             {
-                controller.SimpleMove((directionalMomentum) * 50f * Time.deltaTime);
+                controller.SimpleMove((velocity) * 50f * Time.deltaTime);
                 if (shouldShiftDown)
                     ShiftToGround();
             }
             else
-                controller.Move(directionalMomentum * Time.deltaTime);
+                controller.Move(velocity * Time.deltaTime);
             */
 
 
@@ -578,7 +578,7 @@ public class Player : CollidingEntity
     {
         base.ReceiveBounce(side, otherScr, otherTrans, point, normal, refreshDouble, strength);
 
-        if (directionalMomentum.y < 0)
+        if (velocity.y < 0)
             StartCoroutine(BounceRoutine(refreshDouble, strength));
     }
     public override void ReceiveHarm(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
@@ -603,7 +603,7 @@ public class Player : CollidingEntity
             wallPoint = point;
             //print("wall point updated");
 
-            if (!groundedCompensation && groundDistance > 0.2f && directionalMomentum.y < 0f)
+            if (!groundedCompensation && groundDistance > 0.2f && velocity.y < 0f)
             {
                 airbornStates[0] = AirbornState.WallSliding;
                 lastWalljumpHeight = point.y;
@@ -644,7 +644,7 @@ public class Player : CollidingEntity
 
 
         // Momentary freeze to show the player is hurt
-        Vector3 tempMomentum = directionalMomentum + Vector3.zero;
+        Vector3 tempMomentum = velocity + Vector3.zero;
 
         int tempJumpsPerformed = jumpsPerformed;
 
@@ -654,16 +654,16 @@ public class Player : CollidingEntity
         {
             modelCenter.localRotation = Quaternion.Euler(-22f, 0f, 0f);
 
-            tempMomentum = new Vector3(directionalMomentum.x != 0 ? directionalMomentum.x : tempMomentum.x,
-                                        directionalMomentum.y != 0 ? directionalMomentum.y : tempMomentum.y,
-                                        directionalMomentum.z != 0 ? directionalMomentum.z : tempMomentum.z);
+            tempMomentum = new Vector3(velocity.x != 0 ? velocity.x : tempMomentum.x,
+                                        velocity.y != 0 ? velocity.y : tempMomentum.y,
+                                        velocity.z != 0 ? velocity.z : tempMomentum.z);
 
-            directionalMomentum = new Vector3(0f, 0.01f, 0f);
+            velocity = new Vector3(0f, 0.01f, 0f);
             jumpsPerformed = 99;
             timeLeft -= Time.deltaTime;
             yield return null;
         }
-        directionalMomentum = tempMomentum;
+        velocity = tempMomentum;
 
 
         // If health remains, give control back and make the player blink
@@ -717,8 +717,8 @@ public class Player : CollidingEntity
         //*/
 
         transform.Translate(Vector3.up * 0.1f);
-        directionalMomentum.y = strength * 0.015f;
-        controller.Move(directionalMomentum);
+        velocity.y = strength * 0.015f;
+        controller.Move(velocity);
         groundedCompensation = false;
 
         if (refreshDouble)
@@ -740,8 +740,8 @@ public class Player : CollidingEntity
         float timeLeft = 0.3f;
         while (timeLeft > 0 && !groundedCompensation)
         {
-            targetRotation = Quaternion.LookRotation(directionalMomentum, Vector3.up);
-            directionalMomentum += reflectedDir * 0.25f;
+            targetRotation = Quaternion.LookRotation(velocity, Vector3.up);
+            velocity += reflectedDir * 0.25f;
             timeLeft -= Time.deltaTime;
             yield return null;
         }
@@ -785,6 +785,8 @@ public class Player : CollidingEntity
         health.vulnerable = false;
         SetAnimState("flipping", 0.5f);
         lockedAnimState = true;
+
+        SaveManager.currentSave.teethLost += 10;
 
         yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(1f, 0.5f));
         yield return new WaitForSeconds(0.5f);
