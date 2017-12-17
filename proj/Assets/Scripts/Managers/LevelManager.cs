@@ -188,7 +188,7 @@ public class LevelManager : MonoBehaviour
         foreach (GameObject go in roomObjectArray)
         {
             Room scr = go.GetComponent<Room>();
-            print("Catalogued room #" + scr.roomId + ", " + scr.roomName);
+            //print("Catalogued room #" + scr.roomId + ", " + scr.roomName);
             roomObjects[scr.roomId] = go;
             roomNames[scr.roomId] = scr.roomName;
             roomMusic[scr.roomId] = scr.music;

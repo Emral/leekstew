@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
 
     void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log("Level Loaded: " + scene.name + ", " + mode);
+        //Debug.Log("Level Loaded: " + scene.name + ", " + mode);
 
         player = null;
 

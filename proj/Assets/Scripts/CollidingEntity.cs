@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 [System.Flags] public enum CollideDir
 {
@@ -46,6 +48,8 @@ public class CollidingEntity : MonoBehaviour
 
     [HideInInspector] public bool bounceFlagsUsed;
     [HideInInspector] public bool powerFlagsUsed;
+
+    public static Dictionary<CollideDir, CollideDir> oppositeSide;
 
     public Vector3 velocity;
     public float gravityRate = 0.0f;
@@ -126,6 +130,18 @@ public class CollidingEntity : MonoBehaviour
 
     public virtual void UpdateReferences()
     {
+        if (oppositeSide == null)
+        {
+            oppositeSide = new Dictionary<CollideDir, CollideDir>();
+            oppositeSide[CollideDir.None] = CollideDir.None;
+            oppositeSide[CollideDir.Back] = CollideDir.Front;
+            oppositeSide[CollideDir.Front] = CollideDir.Back;
+            oppositeSide[CollideDir.Right] = CollideDir.Left;
+            oppositeSide[CollideDir.Left] = CollideDir.Right;
+            oppositeSide[CollideDir.Up] = CollideDir.Down;
+            oppositeSide[CollideDir.Down] = CollideDir.Up;
+        }
+
         if (controller == null)
             controller = GetComponent<CharacterController>();
         if (myCollider == null)
@@ -169,8 +185,12 @@ public class CollidingEntity : MonoBehaviour
     public virtual void ProcessCollision(Transform otherTrans, Vector3 point, Vector3 normal, CollidingEntity otherScr)
     {
         // Debug
-        //print(otherTrans.gameObject.name + " touched " + gameObject.name + "from the " + collisionSide.ToString());
-        
+        if (otherScr != null)
+            print("COLLISION: " + otherTrans.gameObject.name + " (" + otherScr.collisionSide.ToString() + ") --> " + gameObject.name + " (" + collisionSide.ToString() + ")");
+        else
+            print("COLLISION: " + otherTrans.gameObject.name + " --> " + gameObject.name + " (" + collisionSide.ToString() + ")");
+        //print(otherTrans.gameObject.name + " touched " + gameObject.name + " from " + gameObject.name + "'s " + collisionSide.ToString());
+
         if (otherScr != null)
         {
             // Kill
@@ -180,9 +200,9 @@ public class CollidingEntity : MonoBehaviour
             }
 
             // Harm
-            if (FlagsHelper.IsSet(otherScr.harmFlags, collisionSide) && FlagsHelper.IsSet(vulnerableFlags, collisionSide))
+            if (FlagsHelper.IsSet(otherScr.harmFlags, collisionSide) && FlagsHelper.IsSet(vulnerableFlags, oppositeSide[collisionSide]))
             {
-                ReceiveHarm(collisionSide, otherScr, otherTrans, point, normal);
+                ReceiveHarm(oppositeSide[collisionSide], otherScr, otherTrans, point, normal);
             }
 
             // Push
@@ -304,7 +324,7 @@ public class CollidingEntity : MonoBehaviour
     public virtual void OnTriggerEnter(Collider collision)
     {
         // Reset the current collison side
-        collisionSide = (CollideDir) 63;
+        collisionSide = CollideDir.None;
         CollidingEntity otherScr = collision.transform.GetComponent<CollidingEntity>();
         
         // Now process the collision for this hit
@@ -323,6 +343,7 @@ public class CollidingEntity : MonoBehaviour
         {
             collisionSide = CollideDir.None;
             CollidingEntity other = hit.transform.gameObject.GetComponent<CollidingEntity>();
+            
             // Store top collision
             if (FlagsHelper.IsSet(controller.collisionFlags, CollisionFlags.Above))
             {
@@ -407,7 +428,7 @@ public class CollidingEntity : MonoBehaviour
 
     public virtual void ReceiveHarm(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
-        print(gameObject.name + " was harmed by " + otherTrans.gameObject.name);
+        //print(gameObject.name + " was harmed by " + otherTrans.gameObject.name + " from " + gameObject.name + "'s " + side.ToString());
 
         if (health != null)
         {
@@ -416,7 +437,7 @@ public class CollidingEntity : MonoBehaviour
     }
     public virtual void ReceiveKill(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
-        //print(gameObject.name + " was killed by " + otherTrans.gameObject.name);
+        //print(gameObject.name + " was killed by " + otherTrans.gameObject.name + " from " + gameObject.name + "'s " + side.ToString());
 
         if (health != null)
         {
@@ -429,11 +450,11 @@ public class CollidingEntity : MonoBehaviour
     }
     public virtual void ReceivePush(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
-        //print(gameObject.name + " was pushed by " + otherTrans.gameObject.name);
+        //print(gameObject.name + " was pushed by " + otherTrans.gameObject.name + " from " + gameObject.name + "'s " + side.ToString());
     }
     public virtual void ReceiveBounce(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal, bool refreshDouble, float strength)
     {
-        //print(gameObject.name + " bounced off " + otherTrans.gameObject.name + " to their " + side.ToString());
+        //print(gameObject.name + " bounced off " + otherTrans.gameObject.name + " from " + gameObject.name + "'s " + side.ToString());
     }
 
 

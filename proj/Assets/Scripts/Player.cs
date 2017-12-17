@@ -141,7 +141,7 @@ public class Player : CollidingEntity
 
     public bool GetGrounded()
     {
-        return (controller.isGrounded && moveState=MoveState.Grounded);
+        return (controller.isGrounded && moveState==MoveState.Grounded);
     }
 
 
@@ -468,7 +468,7 @@ public class Player : CollidingEntity
                     {
                         jumpsSinceGround.Add(JumpType.Jump);
                         jumpsPerformed = Mathf.Max(jumpsPerformed, 1);
-                        print("Jump leniency over.");
+                        //print("Jump leniency over.");
                     }
 
                     // Variable jumping - dampen jump upon button release

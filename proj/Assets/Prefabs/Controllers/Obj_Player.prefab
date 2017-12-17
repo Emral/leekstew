@@ -1117,7 +1117,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vulnerableFlags: -1
-  harmFlags: -1
+  harmFlags: 4
   killFlags: 0
   blockFlags: 0
   pushFlags: 0

@@ -265,9 +265,8 @@ public class UIManager : MonoBehaviour
             yield return null;
         }
 
-        print("STARTING HP COROUTINE");
-
-        print("HP BAR OBJECT FOUND");
+        //print("STARTING HP COROUTINE");
+        //print("HP BAR OBJECT FOUND");
 
         // References and vars
         RectTransform panel;

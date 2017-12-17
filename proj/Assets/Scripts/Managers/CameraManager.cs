@@ -639,7 +639,7 @@ public class CameraManager : MonoBehaviour
             bool zoomChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Zoom);
             bool regionChanged = FlagsHelper.IsSet(newBehavior.changedProperties, CameraProperties.Region);
 
-            //*
+            /*
             if (currentBehavior != null)
                 print("SHIFTING TO " + newBehavior.ToString()+" FROM "+currentBehavior.ToString());
             else

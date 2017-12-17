@@ -12,6 +12,7 @@ public class ProjectileProperties
     public float magnitudeLimit;
 
     public float lifetime = 0f;
+    public float distanceLimit = 0f;
 
     public GameObject deathEffect;
 
@@ -23,6 +24,7 @@ public class ProjectileProperties
         speedMin = p.speedMin;
         magnitudeLimit = p.magnitudeLimit;
         lifetime = p.lifetime;
+        distanceLimit = p.distanceLimit;
         deathEffect = p.deathEffect;
     }
 }
@@ -33,6 +35,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] public ProjectileProperties properties;
     [HideInInspector] public bool pooled = false;
 
+    private Vector3 startPoint;
     private Vector3 speed = Vector3.zero;
     private float timePassed = 0f;
 
@@ -41,6 +44,7 @@ public class Projectile : MonoBehaviour
 
     public void Start()
     {
+        startPoint = transform.position;
         speed = properties.speed;
         timePassed = 0;
     }
@@ -63,8 +67,9 @@ public class Projectile : MonoBehaviour
     }
     public virtual void UpdateLife()
     {
+
         timePassed += Time.deltaTime;
-        if (timePassed >= properties.lifetime && properties.lifetime > 0f)
+        if ((timePassed >= properties.lifetime && properties.lifetime > 0f) || (Vector3.Distance(transform.position, startPoint) > properties.distanceLimit && properties.distanceLimit > 0f))
         {
             if (!pooled)
             {
@@ -85,6 +90,7 @@ public class Projectile : MonoBehaviour
                     deathEffect.transform.position = transform.position;
                 }
                 timePassed = 0;
+                transform.position = startPoint;
                 gameObject.SetActive(false);
             }
         }

@@ -93,15 +93,15 @@ public class BossA : CollidingEntity
 
     public override void ReceiveHarm(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
-        base.ReceiveHarm(side, otherScr, otherTrans, point, normal);
-
-        if (otherScr == GameManager.player && collisionSide == CollideDir.Down)
+        if (otherScr == GameManager.player)
         {
-            squash.effectAmount = 2f;
-            shake.effectAmount = 5f;
-            audio.Play("hurt");
-
-            health.ChangeHP(-1);
+            if (health.vulnerable)
+            {
+                squash.effectAmount = 1f;
+                shake.effectAmount = 1f;
+                audio.Play("hurt");
+            }
+            base.ReceiveHarm(side, otherScr, otherTrans, point, normal);
         }
     }
 
@@ -258,7 +258,7 @@ public class BossA : CollidingEntity
 
         yield return StartCoroutine(Spin(-22f, 0.5f));
 
-        spinSoundSource = audio.Play("spin", true);
+        spinSoundSource = audio.Play("spin", true, 0.5f);
         yield return StartCoroutine(Spin(44f+720f, 1f));
         spinSoundSource.Stop();
 
@@ -270,9 +270,29 @@ public class BossA : CollidingEntity
         HealthPoints health = GetComponent<HealthPoints>();
 
         // Phase 1
-        spinSoundSource = audio.Play("spin", true);
+        spinSoundSource = audio.Play("spin", true, 0.5f);
         rotSpeed = 15f;
         velocity = (transform.forward + transform.right*0.3f) * -1 * slideSpeed;
+
+        while (health.currentHp > 4)
+        {
+            yield return null;
+        }
+
+        // Phase 2
+        GameManager.cutsceneMode = true;
+        GameManager.player.PerformGenericJump(JumpType.Jump);
+        GameManager.player.velocity = bossArenaTransform.position - GameManager.player.transform.position;
+
+        AudioManager.FadeOutMusic(1f, true);
+        Time.timeScale = 0.25f;
+        yield return new WaitForSecondsRealtime(2f);
+
+        Time.timeScale = 1f;
+        yield return new WaitForSeconds(1f);
+
+        AudioManager.SetMusic(AudioManager.instance.songs[AudioManager.instance.songs.Count - 1].key);
+        GameManager.cutsceneMode = false;
 
         while (health.currentHp > 0)
         {

@@ -58,12 +58,15 @@ public class MultichannelAudio : MonoBehaviour
     public void Update()
     {
         // Move used audio sources that have finished playing back into the available list
-        for (int i = sourcesUsed.Count-1; i >= 0; i++)
+        if (sourcesUsed.Count > 0)
         {
-            if (!sourcesUsed[i].isPlaying)
+            for (int i = sourcesUsed.Count - 1; i >= 0; i--)
             {
-                sourcesAvailable.Add(sourcesUsed[i]);
-                sourcesUsed.RemoveAt(i);
+                if (!sourcesUsed[i].isPlaying)
+                {
+                    sourcesAvailable.Add(sourcesUsed[i]);
+                    sourcesUsed.RemoveAt(i);
+                }
             }
         }
     }
@@ -108,7 +111,7 @@ public class MultichannelAudio : MonoBehaviour
         AudioClip[] groupArray = soundsDict[group];
         if (groupArray != null)
         {
-            AudioClip clip = groupArray[Random.Range(0, groupArray.Length)];
+            AudioClip clip = groupArray[Mathf.RoundToInt(Random.Range(0, groupArray.Length-1))];
 
             return Play(clip, loop, volume, pitch, overwrite);
         }

@@ -35,6 +35,7 @@ public class LevelSaveData
 public class GlobalSaveData
 {
     public List<LevelSaveData> allLevelSaves;
+    public int currentHubIndex;
     public int currentLevelIndex;
     public int teethCollected;
     public int teethSpent;
