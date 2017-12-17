@@ -12,10 +12,20 @@ public class BossA : CollidingEntity
     public int jumpsUntilThrash = 0;
 
     public Transform bossArenaTransform;
+    public Transform arenaCeilingTransform;
+
+    public GameObject iciclePrefab;
+    public GameObject slowShockwavePrefab;
+    public GameObject fastShockwavePrefab;
 
     private bool bossStarted = false;
     private float rotSpeed = 0f;
     public float slideSpeed = 0.085f;
+
+    private MultichannelAudio audio;
+
+    private AudioSource spinSoundSource;
+
 
     private Transform modelTrans;
     private Battery batt;
@@ -25,6 +35,7 @@ public class BossA : CollidingEntity
     public override void Start()
     {
         base.Start();
+        audio = GetComponent<MultichannelAudio>();
         batt = GetComponent<Battery>();
         modelTrans = transform.Find("model");
         squash = modelTrans.GetComponent<SquashAndStretch>();
@@ -50,13 +61,47 @@ public class BossA : CollidingEntity
         }
     }
 
+
+    public void SpawnIcicle(Vector3 position)
+    {
+        if (position == Vector3.zero)
+            position = arenaCeilingTransform.position + (Quaternion.AngleAxis(Random.Range(0f, 360f), Vector3.up) * Vector3.forward * Random.Range(0f, 4f));
+        position.y = arenaCeilingTransform.position.y;
+
+        GameObject.Instantiate(iciclePrefab, position, Quaternion.identity);
+    }
+    public void SpawnIcicle()
+    {
+        SpawnIcicle(Vector3.zero);
+    }
+
+    public IEnumerator SequentialIcicles()
+    {
+        for (int i = 1 + Mathf.FloorToInt((health.hp - health.currentHp) * 0.5f); i >= 0; i--)
+        {
+            yield return new WaitForSeconds(Random.Range(0f, 0.5f));
+            SpawnIcicle();
+        }
+    }
+
+    public void SpawnIcicles()
+    {
+        SpawnIcicle(GameManager.player.transform.position);
+        StartCoroutine(SequentialIcicles());
+    }
+
+
     public override void ReceiveHarm(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
     {
         base.ReceiveHarm(side, otherScr, otherTrans, point, normal);
-        if (otherScr == GameManager.player)
+
+        if (otherScr == GameManager.player && collisionSide == CollideDir.Down)
         {
-            squash.effectAmount = 1.5f;
-            shake.effectAmount = 3f;
+            squash.effectAmount = 2f;
+            shake.effectAmount = 5f;
+            audio.Play("hurt");
+
+            health.ChangeHP(-1);
         }
     }
 
@@ -73,14 +118,17 @@ public class BossA : CollidingEntity
             default:
                 if (otherTrans.gameObject.layer == 9 || otherTrans.gameObject.layer == 14)
                 {
+                    audio.Play("hit wall");
                     GameManager.ScreenShake(2f);
                     if (Random.Range(0, 100) < 50)
                         velocity = Quaternion.LookRotation(GameManager.player.transform.position - transform.position, Vector3.up) * Vector3.Reflect(velocity, normal);
                     else
-                        velocity = Quaternion.AngleAxis(Random.Range(-20f,20f), Vector3.up) * Vector3.Reflect(velocity, normal);
+                        velocity = Quaternion.AngleAxis(Random.Range(-5f,5f), Vector3.up) * Vector3.Reflect(velocity, normal);
+
+                    SpawnIcicles();
 
                     velocity.y = 0f;
-                    velocity = velocity.normalized * slideSpeed;
+                    velocity = velocity.normalized * slideSpeed * Random.Range(0.5f, 1f);
                 }
                 break;
         }
@@ -209,7 +257,11 @@ public class BossA : CollidingEntity
         fightShot.yaw = 45;
 
         yield return StartCoroutine(Spin(-22f, 0.5f));
+
+        spinSoundSource = audio.Play("spin", true);
         yield return StartCoroutine(Spin(44f+720f, 1f));
+        spinSoundSource.Stop();
+
         yield return StartCoroutine(Spin(-22f, 0.25f));
         yield return new WaitForSeconds(0.5f);
 
@@ -218,6 +270,7 @@ public class BossA : CollidingEntity
         HealthPoints health = GetComponent<HealthPoints>();
 
         // Phase 1
+        spinSoundSource = audio.Play("spin", true);
         rotSpeed = 15f;
         velocity = (transform.forward + transform.right*0.3f) * -1 * slideSpeed;
 

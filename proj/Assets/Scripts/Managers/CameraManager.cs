@@ -461,10 +461,10 @@ public class CameraManager : MonoBehaviour
                         {
                             Vector3 playerFront = GameManager.player.transform.position + GameManager.player.transform.forward * 1.5f;
                             Vector3 playerFrontGround = playerFront - Vector3.up * 8f;
-                            Physics.Linecast(playerFront, playerFrontGround, out hit, avoidMask);
+                            bool didHit = Physics.Linecast(playerFront, playerFrontGround, out hit, avoidMask);
 
                             Vector3 floorPoint = playerFrontGround;
-                            if (hit.point != null)
+                            if (didHit)
                                 floorPoint = hit.point;
 
                             if (Physics.Linecast(cameraTrans.position, floorPoint, out hit, avoidMask) && floorPoint.y < GameManager.player.groundPoint.y - 0.25f)

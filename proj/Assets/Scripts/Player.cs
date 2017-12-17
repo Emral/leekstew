@@ -115,6 +115,9 @@ public class Player : CollidingEntity
         airbornStates.Add(AirbornState.Falling);
         carryStates.Add(CarryState.NotCarrying);
 
+        UpdateReferences();
+        health.hp = 3 + SaveManager.currentSave.TotalGoldRadishes;
+        health.currentHp = Mathf.FloorToInt(health.hp*0.5f);
         //startPos = transform.position;
     }
     
@@ -138,7 +141,7 @@ public class Player : CollidingEntity
 
     public bool GetGrounded()
     {
-        return groundedCompensation;
+        return (controller.isGrounded && moveState=MoveState.Grounded);
     }
 
 
@@ -183,12 +186,11 @@ public class Player : CollidingEntity
 
     public void LandOnSolidSurface()
     {
-        if (!groundedCompensation)
+        if (!GetGrounded())
         {
             SetAnimState("standing", 0f);
             moveState = MoveState.Grounded;
 
-            groundedCompensation = true;
             squashAmount = 1f;
             jumpsPerformed = 0;
             velocity.y = -0.1f;
@@ -198,7 +200,7 @@ public class Player : CollidingEntity
     }
     public void LandOnMovingSurface(Transform platform)
     {
-        if (!groundedCompensation)
+        if (!GetGrounded())
         {
             transform.SetParent(platform);
             touchingMovingSurface = true;
@@ -253,7 +255,7 @@ public class Player : CollidingEntity
         velocity.y = jumpStrength * 0.015f;
 
         moveState = MoveState.Airborn;
-        groundedCompensation = false;
+
 
         // Bells and whistles
         AudioClip randJumpSound = soundArray[(int)Random.Range(0, soundArray.Length)];
@@ -331,11 +333,10 @@ public class Player : CollidingEntity
                     }
 
                     // Handling for moving over a ledge
-                    if (!controller.isGrounded && groundDistance > 1f && groundedCompensation && Mathf.Abs(controller.velocity.y) > 1f)
+                    if (!controller.isGrounded && groundDistance > 1f && Mathf.Abs(controller.velocity.y) > 1f)
                     {
                         moveState = MoveState.Airborn;
                         airbornStates[0] = AirbornState.Falling;
-                        groundedCompensation = false;
                         jumpLenienceTimer = jumpLenienceSeconds;
                         //print("LEAVING THE GROUND YO");
                     }
@@ -621,7 +622,7 @@ public class Player : CollidingEntity
             continueWallSliding = true;
 
 
-            if (!groundedCompensation && groundDistance > 0.2f && velocity.y < 0f)
+            if (!GetGrounded() && groundDistance > 0.2f && velocity.y < 0f)
             {
                 airbornStates[0] = AirbornState.WallSliding;
                 lastWalljumpHeight = point.y;
@@ -737,7 +738,8 @@ public class Player : CollidingEntity
         transform.Translate(Vector3.up * 0.1f);
         velocity.y = strength * 0.015f;
         controller.Move(velocity);
-        groundedCompensation = false;
+
+        moveState = MoveState.Airborn;
 
         if (refreshDouble)
         {
@@ -756,7 +758,7 @@ public class Player : CollidingEntity
         transform.rotation = Quaternion.LookRotation(wallNormal, Vector3.up);
         Vector3 reflectedDir = Vector3.Lerp(wallNormal, Vector3.Reflect(moveDir, wallNormal), 0.5f);
         float timeLeft = 0.3f;
-        while (timeLeft > 0 && !groundedCompensation)
+        while (timeLeft > 0 && !GetGrounded())
         {
             targetRotation = Quaternion.LookRotation(velocity, Vector3.up);
             velocity += reflectedDir * 0.25f;
@@ -777,7 +779,7 @@ public class Player : CollidingEntity
 
         float lastTimeLeft = timeLeft;
 
-        while (timeLeft > 0 && !groundedCompensation)
+        while (timeLeft > 0 && !GetGrounded())
         {
             float timeMult = timeLeft / totalTime;
             float timeMultEased = Mathf.Sqrt(1 - timeMult * timeMult);

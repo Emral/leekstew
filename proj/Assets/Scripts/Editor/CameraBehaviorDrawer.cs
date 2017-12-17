@@ -71,6 +71,8 @@ public class CameraBehaviorDrawer : LeekstewDrawer
             {
                 if (propRows.ContainsKey(propKey))
                 {
+                    GetNextLine();
+
                     string[] row = propRows[propKey];
                     bool[] includeFlags = new bool[row.Length];
                     for (int i = 0; i < row.Length; i++)

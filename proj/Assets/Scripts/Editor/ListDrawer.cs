@@ -74,13 +74,13 @@ public class ListDrawer : PropertyDrawer
         EditorGUI.BeginProperty(position, label, property);
 
         EditorGUI.PropertyField(new Rect(position.x, position.y, position.width-50, position.height), property, true);
-        if (myIndex > 0)
-            moveUp = GUI.Button(new Rect(position.x + position.width - 40, position.y, 20, baseHeight), "U");
+        //if (myIndex > 0)
+        //    moveUp = GUI.Button(new Rect(position.x + position.width - 40, position.y, 20, baseHeight), "U");
         if (myIndex < arrayProp.arraySize-1)
-            moveDown = GUI.Button(new Rect(position.x + position.width - 20, position.y, 20, baseHeight), "D");
+            moveDown = GUI.Button(new Rect(position.x + position.width - 20, position.y, 20, baseHeight), "\u21b4");
 
-        if (moveUp)
-            arrayProp.MoveArrayElement(myIndex, myIndex - 1);
+        //if (moveUp)
+        //    arrayProp.MoveArrayElement(myIndex, myIndex - 1);
         if (moveDown)
             arrayProp.MoveArrayElement(myIndex, myIndex + 1);
         //EditorGUI

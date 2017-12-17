@@ -5928,7 +5928,7 @@ MonoBehaviour:
     creator: Rockythechao
     isHub: 0
     isIncluded: 1
-    thumbnail: {fileID: 0}
+    thumbnail: {fileID: 2800000, guid: 9806c0d0de2606e448499632b3edae7b, type: 3}
     music: {fileID: 8300000, guid: ce230081f9f806b429605eb15e00409a, type: 3}
     index: 0
   - key: Scene_EnjlTest

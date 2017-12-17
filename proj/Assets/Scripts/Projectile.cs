@@ -31,6 +31,8 @@ public class ProjectileProperties
 public class Projectile : MonoBehaviour
 {
     [SerializeField] public ProjectileProperties properties;
+    [HideInInspector] public bool pooled = false;
+
     private Vector3 speed = Vector3.zero;
     private float timePassed = 0f;
 
@@ -64,13 +66,27 @@ public class Projectile : MonoBehaviour
         timePassed += Time.deltaTime;
         if (timePassed >= properties.lifetime && properties.lifetime > 0f)
         {
-            if (deathEffect != null)
+            if (!pooled)
             {
-                deathEffect.SetActive(true);
-                deathEffect.transform.position = transform.position;
+                if (deathEffect == null && properties.deathEffect != null)
+                    deathEffect = properties.deathEffect;
+
+                if (deathEffect != null)
+                {
+                    GameObject.Instantiate(properties.deathEffect, transform.position, Quaternion.identity);
+                }
+                GameObject.Destroy(this.gameObject);
             }
-            timePassed = 0;
-            gameObject.SetActive(false);
+            else
+            {
+                if (deathEffect != null)
+                {
+                    deathEffect.SetActive(true);
+                    deathEffect.transform.position = transform.position;
+                }
+                timePassed = 0;
+                gameObject.SetActive(false);
+            }
         }
     }
 

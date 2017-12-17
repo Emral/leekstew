@@ -53,7 +53,7 @@ public class LeekstewDrawer : PropertyDrawer
         bool guiEn = GUI.enabled;
 
         int numOnRow = props.Length;
-        Rect newPos = GetNextLine();
+        Rect newPos = GetCurrentLine();
         newPos.width /= numOnRow;
 
         for (int i = 0; i < props.Length; i++)
@@ -61,7 +61,7 @@ public class LeekstewDrawer : PropertyDrawer
             string rowPropName = props[i];
             GUI.enabled = includeFlags[i];
             EditorGUIUtility.labelWidth = GUI.skin.textField.CalcSize(new GUIContent(rowPropName)).x + 20f;
-            EditorGUI.PropertyField(newPos, currentProperty.FindPropertyRelative(rowPropName));
+            EditorGUI.PropertyField(newPos, currentProperty.FindPropertyRelative(rowPropName), true);
             newPos.x += newPos.width;
         }
 

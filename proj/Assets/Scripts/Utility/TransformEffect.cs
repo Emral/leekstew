@@ -12,6 +12,7 @@ public class TransformEffect : MonoBehaviour
 
     public float interval = 0f;
 
+    public bool applyAutomatically;
     public bool activeWhenPaused = false;
 
 

@@ -229,6 +229,7 @@ public class Generator : PlacementTool
                 }
                 projectileScr.deathEffect = deathEffectPool[pos];
                 projectileScr.properties = new ProjectileProperties(projectileProperties[Random.Range(0, projectileProperties.Length - 1)]);
+                projectileScr.pooled = true;
                 if (useRelativeDirection)
                 {
                     projectileScr.properties.speed = transform.InverseTransformDirection(projectileScr.properties.speed);

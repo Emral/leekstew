@@ -1117,7 +1117,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vulnerableFlags: -1
-  harmFlags: 4
+  harmFlags: -1
   killFlags: 0
   blockFlags: 0
   pushFlags: 0
@@ -1136,7 +1136,7 @@ MonoBehaviour:
   groundPoint: {x: 0, y: 0, z: 0}
   bounceFlagsUsed: 0
   powerFlagsUsed: 0
-  directionalMomentum: {x: 0, y: 0, z: 0}
+  velocity: {x: 0, y: 0, z: 0}
   gravityRate: 0.01
   bounceRestoresDoubleJump: 0
   bounceStrength: 18
@@ -1164,6 +1164,9 @@ MonoBehaviour:
   hurtTexture: {fileID: 2800000, guid: 8a29bde6089cf824c98f3c6da56ccfe1, type: 3}
   jumpLenienceTimer: -1
   inputActive: 1
+  wallSlideLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
   slidingDelayTime: 2
   hurtParticle: {fileID: 1267753406698814, guid: 56807b3431fc3eb46be4cc5e23a040b6,
     type: 2}
@@ -1176,6 +1179,7 @@ MonoBehaviour:
   modelCenter: {fileID: 4708325290572170}
   animator: {fileID: 95583990763422626}
   squash: {fileID: 0}
+  walkingUphill: 0
 --- !u!114 &114620696221021948
 MonoBehaviour:
   m_ObjectHideFlags: 1

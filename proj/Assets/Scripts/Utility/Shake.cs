@@ -16,5 +16,7 @@ public class Shake : TransformEffect
     public override void UpdateReturnValue()
     {
         shakeOffset = new Vector3(Random.Range(-effectAmount, effectAmount), Random.Range(-effectAmount, effectAmount), Random.Range(-effectAmount, effectAmount));
+        if (applyAutomatically)
+            transform.localPosition = shakeOffset;
     }
 }
