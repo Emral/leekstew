@@ -55,10 +55,15 @@ public class UIManager : MonoBehaviour
     public RectTransform musicCreditsObj;
     public Text songInfo;
 
+    public RectTransform creditsTrans;
+    public Text creditsText;
+
     //public Text saveTextObj;
     //public CanvasGroup saveTextGroup;
     public CanvasGroup hpBarGroup;
     public GameObject canvasObj;
+
+    public CanvasGroup menusGroup;
     public GameObject pauseMenuObj;
     public GameObject[] otherMenuObjs;
     public Image screenFadeScr;
@@ -187,7 +192,6 @@ public class UIManager : MonoBehaviour
     {
         // Handle pausing
         GameManager.isGamePaused = true;
-
         GameObject activeObj = null;
 
         foreach (GameObject g in otherMenuObjs)
@@ -253,6 +257,10 @@ public class UIManager : MonoBehaviour
         screenFadeAmount = 1f;
         LevelManager.instance.BackToHub();
     }
+    public void DoCredits()
+    {
+        StartCoroutine(Credits());
+    }
     public static void DoScreenFadeChange(float goal, float goalTime, float delay=0f)
     {
         instance.StartCoroutine(instance.ScreenFadeChange(goal, goalTime, delay));
@@ -281,6 +289,26 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region coroutines
+    public IEnumerator Credits()
+    {
+        menusGroup.alpha = 0f;
+
+        float height = 0f;
+        float heightNeeded = 600f + creditsText.preferredHeight + 10f;
+
+        // Scroll up until done or the player has pressed an input
+        while (height < heightNeeded && !GameManager.inputPress["Any"])
+        {
+            height += Time.deltaTime;
+            creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -280f + height);
+            yield return null;
+        }
+
+        // Reset
+        creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -280f);
+        menusGroup.alpha = 0f;
+    }
+
     public IEnumerator UpdateHPBar()
     {
         while (GameManager.player == null)
