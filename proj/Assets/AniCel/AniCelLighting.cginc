@@ -66,7 +66,7 @@
 			inline half ComputeLuminance(half ndotl, half atten)
 			{
 				half l = saturate((ndotl + _ShadowOffset) * (_ShadowSharpness + 1));
-				return saturate(saturate(atten*l*l*(3 - 2 * l)*(_ShadowDepth)+(1 - _ShadowDepth)));
+				return lerp(1, saturate(atten*l*l*(3 - 2 * l)),_ShadowDepth);
 			}
 
 			inline half3 ComputeShadowTone(half3 diff, half lum, half atn)
@@ -108,8 +108,11 @@
 			inline half4 Internal_LightingAnime(AnimeSurfaceOutput s, half3 lightDir, half3 viewDir, half atten, half shadowlessatten)
 			{
 				half3 diff = s.Albedo*0.75;
-				half ndotl = dot(s.Normal, lightDir);
-				half satten = saturate((atten + _ShadowOffset)*(_ShadowSharpness + 1));
+				half ndotl = clamp(dot(s.Normal, lightDir) + _ShadowOffset,-1,1);
+				half satten = saturate((atten)*(_ShadowSharpness + 1));
+				#if SPOT
+					shadowlessatten = satten;
+				#endif
 				#if ANICEL_LINES || ANICEL_LINES_DYNAMIC
 					//Base shadow calculation
 					{
@@ -120,7 +123,7 @@
 							half lum = lerp(1, ComputeLuminance(ndotl, satten), saturate(round(fmod(abs(s.ScreenPos.x + _ScreenParams.y - s.ScreenPos.y)*_ShadowLineStroke, 2) - (1.5*(1-_ShadowLineDensity)))));
 						#endif
 						diff = lerp(ComputeShadowSaturation(saturate(ComputeShadowTone(diff, lum, shadowlessatten)), shadowlessatten), diff, lum * shadowlessatten);
-						diff *= lerp(1, _LightColor0.rgb, satten);
+						diff *= lerp(1, _LightColor0.rgb, shadowlessatten);
 						diff += ComputeFresnel(s.Normal, viewDir, lightDir, lum, shadowlessatten);
 					}
 
@@ -128,9 +131,9 @@
 					#if ANICEL_SPECULAR
 						#if ANICEL_LINES_DYNAMIC
 							half3 sbase = ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir);
-							diff += sbase*(s.Specular*atten)*saturate(round(fmod(abs(s.ScreenPos.x + _ScreenParams.y - s.ScreenPos.y)*_SpecLineStroke, 2) - (1.5 * (1-sbase))));
+							diff += sbase*(s.Specular*satten)*saturate(round(fmod(abs(s.ScreenPos.x + _ScreenParams.y - s.ScreenPos.y)*_SpecLineStroke, 2) - (1.5 * (1-sbase))));
 						#else
-							diff += ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir)*(s.Specular*atten)*saturate(round(fmod(abs(s.ScreenPos.x + _ScreenParams.y - s.ScreenPos.y)*_SpecLineStroke, 2) - (1.5 * (1 - _SpecLineDensity))));
+							diff += ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir)*(s.Specular*satten)*saturate(round(fmod(abs(s.ScreenPos.x + _ScreenParams.y - s.ScreenPos.y)*_SpecLineStroke, 2) - (1.5 * (1 - _SpecLineDensity))));
 						#endif
 					#endif
 
@@ -146,7 +149,7 @@
 							half lum = lerp(ComputeLuminance(ndotl, satten), 1, saturate(sign(length(pos) - _ShadowDotRadius*_ShadowDotDensity)));
 						#endif
 						diff = lerp(ComputeShadowSaturation(saturate(ComputeShadowTone(diff, lum, shadowlessatten)), shadowlessatten), diff, lum * shadowlessatten);
-						diff *= lerp(1, _LightColor0.rgb, satten);
+						diff *= lerp(1, _LightColor0.rgb, shadowlessatten);
 						diff += ComputeFresnel(s.Normal, viewDir, lightDir, lum, shadowlessatten);
 					}
 					
@@ -158,7 +161,7 @@
 							half3 d = ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir)*(s.Specular*atten);
 							diff += 1-saturate(sign(length(pos) - _SpecDotRadius*d));
 						#else
-							diff += ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir)*(s.Specular*atten)*(1-saturate(sign(length(pos) - _SpecDotRadius*_SpecDotDensity)));
+							diff += ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir)*(s.Specular*satten)*(1-saturate(sign(length(pos) - _SpecDotRadius*_SpecDotDensity)));
 						#endif
 					}
 					#endif
@@ -171,14 +174,14 @@
 						half lum = ComputeLuminance(ndotl, satten);
 						half3 nd = lerp(diff, ComputeShadowTone(diff, lum, shadowlessatten), tex2D(_ShadowBrushMask, TRANSFORM_TEX(s.ScreenPos.xy, _ShadowBrushMask)).r);
 						diff = lerp(ComputeShadowSaturation(nd, shadowlessatten), diff, lum * shadowlessatten);
-						diff *= lerp(1, _LightColor0.rgb, satten);
+						diff *= lerp(1, _LightColor0.rgb, shadowlessatten);
 						diff += ComputeFresnel(s.Normal, viewDir, lightDir, lum, shadowlessatten);
 					}
 					
 					//Specular calculation
 					#if ANICEL_SPECULAR
 					{
-						diff += ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir)*(s.Specular*atten)*tex2D(_SpecBrushMask, TRANSFORM_TEX(s.ScreenPos.xy, _SpecBrushMask)).r;
+						diff += ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir)*(s.Specular*satten)*tex2D(_SpecBrushMask, TRANSFORM_TEX(s.ScreenPos.xy, _SpecBrushMask)).r;
 					}
 					#endif
 
@@ -189,13 +192,13 @@
 						half lum = ComputeLuminance(ndotl, satten);
 						diff = ComputeShadowTone(diff, lum, shadowlessatten);
 						diff = lerp(ComputeShadowSaturation(diff, shadowlessatten), diff, lum * shadowlessatten);
-						diff *= lerp(1, _LightColor0.rgb, satten);
+						diff *= lerp(1, _LightColor0.rgb, lum);
 						diff += ComputeFresnel(s.Normal, viewDir, lightDir, lum, shadowlessatten);
 					}
 
 					//Specular calculation
 					#if ANICEL_SPECULAR
-						diff += ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir)*(s.Specular*atten);
+						diff += ComputeSpecularHighlights(s.Gloss, ndotl, s.Normal, lightDir, viewDir)*(s.Specular*satten);
 					#endif
 
 					//Physically-based colour blend

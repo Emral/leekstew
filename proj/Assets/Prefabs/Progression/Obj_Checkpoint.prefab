@@ -177,7 +177,7 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1081675665508280}
   m_Enabled: 1
-  m_CastShadows: 0
+  m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
@@ -412,8 +412,8 @@ MonoBehaviour:
   decayStyle: 1
   decayRate: 0
   interval: 0
+  applyAutomatically: 0
   activeWhenPaused: 0
-  squashScale: {x: 1, y: 1, z: 1}
   shakeOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &114677114570676110
 MonoBehaviour:
