@@ -42,19 +42,19 @@ Material:
     - _Cull: 2
     - _Cutoff: 0.094
     - _DstBlend: 0
-    - _FresPower: 4
-    - _Glossiness: 0.31
+    - _FresPower: 2
+    - _Glossiness: 0.25
     - _ShadowDepth: 1
     - _ShadowDotDensity: 0.8
     - _ShadowDotRadius: 0.01
     - _ShadowLineDensity: 0.5
     - _ShadowLineStroke: 198
-    - _ShadowOffset: -0.151
-    - _ShadowSaturation: 1.23
-    - _ShadowSharpness: 2.8
+    - _ShadowOffset: -0.15
+    - _ShadowSaturation: 5.1
+    - _ShadowSharpness: 0
     - _SpecDotDensity: 0.8
     - _SpecDotRadius: 0.01
-    - _SpecLevels: 3
+    - _SpecLevels: 4
     - _SpecLineDensity: 0.5
     - _SpecLineStroke: 157
     - _SpecSharpness: 1.7
@@ -63,5 +63,5 @@ Material:
     m_Colors:
     - _Color: {r: 0.31617647, g: 0.6604464, b: 1, a: 1}
     - _FresColor: {r: 0.33823532, g: 0.64401627, b: 1, a: 0.669}
-    - _ShadowHue: {r: 0.12932527, g: 0.14805509, b: 0.33823532, a: 0.497}
-    - _SpecColor: {r: 0.5474157, g: 0.82683295, b: 0.9191176, a: 0.646}
+    - _ShadowHue: {r: 0.50097317, g: 0.5058958, b: 0.60294116, a: 1}
+    - _SpecColor: {r: 0.5474157, g: 0.82683295, b: 0.9191176, a: 0.334}

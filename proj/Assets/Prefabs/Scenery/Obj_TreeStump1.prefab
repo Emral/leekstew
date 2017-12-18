@@ -21,12 +21,12 @@ GameObject:
   - component: {fileID: 4025190440385148}
   - component: {fileID: 33398792259419670}
   - component: {fileID: 23112285198016396}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: pasted__pCube1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1340126083088242
 GameObject:
@@ -36,12 +36,12 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4942630134343580}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Obj_TreeStump1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1670972023315946
 GameObject:
@@ -52,12 +52,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4845041053144910}
   - component: {fileID: 95895780698845676}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: mesh_TreeStump
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &4025190440385148
 Transform:
