@@ -36,7 +36,9 @@ public class GlobalSaveData
 {
     public List<LevelSaveData> allLevelSaves;
     public int currentHubIndex;
+    public string currentHubScene;
     public int currentLevelIndex;
+    public string currentLevelScene;
     public int teethCollected;
     public int teethSpent;
     public int teethLost;
@@ -163,6 +165,12 @@ public class SaveManager : MonoBehaviour
         if (LevelManager.currentLevel != null)
         {
             currentSave.currentLevelIndex = LevelManager.currentLevel.index;
+            currentSave.currentLevelScene = LevelManager.currentLevel.key;
+            if (LevelManager.currentLevel.isHub)
+            {
+                currentSave.currentHubIndex = LevelManager.currentLevel.index;
+                currentSave.currentHubScene = LevelManager.currentLevel.key;
+            }
         }
         /*
         print("CURRENT GLOBAL SAVE DATA: " + currentSave.ToString());

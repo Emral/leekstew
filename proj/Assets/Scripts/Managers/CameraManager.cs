@@ -104,6 +104,9 @@ public class CameraManager : MonoBehaviour
     private List<float> leftWhiskerDistances;
     private List<float> rightWhiskerDistances;
 
+    private float walkInputTime = 0f;
+    private float cameraInputTime = 0f;
+
     private bool shifting = false;
 
     private bool playerChoiceLock = false;
@@ -446,6 +449,11 @@ public class CameraManager : MonoBehaviour
                         }
                         */
 
+                        // wait until X seconds after the player has moved
+                        CharacterController playercc = GameManager.player.GetCharacterController();
+                        walkInputTime = playercc.velocity.magnitude > 0f ? Mathf.Clamp(walkInputTime + Time.deltaTime, 0f, 2f) : Mathf.Clamp(walkInputTime - Time.deltaTime, -2f, 0f);
+                        cameraInputTime = moveX != 0f || moveY != 0f ? Mathf.Clamp(cameraInputTime + Time.deltaTime, 0f, 2f) : Mathf.Clamp(cameraInputTime - Time.deltaTime, -2f, 0f);
+
                         // Look down when falling
                         if (GameManager.player.groundDistance > 5)
                         {
@@ -502,8 +510,7 @@ public class CameraManager : MonoBehaviour
 
 
                         // Rotate when moving
-                        CharacterController playercc = GameManager.player.GetCharacterController();
-                        if (playercc.velocity.magnitude > 0 && moveX == 0 && moveY == 0 && Quaternion.Angle(Quaternion.Euler(0f, playerRotEuler.y, 0f), dollyTrans.rotation) < 120f)
+                        if (OptionsManager.dynamicCamera && cameraInputTime == -2f && walkInputTime == 2f && Quaternion.Angle(Quaternion.Euler(0f, playerRotEuler.y, 0f), dollyTrans.rotation) < 120f)
                         {
                             dollyTrans.rotation = Quaternion.Lerp(dollyTrans.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, playerRotEuler.z), rotRate);
                         }

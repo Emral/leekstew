@@ -157,6 +157,7 @@ public class LevelManager : MonoBehaviour
             currentLevel = levelDict[scene];
         }
 
+        CameraManager.DoGradualReset(0f);
         SceneManager.LoadScene(scene);
         GameManager.instance.Awake();
     }
@@ -171,6 +172,10 @@ public class LevelManager : MonoBehaviour
     public void RestartLevel()
     {
         LoadScene(SceneManager.GetActiveScene().name, true);
+    }
+    public void BackToHub()
+    {
+        LoadScene(SaveManager.currentSave.currentHubScene, true);
     }
     public static void EnterLevel(string level)
     {

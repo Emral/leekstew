@@ -22,7 +22,7 @@ public class BossA : CollidingEntity
     private float rotSpeed = 0f;
     public float slideSpeed = 0.085f;
 
-    private MultichannelAudio audio;
+    private MultichannelAudio multiAudio;
 
     private AudioSource spinSoundSource;
 
@@ -35,7 +35,7 @@ public class BossA : CollidingEntity
     public override void Start()
     {
         base.Start();
-        audio = GetComponent<MultichannelAudio>();
+        multiAudio = GetComponent<MultichannelAudio>();
         batt = GetComponent<Battery>();
         modelTrans = transform.Find("model");
         squash = modelTrans.GetComponent<SquashAndStretch>();
@@ -99,7 +99,7 @@ public class BossA : CollidingEntity
             {
                 squash.effectAmount = 1f;
                 shake.effectAmount = 1f;
-                audio.Play("hurt");
+                multiAudio.Play("hurt");
             }
             base.ReceiveHarm(side, otherScr, otherTrans, point, normal);
         }
@@ -118,7 +118,7 @@ public class BossA : CollidingEntity
             default:
                 if (otherTrans.gameObject.layer == 9 || otherTrans.gameObject.layer == 14)
                 {
-                    audio.Play("hit wall");
+                    multiAudio.Play("hit wall");
                     GameManager.ScreenShake(2f);
                     if (Random.Range(0, 100) < 50)
                         velocity = Quaternion.LookRotation(GameManager.player.transform.position - transform.position, Vector3.up) * Vector3.Reflect(velocity, normal);
@@ -258,7 +258,7 @@ public class BossA : CollidingEntity
 
         yield return StartCoroutine(Spin(-22f, 0.5f));
 
-        spinSoundSource = audio.Play("spin", true, 0.5f);
+        spinSoundSource = multiAudio.Play("spin", true, 0.5f);
         yield return StartCoroutine(Spin(44f+720f, 1f));
         spinSoundSource.Stop();
 
@@ -270,7 +270,7 @@ public class BossA : CollidingEntity
         HealthPoints health = GetComponent<HealthPoints>();
 
         // Phase 1
-        spinSoundSource = audio.Play("spin", true, 0.5f);
+        spinSoundSource = multiAudio.Play("spin", true, 0.5f);
         rotSpeed = 15f;
         velocity = (transform.forward + transform.right*0.3f) * -1 * slideSpeed;
 

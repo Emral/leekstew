@@ -63,6 +63,9 @@ public class UIManager : MonoBehaviour
     public GameObject[] otherMenuObjs;
     public Image screenFadeScr;
 
+    public GameObject topPauseButtonObj;
+    public Button backToHubButton;
+
     public UnityEngine.EventSystems.StandaloneInputModule inputModule;
     public UnityEngine.EventSystems.EventSystem eventSystem;
 
@@ -200,6 +203,7 @@ public class UIManager : MonoBehaviour
             {
                 UnpauseGame();
             }
+
         } else if (activeObj != null)
         {
             if (GameManager.inputRelease["Pause"] || GameManager.inputRelease["Run"])
@@ -221,7 +225,14 @@ public class UIManager : MonoBehaviour
     {
         Time.timeScale = 0;
         pauseMenuObj.SetActive(true);
-        eventSystem.SetSelectedGameObject(GameObject.Find("UI_PauseMenu_Button1"));
+        eventSystem.SetSelectedGameObject(topPauseButtonObj);
+
+        backToHubButton.interactable = true;
+        if (LevelManager.currentLevel.isHub)
+        {
+            backToHubButton.interactable = false;
+        }
+
     }
     void UnpauseGame()
     {
@@ -229,6 +240,18 @@ public class UIManager : MonoBehaviour
         pauseMenuObj.SetActive(false);
         musicFadeCounter = 999f;
         pickupFadeCounter = 999f;
+    }
+    public void ResetLevel()
+    {
+        UnpauseGame();
+        screenFadeAmount = 1f;
+        LevelManager.EnterLevel(SaveManager.currentSave.currentLevelScene);
+    }
+    public void BackToHub()
+    {
+        UnpauseGame();
+        screenFadeAmount = 1f;
+        LevelManager.instance.BackToHub();
     }
     public static void DoScreenFadeChange(float goal, float goalTime, float delay=0f)
     {

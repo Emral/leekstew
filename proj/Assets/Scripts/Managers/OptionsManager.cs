@@ -7,6 +7,7 @@ public class OptionsManager : MonoBehaviour
 {
     public static OptionsManager instance = null;
 
+    public static bool dynamicCamera = false;
     public static float cameraSpeedX = 4f;
     public static float cameraSpeedY = 4f;
     public static bool cameraInvertedX = false;
@@ -27,6 +28,7 @@ public class OptionsManager : MonoBehaviour
     public Slider SoundSlider;
     public Slider MusicSlider;
 
+    public Toggle DynamicCamToggle;
     public Toggle CamXToggle;
     public Toggle CamYToggle;
 
@@ -43,6 +45,7 @@ public class OptionsManager : MonoBehaviour
         cameraSpeedY = CamYSlider.value;
         cameraShakeStrength = CamShakeSlider.value;
 
+        dynamicCamera = DynamicCamToggle.isOn;
         cameraInvertedX = CamXToggle.isOn;
         cameraInvertedY = CamYToggle.isOn;
 

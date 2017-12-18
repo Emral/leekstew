@@ -117,7 +117,7 @@ public class Player : CollidingEntity
 
         UpdateReferences();
         health.hp = 3 + SaveManager.currentSave.TotalGoldRadishes;
-        health.currentHp = Mathf.FloorToInt(health.hp*0.5f);
+        health.currentHp = Mathf.FloorToInt(health.hp*2f/3f);
         //startPos = transform.position;
     }
     
@@ -619,6 +619,7 @@ public class Player : CollidingEntity
             wallNormal = normal;
             wallPoint = point;
 
+            /*
             continueWallSliding = true;
 
 
@@ -627,6 +628,7 @@ public class Player : CollidingEntity
                 airbornStates[0] = AirbornState.WallSliding;
                 lastWalljumpHeight = point.y;
             }
+            */
         }
     }
     #endregion
