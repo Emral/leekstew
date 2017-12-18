@@ -355,19 +355,7 @@ public class CollidingEntity : MonoBehaviour
                 }
             }
 
-            // Store bottom collision
-            if (FlagsHelper.IsSet(controller.collisionFlags, CollisionFlags.Below))
-            {
-                FlagsHelper.Set(ref collisionSides, CollideDir.Down);
-                collisionSide = CollideDir.Down;
-                groundNormal = hit.normal;
-                if (other != null)
-                {
-                    other.collisionSide = CollideDir.Up;
-                }
-            }
-
-            // Store horizontal collison
+            // Store horizontal collison. We store this first, because storing it later causes the freefall glitch.
             if (FlagsHelper.IsSet(controller.collisionFlags, CollisionFlags.Sides))
             {
                 Vector3 fwd = transform.forward;
@@ -415,6 +403,19 @@ public class CollidingEntity : MonoBehaviour
                     }
                 }
             }
+
+            // Store bottom collision
+            if (FlagsHelper.IsSet(controller.collisionFlags, CollisionFlags.Below))
+            {
+                FlagsHelper.Set(ref collisionSides, CollideDir.Down);
+                collisionSide = CollideDir.Down;
+                groundNormal = hit.normal;
+                if (other != null)
+                {
+                    other.collisionSide = CollideDir.Up;
+                }
+            }
+
 
             // Now process the collision for this hit
             ProcessCollision (hit.transform, hit.point, hit.normal, other);

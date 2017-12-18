@@ -225,7 +225,7 @@ public class CameraManager : MonoBehaviour
             shake.effectAmount = constantShake;
 
         dollyTrans.localPosition = (shake.shakeOffset * OptionsManager.cameraShakeStrength);
-
+        
 
         if (target != null && !GameManager.isGamePaused)
         {
@@ -235,13 +235,15 @@ public class CameraManager : MonoBehaviour
             if (!shifting)
             {
                 // Apply camera behavior
-                ApplyBehavior(appliedBehavior);
+
+                //Or don't do it yet, because it breaks the camera when respawning. Uncomment this and the if statement below to see what I mean. ~Enjl
+
+                //ApplyBehavior(appliedBehavior);
 
                 if (target != null)
                 {
                     transform.position = target.position;  //transform.position = Vector3.Lerp(transform.position, target.position, 0.25f);
-
-                    if (GameManager.player != null && target == GameManager.player.transform && appliedBehavior == null)
+                    if (GameManager.player != null && target == GameManager.player.transform)  // && appliedBehavior == null)
                     {
                         // Player camera control stick
                         moveX = GameManager.inputVals["Cam X"] * OptionsManager.cameraSpeedX * 0.5f * (OptionsManager.cameraInvertedX ? -1 : 1) * (GameManager.cutsceneMode ? 0 : 1);
