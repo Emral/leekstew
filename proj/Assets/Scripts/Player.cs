@@ -168,7 +168,7 @@ public class Player : CollidingEntity
         base.OnControllerColliderHit(hit);
 
         // Landing on something
-        if (collisionSide == CollideDir.Down)
+        if (collisionSide == CollideDir.Down && controller.velocity.y < 0)
         {
             if (hit.gameObject.layer == 9 || hit.gameObject.layer == 14)
             {
@@ -190,7 +190,6 @@ public class Player : CollidingEntity
         {
             SetAnimState("standing", 0f);
             moveState = MoveState.Grounded;
-
             squashAmount = 1f;
             jumpsPerformed = 0;
             velocity.y = -0.1f;
@@ -259,7 +258,7 @@ public class Player : CollidingEntity
 
         // Bells and whistles
         AudioClip randJumpSound = soundArray[(int)Random.Range(0, soundArray.Length)];
-        SetAnimState("jumping", 0f);
+        SetAnimState("jumping", 0.1f);
         PlaySound(randJumpSound, Random.Range(0.8f, 1.2f));
 
         // State management
