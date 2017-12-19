@@ -57,6 +57,7 @@ public class UIManager : MonoBehaviour
 
     public RectTransform creditsTrans;
     public Text creditsText;
+    public static bool midCredits;
 
     //public Text saveTextObj;
     //public CanvasGroup saveTextGroup;
@@ -259,7 +260,8 @@ public class UIManager : MonoBehaviour
     }
     public void DoCredits()
     {
-        StartCoroutine(Credits());
+        if (!midCredits)
+            StartCoroutine(Credits());
     }
     public static void DoScreenFadeChange(float goal, float goalTime, float delay=0f)
     {
@@ -291,22 +293,52 @@ public class UIManager : MonoBehaviour
     #region coroutines
     public IEnumerator Credits()
     {
-        menusGroup.alpha = 0f;
+        GameObject currentSelected = eventSystem.currentSelectedGameObject;
+        eventSystem.SetSelectedGameObject(null);
+
+        midCredits = true;
+        inputModule.enabled = false;
+
+        DoFadeCanvasGroup(pickupBarGroup, 0f, 0.5f);
+        DoFadeCanvasGroup(musicCreditsGroup, 0f, 0.5f);
+        yield return instance.StartCoroutine(FadeCanvasGroup(menusGroup, 0f, 0.5f));
 
         float height = 0f;
-        float heightNeeded = 600f + creditsText.preferredHeight + 10f;
+        float heightNeeded = 600f + 3400f + 20f;//creditsText.preferredHeight + 20f;
 
         // Scroll up until done or the player has pressed an input
-        while (height < heightNeeded && !GameManager.inputPress["Any"])
+        while (height < heightNeeded)
         {
-            height += Time.deltaTime;
-            creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -280f + height);
+            height += Time.unscaledDeltaTime * 60f;
+            creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -290f + height);
+
+            menusGroup.alpha = 0f;
+            musicCreditsGroup.alpha = 0f;
+            pickupBarGroup.alpha = 0f;
+
+            //*
+            if (GameManager.GetEatenInputPressed("Run"))
+                height += Time.unscaledDeltaTime * 60f;
+            else if (GameManager.GetEatenInputPressed())
+                height = heightNeeded * 1.5f;
+
+            GameManager.EatInput();
+            //*/
+
             yield return null;
         }
 
         // Reset
-        creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -280f);
-        menusGroup.alpha = 0f;
+        creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -290f);
+
+        DoFadeCanvasGroup(pickupBarGroup, 1f, 0.5f);
+        DoFadeCanvasGroup(musicCreditsGroup, 1f, 0.5f);
+        yield return instance.StartCoroutine(FadeCanvasGroup(menusGroup, 1f, 0.5f));
+
+        inputModule.enabled = true;
+        midCredits = false;
+
+        eventSystem.SetSelectedGameObject(currentSelected);
     }
 
     public IEnumerator UpdateHPBar()
@@ -506,7 +538,7 @@ public class UIManager : MonoBehaviour
         while (currentTime < goalTime)
         {
             screenFadeAmount = Mathf.Lerp(startAmount, goal, currentTime / goalTime);
-            currentTime += Time.deltaTime;
+            currentTime += Time.unscaledDeltaTime;
             yield return null;
         }
         screenFadeAmount = goal;
@@ -520,7 +552,7 @@ public class UIManager : MonoBehaviour
             while (currentTime < fadeTime)
             {
                 group.alpha = Mathf.Lerp(startAmount, newAlpha, currentTime / fadeTime);
-                currentTime += Time.deltaTime;
+                currentTime += Time.unscaledDeltaTime;
                 yield return null;
             }
             group.alpha = newAlpha;

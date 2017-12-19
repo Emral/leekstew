@@ -221,303 +221,309 @@ public class CameraManager : MonoBehaviour
     {
         UpdateRefs();
 
-        if (constantShake >= 0f)
-            shake.effectAmount = constantShake;
-
-        dollyTrans.localPosition = (shake.shakeOffset * OptionsManager.cameraShakeStrength);
-        
-
-        if (target != null && !GameManager.isGamePaused)
+        if (!GameManager.isGamePaused)
         {
-            float moveX = 0;
-            float moveY = 0;
+            if (constantShake >= 0f)
+                shake.effectAmount = constantShake;
 
-            if (!shifting)
+            dollyTrans.localPosition = (shake.shakeOffset * OptionsManager.cameraShakeStrength);
+
+
+            if (target != null)
             {
-                // Apply camera behavior
+                float moveX = 0;
+                float moveY = 0;
 
-                //Or don't do it yet, because it breaks the camera when respawning. Uncomment this and the if statement below to see what I mean. ~Enjl
-
-                //ApplyBehavior(appliedBehavior);
-
-                if (target != null)
+                if (!shifting)
                 {
-                    transform.position = target.position;  //transform.position = Vector3.Lerp(transform.position, target.position, 0.25f);
-                    if (GameManager.player != null && target == GameManager.player.transform)  // && appliedBehavior == null)
+                    // Apply camera behavior
+
+                    //Or don't do it yet, because it breaks the camera when respawning. Uncomment this and the if statement below to see what I mean. ~Enjl
+
+                    //ApplyBehavior(appliedBehavior);
+
+                    if (target != null)
                     {
-                        // Player camera control stick
-                        moveX = GameManager.inputVals["Cam X"] * OptionsManager.cameraSpeedX * 0.5f * (OptionsManager.cameraInvertedX ? -1 : 1) * (GameManager.cutsceneMode ? 0 : 1);
-                        moveY = GameManager.inputVals["Cam Y"] * OptionsManager.cameraSpeedY * 0.33f * (OptionsManager.cameraInvertedY ? 1 : -1) * (GameManager.cutsceneMode ? 0 : 1);
-
-
-                        // Vertical management
-                        Vector2 vertLimits = new Vector2(-22f, 80f);
-
-                        float currentVal = dollyTrans.rotation.eulerAngles.x;
-                        if (currentVal > 180)
-                            currentVal -= 360;
-
-                        float vertSpan = vertLimits.y - vertLimits.x;
-                        float vertMid = (vertLimits.x + vertLimits.y) * 0.5f;
-                        float vertDistAbs = Mathf.Abs(currentVal - vertMid);
-                        float vertMidDistMult = 1f - Mathf.InverseLerp(0f, vertSpan * 0.5f, vertDistAbs);
-
-                        float vertAdd = moveY;
-                        if ((moveY > 0 && currentVal > vertMid) || (moveY < 0 && currentVal < vertMid))
-                            vertAdd *= vertMidDistMult;
-
-                        float newX = dollyTrans.rotation.eulerAngles.x + vertAdd;
-                        if (newX > 180)
-                            newX = Mathf.Max(newX, 360f + vertLimits.x);
-                        else
-                            newX = Mathf.Clamp(newX, vertLimits.x, vertLimits.y);
-
-
-                        // Vert and horizontal
-                        Quaternion rotation = Quaternion.Euler(newX, dollyTrans.rotation.eulerAngles.y + moveX, 0f);
-                        dollyTrans.rotation = rotation;
-
-                        float angleForLerp = dollyTrans.rotation.eulerAngles.x;
-                        while (angleForLerp > 180)
+                        transform.position = target.position;  //transform.position = Vector3.Lerp(transform.position, target.position, 0.25f);
+                        if (GameManager.player != null && target == GameManager.player.transform)  // && appliedBehavior == null)
                         {
-                            angleForLerp -= 360;
-                        }
+                            // Player camera control stick
+                            moveX = GameManager.inputVals["Cam X"] * OptionsManager.cameraSpeedX * 0.5f * (OptionsManager.cameraInvertedX ? -1 : 1) * (GameManager.cutsceneMode ? 0 : 1);
+                            moveY = GameManager.inputVals["Cam Y"] * OptionsManager.cameraSpeedY * 0.33f * (OptionsManager.cameraInvertedY ? 1 : -1) * (GameManager.cutsceneMode ? 0 : 1);
 
 
-                        // Determine zoom
-                        float distanceInvLerp = Mathf.InverseLerp(-22f, 80f, angleForLerp);
-                        float distanceAmount = Mathf.Lerp(-2.5f, -25f, distanceInvLerp);
-                        float fovAmount = Mathf.Lerp(70f, 60f, distanceInvLerp);
-                        Vector3 newLocalPos = new Vector3(cameraTrans.localPosition.x, cameraTrans.localPosition.y, distanceAmount);
-                        cameraTrans.localPosition = newLocalPos;
-                        Camera.main.fieldOfView = fovAmount;
+                            // Vertical management
+                            Vector2 vertLimits = new Vector2(-22f, 80f);
 
+                            float currentVal = dollyTrans.rotation.eulerAngles.x;
+                            if (currentVal > 180)
+                                currentVal -= 360;
 
-                        // Whiskers to avoid walls
-                        leftWhiskerDistances.Clear();
-                        rightWhiskerDistances.Clear();
-                        float rightMinDist = 999f;
-                        float leftMinDist = 999f;
+                            float vertSpan = vertLimits.y - vertLimits.x;
+                            float vertMid = (vertLimits.x + vertLimits.y) * 0.5f;
+                            float vertDistAbs = Mathf.Abs(currentVal - vertMid);
+                            float vertMidDistMult = 1f - Mathf.InverseLerp(0f, vertSpan * 0.5f, vertDistAbs);
 
+                            float vertAdd = moveY;
+                            if ((moveY > 0 && currentVal > vertMid) || (moveY < 0 && currentVal < vertMid))
+                                vertAdd *= vertMidDistMult;
 
-                        Vector3 startDirection = cameraTrans.position - target.position;
-                        startDirection.y = 0f;//*= -1f;
-
-                        RaycastHit hit;
-                        LayerMask avoidMask = 1 << 9;
-
-
-                        // Main raycast for whiskers
-                        float minDist = 999f;
-                        if (Physics.Linecast(GameManager.player.transform.position, cameraTrans.position, out hit, avoidMask))
-                        {
-                            bool noNeedToJump = false;
-                            for (int i = -5; i < 5; i++)
-                            {
-                                noNeedToJump = !Physics.Linecast(GameManager.player.transform.position + Vector3.up * i, cameraTrans.position, out hit, avoidMask);
-                                if (noNeedToJump)
-                                    break;
-                            }
-                            if (!noNeedToJump)
-                                minDist = Mathf.Max(hit.distance, 4f);
-                        }
-
-
-                        // Side raycasts for whiskers
-                        /*
-                        for (int i = 0; i <= 10; i++)
-                        {
-
-                            // Right side
-                            Ray ray = new Ray(target.position, Quaternion.AngleAxis(45 + (i / 10f) * 90f, Vector3.up) * startDirection);
-                            Vector3 endPoint = ray.GetPoint(distanceAmount);
-
-                            if (Physics.Linecast(target.position, endPoint, out hit, avoidMask))
-                            {
-                                rightMinDist = Mathf.Min(rightMinDist, hit.distance);
-                                rightWhiskerDistances.Add(hit.distance);
-                                endPoint = ray.GetPoint(hit.distance);
-                                Debug.DrawLine(target.position, endPoint, Color.red);
-                            }
+                            float newX = dollyTrans.rotation.eulerAngles.x + vertAdd;
+                            if (newX > 180)
+                                newX = Mathf.Max(newX, 360f + vertLimits.x);
                             else
-                                Debug.DrawLine(target.position, endPoint, Color.yellow);
+                                newX = Mathf.Clamp(newX, vertLimits.x, vertLimits.y);
 
-                            // Left side
-                            ray = new Ray(target.position, Quaternion.AngleAxis(-45 - (i / 10f) * 90f, Vector3.up) * startDirection);
-                            endPoint = ray.GetPoint(distanceAmount);
 
-                            if (Physics.Linecast(target.position, endPoint, out hit, avoidMask))
+                            // Vert and horizontal
+                            Quaternion rotation = Quaternion.Euler(newX, dollyTrans.rotation.eulerAngles.y + moveX, 0f);
+                            dollyTrans.rotation = rotation;
+
+                            float angleForLerp = dollyTrans.rotation.eulerAngles.x;
+                            while (angleForLerp > 180)
                             {
-                                leftMinDist = Mathf.Min(leftMinDist, hit.distance);
-                                leftWhiskerDistances.Add(hit.distance);
-                                endPoint = ray.GetPoint(hit.distance);
-                                Debug.DrawLine(target.position, endPoint, Color.red);
+                                angleForLerp -= 360;
                             }
-                            else
-                                Debug.DrawLine(target.position, endPoint, Color.yellow);
-                        }
-                        */
-
-                        // Move the camera forward and backward based on the whiskers and stuff
-                        newLocalPos.z = Mathf.Max(-minDist + 1, newLocalPos.z);
-                        cameraTrans.localPosition = newLocalPos;
 
 
-
-                        // Raise and lower the dolly to look over the player's shoulder when the camera is close
-                        Vector3 newPos = new Vector3(0, Mathf.Lerp(2f, 0f, distanceInvLerp), 0);
-                        dollyTrans.localPosition = newPos + (shake.shakeOffset * OptionsManager.cameraShakeStrength);
-
-
-                        // Camera snap
-                        if (GameManager.inputVals["Cam Focus"] > 0.5)
-                        {
-                            dollyTrans.rotation = Quaternion.Lerp(dollyTrans.rotation, GameManager.player.transform.rotation, 0.03f);
-                        }
+                            // Determine zoom
+                            float distanceInvLerp = Mathf.InverseLerp(-22f, 80f, angleForLerp);
+                            float distanceAmount = Mathf.Lerp(-2.5f, -25f, distanceInvLerp);
+                            float fovAmount = Mathf.Lerp(70f, 60f, distanceInvLerp);
+                            Vector3 newLocalPos = new Vector3(cameraTrans.localPosition.x, cameraTrans.localPosition.y, distanceAmount);
+                            cameraTrans.localPosition = newLocalPos;
+                            Camera.main.fieldOfView = fovAmount;
 
 
-                        // Player camera automation
-                        float rotRate = (GameManager.player.GetGrounded()) ? 0.01f : 0.00625f;
-                        Vector3 playerRotEuler = GameManager.player.transform.rotation.eulerAngles;
-                        Vector3 dollyTransEuler = dollyTrans.rotation.eulerAngles;
+                            // Whiskers to avoid walls
+                            leftWhiskerDistances.Clear();
+                            rightWhiskerDistances.Clear();
+                            float rightMinDist = 999f;
+                            float leftMinDist = 999f;
 
-                        // Avoidance
-                        /*
-                        RaycastHit hit;
-                        LayerMask avoidMask = 1 << 9;
 
-                        if (Physics.Linecast(camera.position, GameManager.player.transform.position, out hit, avoidMask) && moveX == 0)
-                        {
-                            Debug.DrawLine(camera.position, GameManager.player.transform.position, Color.red);
+                            Vector3 startDirection = cameraTrans.position - target.position;
+                            startDirection.y = 0f;//*= -1f;
 
-                            Vector3 toPlayerDir = GameManager.player.transform.position - camera.position;
-                            float toPlayerDirY = toPlayerDir.y;
-                            toPlayerDir.y = 0;
-                            float toPlayerDist = Vector3.Distance(GameManager.player.transform.position, camera.position);
+                            RaycastHit hit;
+                            LayerMask avoidMask = 1 << 9;
 
-                            for (int i = 0; i < 40; i++)
+
+                            // Main raycast for whiskers (inaccurate comment but)
+                            float minDist = 999f;
+                            if (Physics.Linecast(GameManager.player.transform.position, cameraTrans.position, out hit, avoidMask))
                             {
-                                Vector3 lWhisker = -1 * (Quaternion.Euler(0, 5 * i, 0) * toPlayerDir);
-                                lWhisker.y = -toPlayerDirY;
-                                Vector3 rWhisker = -1 * (Quaternion.Euler(0, -5 * i, 0) * toPlayerDir);
-                                rWhisker.y = -toPlayerDirY;
-
-                                Vector3 lWhiskerEnd = GameManager.player.transform.position + lWhisker.normalized * toPlayerDist;
-                                Vector3 rWhiskerEnd = GameManager.player.transform.position + rWhisker.normalized * toPlayerDist;
-
-                                RaycastHit lAvoidHit;
-                                RaycastHit rAvoidHit;
-                                bool lHit = Physics.Linecast(GameManager.player.transform.position, lWhiskerEnd, out lAvoidHit, avoidMask);
-                                bool rHit = Physics.Linecast(GameManager.player.transform.position, rWhiskerEnd, out rAvoidHit, avoidMask);
-
-                                if (lHit != rHit)
+                                bool noNeedToJump = false;
+                                for (int i = -5; i < 5; i++)
                                 {
-                                    if (lHit)
-                                    {
-                                        print("Avoiding to the right");
-                                        Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.red);
-                                        Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.yellow);
-                                        dollyTrans.rotation = Quaternion.RotateTowards(dollyTrans.rotation, Quaternion.Euler(dollyTrans.rotation.x, dollyTrans.rotation.y-5*i, dollyTrans.rotation.z), 2);
+                                    noNeedToJump = !Physics.Linecast(GameManager.player.transform.position + Vector3.up * i, cameraTrans.position, out hit, avoidMask);
+                                    if (noNeedToJump)
                                         break;
-                                    }
-                                    else if (rHit)
+                                }
+                                if (!noNeedToJump)
+                                    minDist = Mathf.Max(hit.distance, 4f);
+                            }
+
+
+
+                            // Side raycasts for whiskers
+                            /*
+                            for (int i = 0; i <= 10; i++)
+                            {
+
+                                // Right side
+                                Ray ray = new Ray(target.position, Quaternion.AngleAxis(45 + (i / 10f) * 90f, Vector3.up) * startDirection);
+                                Vector3 endPoint = ray.GetPoint(distanceAmount);
+
+                                if (Physics.Linecast(target.position, endPoint, out hit, avoidMask))
+                                {
+                                    rightMinDist = Mathf.Min(rightMinDist, hit.distance);
+                                    rightWhiskerDistances.Add(hit.distance);
+                                    endPoint = ray.GetPoint(hit.distance);
+                                    Debug.DrawLine(target.position, endPoint, Color.red);
+                                }
+                                else
+                                    Debug.DrawLine(target.position, endPoint, Color.yellow);
+
+                                // Left side
+                                ray = new Ray(target.position, Quaternion.AngleAxis(-45 - (i / 10f) * 90f, Vector3.up) * startDirection);
+                                endPoint = ray.GetPoint(distanceAmount);
+
+                                if (Physics.Linecast(target.position, endPoint, out hit, avoidMask))
+                                {
+                                    leftMinDist = Mathf.Min(leftMinDist, hit.distance);
+                                    leftWhiskerDistances.Add(hit.distance);
+                                    endPoint = ray.GetPoint(hit.distance);
+                                    Debug.DrawLine(target.position, endPoint, Color.red);
+                                }
+                                else
+                                    Debug.DrawLine(target.position, endPoint, Color.yellow);
+                            }
+                            */
+
+                            // Move the camera forward and backward based on the whiskers and stuff
+                            newLocalPos.z = Mathf.Max(-minDist + 1, newLocalPos.z);
+                            cameraTrans.localPosition = newLocalPos;
+
+
+
+                            // Raise and lower the dolly to look over the player's shoulder when the camera is close
+                            Vector3 newPos = new Vector3(0, Mathf.Lerp(2f, 0f, distanceInvLerp * distanceInvLerp * distanceInvLerp), 0);
+                            dollyTrans.localPosition = newPos + (shake.shakeOffset * OptionsManager.cameraShakeStrength);
+
+
+                            // Player camera automation control vars
+                            float rotRate = (GameManager.player.GetGrounded()) ? 0.01f : 0.00625f;
+                            Vector3 playerRotEuler = GameManager.player.transform.rotation.eulerAngles;
+                            Vector3 dollyTransEuler = dollyTrans.rotation.eulerAngles;
+
+                            // Avoidance
+                            /*
+                            RaycastHit hit;
+                            LayerMask avoidMask = 1 << 9;
+
+                            if (Physics.Linecast(camera.position, GameManager.player.transform.position, out hit, avoidMask) && moveX == 0)
+                            {
+                                Debug.DrawLine(camera.position, GameManager.player.transform.position, Color.red);
+
+                                Vector3 toPlayerDir = GameManager.player.transform.position - camera.position;
+                                float toPlayerDirY = toPlayerDir.y;
+                                toPlayerDir.y = 0;
+                                float toPlayerDist = Vector3.Distance(GameManager.player.transform.position, camera.position);
+
+                                for (int i = 0; i < 40; i++)
+                                {
+                                    Vector3 lWhisker = -1 * (Quaternion.Euler(0, 5 * i, 0) * toPlayerDir);
+                                    lWhisker.y = -toPlayerDirY;
+                                    Vector3 rWhisker = -1 * (Quaternion.Euler(0, -5 * i, 0) * toPlayerDir);
+                                    rWhisker.y = -toPlayerDirY;
+
+                                    Vector3 lWhiskerEnd = GameManager.player.transform.position + lWhisker.normalized * toPlayerDist;
+                                    Vector3 rWhiskerEnd = GameManager.player.transform.position + rWhisker.normalized * toPlayerDist;
+
+                                    RaycastHit lAvoidHit;
+                                    RaycastHit rAvoidHit;
+                                    bool lHit = Physics.Linecast(GameManager.player.transform.position, lWhiskerEnd, out lAvoidHit, avoidMask);
+                                    bool rHit = Physics.Linecast(GameManager.player.transform.position, rWhiskerEnd, out rAvoidHit, avoidMask);
+
+                                    if (lHit != rHit)
                                     {
-                                        print("Avoiding to the left");
+                                        if (lHit)
+                                        {
+                                            print("Avoiding to the right");
+                                            Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.red);
+                                            Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.yellow);
+                                            dollyTrans.rotation = Quaternion.RotateTowards(dollyTrans.rotation, Quaternion.Euler(dollyTrans.rotation.x, dollyTrans.rotation.y-5*i, dollyTrans.rotation.z), 2);
+                                            break;
+                                        }
+                                        else if (rHit)
+                                        {
+                                            print("Avoiding to the left");
+                                            Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.yellow);
+                                            Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.red);
+                                            dollyTrans.rotation = Quaternion.RotateTowards(dollyTrans.rotation, Quaternion.Euler(dollyTrans.rotation.x, dollyTrans.rotation.y+5*i, dollyTrans.rotation.z), 2);
+                                            break;
+                                        }
+
+                                    }
+                                    else if (!lHit)
+                                    {
+                                        print("Random avoiding");
                                         Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.yellow);
-                                        Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.red);
-                                        dollyTrans.rotation = Quaternion.RotateTowards(dollyTrans.rotation, Quaternion.Euler(dollyTrans.rotation.x, dollyTrans.rotation.y+5*i, dollyTrans.rotation.z), 2);
+                                        Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.yellow);
+                                        //dollyTrans.rotation = Quaternion.RotateTowards(dollyTrans.rotation, Quaternion.Euler(dollyTrans.rotation.x, dollyTrans.rotation.y-5*i, dollyTrans.rotation.z), 2);
                                         break;
                                     }
-
-                                }
-                                else if (!lHit)
-                                {
-                                    print("Random avoiding");
-                                    Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.yellow);
-                                    Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.yellow);
-                                    //dollyTrans.rotation = Quaternion.RotateTowards(dollyTrans.rotation, Quaternion.Euler(dollyTrans.rotation.x, dollyTrans.rotation.y-5*i, dollyTrans.rotation.z), 2);
-                                    break;
-                                }
-                                else
-                                {
-                                    Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.red);
-                                    Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.red);
+                                    else
+                                    {
+                                        Debug.DrawLine(GameManager.player.transform.position, lWhiskerEnd, Color.red);
+                                        Debug.DrawLine(GameManager.player.transform.position, rWhiskerEnd, Color.red);
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
-                            Debug.DrawLine(camera.position, GameManager.player.transform.position, Color.yellow);
-                        }
-                        */
-
-                        // wait until X seconds after the player has moved
-                        CharacterController playercc = GameManager.player.GetCharacterController();
-                        walkInputTime = playercc.velocity.magnitude > 0f ? Mathf.Clamp(walkInputTime + Time.deltaTime, 0f, 2f) : Mathf.Clamp(walkInputTime - Time.deltaTime, -2f, 0f);
-                        cameraInputTime = moveX != 0f || moveY != 0f ? Mathf.Clamp(cameraInputTime + Time.deltaTime, 0f, 2f) : Mathf.Clamp(cameraInputTime - Time.deltaTime, -2f, 0f);
-
-                        // Look down when falling
-                        if (GameManager.player.groundDistance > 5)
-                        {
-                            playerRotEuler.x += 55;
-                        }
-                        if (GameManager.player.groundDistance > 10)
-                        {
-                            playerRotEuler.x += 55;
-                        }
-
-                        // Look over the edge when standing at cliffs
-                        if (GameManager.player.groundDistance < 0.1f)
-                        {
-                            Vector3 playerFront = GameManager.player.transform.position + GameManager.player.transform.forward * 1.5f;
-                            Vector3 playerFrontGround = playerFront - Vector3.up * 8f;
-                            bool didHit = Physics.Linecast(playerFront, playerFrontGround, out hit, avoidMask);
-
-                            Vector3 floorPoint = playerFrontGround;
-                            if (didHit)
-                                floorPoint = hit.point;
-
-                            if (Physics.Linecast(cameraTrans.position, floorPoint, out hit, avoidMask) && floorPoint.y < GameManager.player.groundPoint.y - 0.25f)
-                                playerRotEuler.x += 55;
-
-                            // Look up and down slopes
-                            float groundAngle = Vector3.Angle(GameManager.player.groundNormal, Vector3.up);
-                            if (groundAngle > 11 && GameManager.player.velocity.magnitude > 0)
+                            else
                             {
-                                if (GameManager.player.walkingUphill)
+                                Debug.DrawLine(camera.position, GameManager.player.transform.position, Color.yellow);
+                            }
+                            */
+
+                            // wait until X seconds after the player has moved
+                            CharacterController playercc = GameManager.player.GetCharacterController();
+                            walkInputTime = playercc.velocity.magnitude > 0f ? Mathf.Clamp(walkInputTime + Time.deltaTime, 0f, 2f) : Mathf.Clamp(walkInputTime - Time.deltaTime, -2f, 0f);
+                            cameraInputTime = moveX != 0f || moveY != 0f ? Mathf.Clamp(cameraInputTime + Time.deltaTime, 0f, 2f) : Mathf.Clamp(cameraInputTime - Time.deltaTime, -2f, 0f);
+
+                            // Look down when falling
+                            if (GameManager.player.groundDistance > 5)
+                            {
+                                playerRotEuler.x += 55;
+                            }
+                            if (GameManager.player.groundDistance > 10)
+                            {
+                                playerRotEuler.x += 55;
+                            }
+
+                            // Look over the edge when standing at cliffs
+                            if (GameManager.player.groundDistance < 0.1f)
+                            {
+                                Vector3 playerFront = GameManager.player.transform.position + GameManager.player.transform.forward * 1.5f;
+                                Vector3 playerFrontGround = playerFront - Vector3.up * 8f;
+                                bool didHit = Physics.Linecast(playerFront, playerFrontGround, out hit, avoidMask);
+
+                                Vector3 floorPoint = playerFrontGround;
+                                if (didHit)
+                                    floorPoint = hit.point;
+
+                                if (Physics.Linecast(cameraTrans.position, floorPoint, out hit, avoidMask) && floorPoint.y < GameManager.player.groundPoint.y - 0.25f)
+                                    playerRotEuler.x += 55;
+
+                                // Look up and down slopes
+                                float groundAngle = Vector3.Angle(GameManager.player.groundNormal, Vector3.up);
+                                if (groundAngle > 11 && GameManager.player.velocity.magnitude > 0)
                                 {
-                                    playerRotEuler.x -= 22;
-                                }
-                                else
-                                {
-                                    playerRotEuler.x += 22;
+                                    if (GameManager.player.walkingUphill)
+                                    {
+                                        playerRotEuler.x -= 22;
+                                    }
+                                    else
+                                    {
+                                        playerRotEuler.x += 22;
+                                    }
                                 }
                             }
+
+                            playerRotEuler.y = (playerRotEuler.y) % 360;
+
+
+                            // If the player moves the camera at a certain height, keep it there until it gets lower again
+                            if (dollyTransEuler.x < 33 && moveX == 0 && moveY == 0)
+                                playerChoiceLock = false;
+
+                            if (dollyTransEuler.x > 33 && (moveX != 0 || moveY != 0))
+                            {
+                                playerChoiceLock = true;
+                            }
+
+                            if (playerChoiceLock)
+                                playerRotEuler.x = dollyTransEuler.x;
+
+
+                            // Rotate when moving
+                            float playerAngleFromCamera = Quaternion.Angle(Quaternion.Euler(0f, playerRotEuler.y, 0f), dollyTrans.rotation);
+                            if (OptionsManager.dynamicCamera && cameraInputTime == -2f && walkInputTime == 2f && playerAngleFromCamera < 120f)
+                            {
+                                dollyTrans.rotation = Quaternion.Lerp(dollyTrans.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, playerRotEuler.z), rotRate);
+                            }
+
+
+                            // Camera snap if holding the right trigger
+                            if (GameManager.inputVals["Cam Focus"] > 0.5 && (playerAngleFromCamera < 160f || playercc.velocity.magnitude == 0f))
+                            {
+                                dollyTrans.rotation = Quaternion.Lerp(dollyTrans.rotation, GameManager.player.transform.rotation, 0.03f);
+                            }
+
+
+                            //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, -playerRotEuler.z), 0.005f);
                         }
-
-                        playerRotEuler.y = (playerRotEuler.y) % 360;
-
-
-                        // If the player moves the camera at a certain height, keep it there until it gets lower again
-                        if (dollyTransEuler.x < 33 && moveX == 0 && moveY == 0)
-                            playerChoiceLock = false;
-
-                        if (dollyTransEuler.x > 33 && (moveX != 0 || moveY != 0))
-                        {
-                            playerChoiceLock = true;
-                        }
-
-                        if (playerChoiceLock)
-                            playerRotEuler.x = dollyTransEuler.x;
-
-
-                        // Rotate when moving
-                        if (OptionsManager.dynamicCamera && cameraInputTime == -2f && walkInputTime == 2f && Quaternion.Angle(Quaternion.Euler(0f, playerRotEuler.y, 0f), dollyTrans.rotation) < 120f)
-                        {
-                            dollyTrans.rotation = Quaternion.Lerp(dollyTrans.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, playerRotEuler.z), rotRate);
-                        }
-
-                        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(playerRotEuler.x, playerRotEuler.y, -playerRotEuler.z), 0.005f);
                     }
                 }
             }
