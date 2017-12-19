@@ -22,9 +22,12 @@ public class Battery : MonoBehaviour
     }
 
     private bool active;
+    private bool wasActive = false;
 
     public bool defaultActive = false;
     public BatteryType type = BatteryType.Continuous;
+    public AudioClip powerOnSound;
+    public AudioClip powerOffSound;
 
     public virtual void Start()
     {
@@ -33,6 +36,7 @@ public class Battery : MonoBehaviour
 
     public virtual void LateUpdate()
     {
+        wasActive = active;
         if (type == BatteryType.Continuous)
         {
             active = defaultActive;
@@ -51,16 +55,32 @@ public class Battery : MonoBehaviour
 
     public virtual void PowerOn()
     {
+        if (!active && !wasActive)
+        {
+            AudioManager.PlaySound(powerOnSound);
+        }
         active = true;
     }
 
     public virtual void TogglePower()
     {
+        if (!active && !wasActive)
+        {
+            AudioManager.PlaySound(powerOnSound);
+        }
+        if (active && wasActive)
+        {
+            AudioManager.PlaySound(powerOffSound);
+        }
         active = !active;
     }
 
     public virtual void PowerOff()
     {
+        if (active && wasActive)
+        {
+            AudioManager.PlaySound(powerOffSound);
+        }
         active = false;
     }
 
