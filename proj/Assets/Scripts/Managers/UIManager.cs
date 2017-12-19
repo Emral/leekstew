@@ -151,9 +151,11 @@ public class UIManager : MonoBehaviour
 
         if (AudioManager.currentSong != null)
         {
-            songInfo.text = AudioManager.currentSong.name + (AudioManager.currentSong.artist==null?"":"\n" + AudioManager.currentSong.artist) + (AudioManager.currentSong.album==null?"":"\n" + AudioManager.currentSong.album);
-            musicCreditsObj.sizeDelta = new Vector2(songInfo.preferredWidth + 20f, songInfo.preferredHeight + 8f);
+            songInfo.text = AudioManager.currentSong.name + (AudioManager.currentSong.artist == null ? "" : "\n" + AudioManager.currentSong.artist) + (AudioManager.currentSong.album == null ? "" : "\n" + AudioManager.currentSong.album);
         }
+        else
+            songInfo.text = "The Silent\nOmnipresent";
+        musicCreditsObj.sizeDelta = new Vector2(songInfo.preferredWidth + 20f, songInfo.preferredHeight + 8f);
 
         musicFadeCounter += Time.deltaTime;
         musicFadeCounter = Mathf.Clamp(musicFadeCounter, 0f, 8f);
@@ -258,10 +260,10 @@ public class UIManager : MonoBehaviour
         screenFadeAmount = 1f;
         LevelManager.instance.BackToHub();
     }
-    public void DoCredits()
+    public void DoCredits(bool skippable = true)
     {
         if (!midCredits)
-            StartCoroutine(Credits());
+            StartCoroutine(Credits(skippable));
     }
     public static void DoScreenFadeChange(float goal, float goalTime, float delay=0f)
     {
@@ -291,7 +293,7 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region coroutines
-    public IEnumerator Credits()
+    public IEnumerator Credits(bool skippable)
     {
         GameObject currentSelected = eventSystem.currentSelectedGameObject;
         eventSystem.SetSelectedGameObject(null);
@@ -319,7 +321,7 @@ public class UIManager : MonoBehaviour
             //*
             if (GameManager.GetEatenInputPressed("Run"))
                 height += Time.unscaledDeltaTime * 60f;
-            else if (GameManager.GetEatenInputPressed())
+            else if (GameManager.GetEatenInputPressed() && skippable)
                 height = heightNeeded * 1.5f;
 
             GameManager.EatInput();

@@ -9,6 +9,8 @@ TagManager:
   - Menu
   - Room
   - WarpPad
+  - FurbaMesh
+  - IcecubeMesh
   layers:
   - Default
   - TransparentFX

@@ -7,6 +7,7 @@ public class HealthPoints : MonoBehaviour
     public int hp = 1;
     public int currentHp;
     public bool vulnerable = true;
+    [HideInInspector] public bool invincible = false;
     public float mercySeconds = 1f;
 
     public Transform deathEffect;
@@ -31,11 +32,11 @@ public class HealthPoints : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if  (mercySeconds > 0f  &&  mercyCountdown > 0f)
+        if (mercySeconds > 0f && mercyCountdown > 0f)
         {
-            mercyCountdown = Mathf.Max(mercyCountdown-Time.deltaTime, 0f);
-            vulnerable = (mercyCountdown == 0f);
+            mercyCountdown = Mathf.Max(mercyCountdown - Time.deltaTime, 0f);
         }
+        vulnerable = (mercyCountdown == 0f && !invincible);
     }
 
     public void Kill()

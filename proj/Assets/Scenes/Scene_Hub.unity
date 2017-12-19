@@ -1054,6 +1054,11 @@ Prefab:
       propertyPath: useDefaultPosition
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114880421131921186, guid: ccfcd0d3fe634ee4b9b4740978c7fd34,
+        type: 2}
+      propertyPath: dontFadeBackIn
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ccfcd0d3fe634ee4b9b4740978c7fd34, type: 2}
   m_IsPrefabParent: 0
@@ -11415,7 +11420,7 @@ Prefab:
     - target: {fileID: 114015197830963412, guid: b082f4fe81045144fae02388cacffdd7,
         type: 2}
       propertyPath: cost
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 114015197830963412, guid: b082f4fe81045144fae02388cacffdd7,
         type: 2}
