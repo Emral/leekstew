@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
 
     public static float timeSinceInput = 0f;
 
-
+    public GameObject youDidItPrefab;
     public static int youDidIt = -1;
 
     public static float timeRate = 1f;
@@ -246,6 +246,11 @@ public class GameManager : MonoBehaviour
     public static void ScreenShake(float strength)
     {
         CameraManager.instance.StartCoroutine(CameraManager.instance.DelayedShake(strength));
+    }
+
+    public static void YouDidIt()
+    {
+        GameObject.Instantiate(instance.youDidItPrefab, player.transform.position, Quaternion.identity);
     }
     #endregion
 

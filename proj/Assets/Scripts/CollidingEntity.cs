@@ -185,10 +185,12 @@ public class CollidingEntity : MonoBehaviour
     public virtual void ProcessCollision(Transform otherTrans, Vector3 point, Vector3 normal, CollidingEntity otherScr)
     {
         // Debug
+        /*
         if (otherScr != null)
             print("COLLISION: " + otherTrans.gameObject.name + " (" + otherScr.collisionSide.ToString() + ") --> " + gameObject.name + " (" + collisionSide.ToString() + ")");
         else
             print("COLLISION: " + otherTrans.gameObject.name + " --> " + gameObject.name + " (" + collisionSide.ToString() + ")");
+        */
         //print(otherTrans.gameObject.name + " touched " + gameObject.name + " from " + gameObject.name + "'s " + collisionSide.ToString());
 
         if (otherScr != null)
@@ -221,6 +223,10 @@ public class CollidingEntity : MonoBehaviour
             if (FlagsHelper.IsSet(otherScr.bounceFlags, collisionSide))
             {
                 ReceiveBounce(collisionSide, otherScr, otherTrans, point, normal, otherScr.bounceRestoresDoubleJump, otherScr.bounceStrength);
+
+                // HACKY WORKAROUND
+                if (otherScr != null)
+                    otherScr.GiveBounce(this);
             }
 
             // Power
@@ -456,6 +462,10 @@ public class CollidingEntity : MonoBehaviour
     public virtual void ReceiveBounce(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal, bool refreshDouble, float strength)
     {
         //print(gameObject.name + " bounced off " + otherTrans.gameObject.name + " from " + gameObject.name + "'s " + side.ToString());
+    }
+
+    public virtual void GiveBounce(CollidingEntity otherScr)
+    {
     }
 
 

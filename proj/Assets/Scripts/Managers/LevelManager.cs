@@ -26,7 +26,7 @@ public class LevelManager : MonoBehaviour
     public static LevelManager instance = null;
     public static LevelData currentLevel;
 
-    private static bool beginningLevel = true;
+    public static bool beginningLevel = true;
     public static bool isWarping = false;
     public static bool dontFadeBackIn = false;
 
@@ -277,6 +277,7 @@ public class LevelManager : MonoBehaviour
         // Intro text
         if (beginningLevel)
         {
+            AudioManager.StopMusic();
             UIManager.DoFadeCanvasGroup(UIManager.instance.levelIntroGroup, 1f, 0f);
             if (currentLevel != null && UIManager.instance != null)
             {
@@ -297,8 +298,10 @@ public class LevelManager : MonoBehaviour
 
         // Start the level music
         if (currentLevel != null)
-            AudioManager.SetMusic(currentLevel.music);
-
+        {
+            if (currentLevel.music != null)
+                AudioManager.SetMusic(currentLevel.music);
+        }
 
         // Fade the screen in
         if (!dontFadeBackIn)

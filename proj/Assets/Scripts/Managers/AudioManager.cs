@@ -40,6 +40,8 @@ public class AudioManager : MonoBehaviour
     // Use this for initialization
     private void Awake ()
     {
+        source = transform.GetComponent<AudioSource>();
+
         if (instance == null)
             instance = this;
 
@@ -63,6 +65,7 @@ public class AudioManager : MonoBehaviour
             currentMusic = source.clip;
             currentSong = songDict[currentMusic];
             source.pitch = Time.timeScale*musicPitch;
+            source.volume = musicFadeAmount;
         }
     }
 
@@ -115,11 +118,11 @@ public class AudioManager : MonoBehaviour
             instance.StartCoroutine(instance.MusicFadeToStop(seconds));
     }
 
-    public static void SetMusic(AudioClip music, bool loop=true, bool useLoopPoints=false)
+    public static void SetMusic(AudioClip music, bool loop = true, bool useLoopPoints = false)
     {
         if (source.clip != music || source.loop != loop || usingLoopPoints != useLoopPoints)
         {
-            UIManager.hpFadeCounter = 0f;
+            UIManager.musicFadeCounter = 0f;
 
             StopMusic();
 
@@ -127,10 +130,17 @@ public class AudioManager : MonoBehaviour
             source.clip = music;
             source.Play();
             currentMusic = music;
+            musicFadeAmount = 1f;
 
             if (useLoopPoints)
                 instance.StartCoroutine(instance.LoopMusic(music));
         }
+    }
+
+    public static void SetMusic(int track, bool loop = true, bool useLoopPoints = false)
+    {
+        if (track >= 0 && track < instance.songs.Count)
+            SetMusic(instance.songs[track].key, loop, useLoopPoints);
     }
 
 
@@ -150,7 +160,7 @@ public class AudioManager : MonoBehaviour
         while (currentTime < goalTime)
         {
             musicFadeAmount = Mathf.Lerp(startAmount, goal, currentTime / goalTime);
-            currentTime += Time.deltaTime;
+            currentTime += Time.unscaledDeltaTime;
             yield return null;
         }
         musicFadeAmount = goal;

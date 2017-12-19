@@ -194,6 +194,8 @@ public class PolyPlateau : MonoBehaviour
             int i = 0;
             Vector3[] verts = new Vector3[points.Length + 1];
             Vector2[] uvs = new Vector2[points.Length + 1];
+            Vector3[] normals = new Vector3[points.Length + 1];
+
             foreach (Vector2 point in points)
             {
                 highestPoint.x = Mathf.Max(point.x, highestPoint.x);
@@ -204,6 +206,7 @@ public class PolyPlateau : MonoBehaviour
                 //print("POINT: " + point.ToString());
                 verts[i] = new Vector3(point.x, 0f, point.y);
                 uvs[i] = points[i];
+                normals[i] = Vector3.up;
                 i++;
             }
 
@@ -213,6 +216,7 @@ public class PolyPlateau : MonoBehaviour
 
             // Make the tris and walls
             int[] tris = new int[3 * points.Length];
+
             for (i = 0; i < points.Length; i++)
             {
                 // Make the walls
@@ -272,6 +276,7 @@ public class PolyPlateau : MonoBehaviour
             groundMesh.vertices = verts;
             groundMesh.uv = uvs;
             groundMesh.triangles = tris;
+            //groundMesh.normals = normals;
             //groundMesh.RecalculateNormals();
 
 

@@ -190,6 +190,8 @@ public class CameraManager : MonoBehaviour
         defaultBehavior.changedProperties = (CameraProperties)~0;
         defaultBehavior.regionMin = Vector3.one * -9999f;
         defaultBehavior.regionMax = Vector3.one * 9999f;
+        currentBehavior = null;
+        appliedBehavior = null;
     }
 
     public static CameraBehavior CaptureCurrentShot()
@@ -610,7 +612,6 @@ public class CameraManager : MonoBehaviour
     }
 
 
-
     public static void DoShiftToNewShot(CameraBehavior newBehavior, float goalTime = 0f, int priority = 0)
     {
         instance.StartCoroutine(instance.ShiftToNewShot(newBehavior, goalTime, priority));
@@ -748,7 +749,7 @@ public class CameraManager : MonoBehaviour
                 //print("NEW POSITION: "+newPos.ToString());
 
 
-                timeLeft -= Time.deltaTime;
+                timeLeft -= Time.unscaledDeltaTime;
 
                 yield return null;
             }

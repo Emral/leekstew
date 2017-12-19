@@ -275,6 +275,8 @@ public class Player : CollidingEntity
         // Only update when the game isn't paused
         if (!GameManager.isGamePaused)
         {
+            health.invincible = GameManager.cutsceneMode;
+
             // Get walk/steer input vector
             float h = inputActive && !GameManager.cutsceneMode ? GameManager.inputVals["Walk X"] : 0;
             float v = inputActive && !GameManager.cutsceneMode ? GameManager.inputVals["Walk Y"] : 0;
@@ -803,6 +805,7 @@ public class Player : CollidingEntity
     }
     IEnumerator DeathSequence()
     {
+        AudioManager.StopMusic();
         inputActive = false;
         health.vulnerable = false;
         SetAnimState("flipping", 0.5f);

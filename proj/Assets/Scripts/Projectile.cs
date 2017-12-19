@@ -51,7 +51,7 @@ public class Projectile : MonoBehaviour
 
     public virtual void UpdateMovement()
     {
-        speed += properties.acceleration;
+        speed += properties.acceleration * Time.deltaTime * 60f;
         if (properties.speedMax != Vector3.zero || properties.speedMin != Vector3.zero)
         {
             speed.x = Mathf.Clamp(speed.x, properties.speedMin.x, properties.speedMax.x);
@@ -63,7 +63,7 @@ public class Projectile : MonoBehaviour
             speed = Vector3.ClampMagnitude(speed, properties.magnitudeLimit);
 
 
-        transform.Translate(speed);
+        transform.Translate(speed * Time.deltaTime * 60f);
     }
     public virtual void UpdateLife()
     {

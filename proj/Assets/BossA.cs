@@ -10,6 +10,11 @@ public class BossA : CollidingEntity
     public static bool cutsceneWatched = false;
     public float jumpTimer = 0f;
     public int jumpsUntilThrash = 0;
+   
+    private bool justHitWall = false;
+
+    public GameObject powerupEffect;
+    public GameObject shatterEffect;
 
     public Transform bossArenaTransform;
     public Transform arenaCeilingTransform;
@@ -18,13 +23,20 @@ public class BossA : CollidingEntity
     public GameObject slowShockwavePrefab;
     public GameObject fastShockwavePrefab;
 
+    public Texture2D newFurbaColorsTex;
+    public Texture2D newIceColorsTex;
+
+    private bool poweringUp = false;
     private bool bossStarted = false;
+    private bool bossEnded = false;
     private float rotSpeed = 0f;
     public float slideSpeed = 0.085f;
 
     private MultichannelAudio multiAudio;
 
     private AudioSource spinSoundSource;
+
+    private bool droppingIcicles;
 
 
     private Transform modelTrans;
@@ -52,13 +64,27 @@ public class BossA : CollidingEntity
             StartCoroutine(Battle());
         }
 
-        modelTrans.Rotate(0f,rotSpeed,0f);
+        if (!bossEnded && health.currentHp <= 0)
+        {
+            bossEnded = true;
+            StopAllCoroutines();
+            StartCoroutine(PostBattle());
+        }
 
+        if (spinSoundSource != null)
+        {
+            spinSoundSource.pitch = Time.timeScale;
+        }
+
+        modelTrans.Rotate(0f,rotSpeed*Time.deltaTime*60f,0f);
+
+        /*
         if (Vector3.Distance(transform.position, bossArenaTransform.position) > 10)
         {
             transform.position = new Vector3(bossArenaTransform.position.x, transform.position.y, bossArenaTransform.position.z);
             velocity = modelTrans.forward * -1 * slideSpeed;
         }
+        */
     }
 
 
@@ -77,31 +103,39 @@ public class BossA : CollidingEntity
 
     public IEnumerator SequentialIcicles()
     {
-        for (int i = 1 + Mathf.FloorToInt((health.hp - health.currentHp) * 0.5f); i >= 0; i--)
+        for (int i = 1 + Mathf.FloorToInt((health.hp - health.currentHp)%6 * 0.5f); i >= 0; i--)
         {
             yield return new WaitForSeconds(Random.Range(0f, 0.5f));
+            droppingIcicles = false;
             SpawnIcicle();
         }
     }
 
     public void SpawnIcicles()
     {
-        SpawnIcicle(GameManager.player.transform.position);
-        StartCoroutine(SequentialIcicles());
+        if (!droppingIcicles)
+        {
+            droppingIcicles = true;
+            SpawnIcicle(GameManager.player.transform.position);
+            StartCoroutine(SequentialIcicles());
+        }
     }
 
 
-    public override void ReceiveHarm(CollideDir side, CollidingEntity otherScr, Transform otherTrans, Vector3 point, Vector3 normal)
+    public override void GiveBounce(CollidingEntity otherScr)
     {
         if (otherScr == GameManager.player)
         {
+            GameManager.player.velocity = Quaternion.AngleAxis(Random.Range(-90f, 90f), Vector3.up) * (bossArenaTransform.position - GameManager.player.transform.position);
+            GameManager.player.PerformGenericJump(JumpType.Jump);
+
             if (health.vulnerable)
             {
-                squash.effectAmount = 1f;
+                squash.effectAmount = 0.5f;
                 shake.effectAmount = 1f;
-                multiAudio.Play("hurt");
+                multiAudio.Play("hurt", false, 0.25f);
             }
-            base.ReceiveHarm(side, otherScr, otherTrans, point, normal);
+            health.TakeHit();
         }
     }
 
@@ -120,6 +154,9 @@ public class BossA : CollidingEntity
                 {
                     multiAudio.Play("hit wall");
                     GameManager.ScreenShake(2f);
+
+                    float tempYVel = velocity.y;
+
                     if (Random.Range(0, 100) < 50)
                         velocity = Quaternion.LookRotation(GameManager.player.transform.position - transform.position, Vector3.up) * Vector3.Reflect(velocity, normal);
                     else
@@ -129,10 +166,59 @@ public class BossA : CollidingEntity
 
                     velocity.y = 0f;
                     velocity = velocity.normalized * slideSpeed * Random.Range(0.5f, 1f);
+                    velocity.y = tempYVel;
+
+                    justHitWall = true;
                 }
                 break;
         }
     }
+
+
+    private IEnumerator ShockwaveJump(bool maintainVelocity = true, float forwardSpeed = 0f)
+    {
+        // Backup velocity
+        Vector3 tempVel = Vector3.zero;
+        if (!maintainVelocity)
+        {
+            tempVel = velocity;
+            velocity = Vector3.zero;
+        }
+
+        // Squash
+        float elapsedTime = 0f;
+        while (elapsedTime < 0.5f)
+        {
+            squash.effectAmount = Mathf.SmoothStep(0f, 0.5f, elapsedTime);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Jump
+        squash.effectAmount = -0.5f;
+        if (!maintainVelocity)
+        {
+            velocity = tempVel.normalized * forwardSpeed;
+        }
+        velocity.y = 0.25f;
+
+        while (!controller.isGrounded)
+        {
+            velocity.y -= gravityRate * Time.deltaTime * 60f;
+            yield return null;
+        }
+
+        // Land
+        GameManager.ScreenShake(0.5f);
+        multiAudio.Play("hit floor");
+
+        GameObject prefabToSpawn = slowShockwavePrefab;
+        if (health.currentHp/health.hp <= 0.25f && Random.value < 0.5f)
+            prefabToSpawn = fastShockwavePrefab;
+
+        GameObject.Instantiate(prefabToSpawn, new Vector3(transform.position.x, bossArenaTransform.position.y+0.1f, transform.position.z), Quaternion.identity);
+    }
+
 
     private IEnumerator ReduceFOV()
     {
@@ -158,18 +244,71 @@ public class BossA : CollidingEntity
         AudioManager.StopMusic();
     }
 
-    private IEnumerator Spin(float changeAmt, float changeTime)
+    private IEnumerator Intensifies()
+    {
+        poweringUp = true;
+        float elapsedTime = 0f;
+        while (poweringUp)
+        {
+            float squashCap = Mathf.Lerp(0f, 0.125f, Mathf.Max(elapsedTime) / 3);
+            squash.effectAmount = Random.RandomRange(-squashCap, squashCap);
+            shake.effectAmount = Mathf.Lerp(0f, 0.125f, Mathf.Max(elapsedTime) / 3);
+            elapsedTime += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        GameObject.Instantiate(powerupEffect, transform.position, Quaternion.identity);
+        foreach (Transform trans in transform)
+        {
+            MeshRenderer rend = trans.GetComponent<MeshRenderer>();
+            if (rend != null)
+            {
+                if (rend.gameObject.tag == "FurbaMesh")
+                {
+                    rend.material.mainTexture = newFurbaColorsTex;
+                    /*
+                    foreach (Material mat in rend.materials)
+                    {
+                        mat.mainTexture = newFurbaColorsTex;
+                    }
+                    */
+                }
+                if (rend.gameObject.tag == "IcecubeMesh")
+                {
+                    rend.material.mainTexture = newIceColorsTex;
+                    /*
+                    foreach (Material mat in rend.materials)
+                    {
+                        mat.mainTexture = newIceColorsTex;
+                    }
+                    */
+                }
+            }
+        }
+    }
+
+    private IEnumerator Spin(float changeAmt, float changeTime, bool absolute = false)
     {
         Vector3 oldRot = modelTrans.rotation.eulerAngles;
+        float newVal;
 
         float elapsedTime = 0;
         while (elapsedTime < changeTime)
         {
-            modelTrans.rotation = Quaternion.Euler(new Vector3(oldRot.x, Mathf.SmoothStep(oldRot.y, oldRot.y+changeAmt, elapsedTime/changeTime), oldRot.z));
+            newVal = oldRot.y + changeAmt;
+            if (absolute)
+                newVal = changeAmt;
+
+            modelTrans.rotation = Quaternion.Euler(new Vector3(oldRot.x, Mathf.SmoothStep(oldRot.y, newVal, elapsedTime/changeTime), oldRot.z));
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        modelTrans.rotation = Quaternion.Euler(new Vector3(oldRot.x, oldRot.y + changeAmt, oldRot.z));
+
+        newVal = oldRot.y + changeAmt;
+        if (absolute)
+            newVal = changeAmt;
+
+        modelTrans.rotation = Quaternion.Euler(new Vector3(oldRot.x, newVal, oldRot.z));
     }
 
     private IEnumerator Battle()
@@ -179,9 +318,11 @@ public class BossA : CollidingEntity
         // Cutscene mode
         GameManager.cutsceneMode = true;
         UIManager ui = UIManager.instance;
+        LevelManager.dontFadeBackIn = true;
 
         // Set up the camera shots
         CameraBehavior initialShot = CameraManager.CaptureCurrentShot();
+        initialShot.debugName = "INITIAL SHOT";
         initialShot.target = transform;
         initialShot.yaw = transform.rotation.eulerAngles.y;
         initialShot.pitch = 0f;
@@ -189,20 +330,28 @@ public class BossA : CollidingEntity
         initialShot.zoom = -0.89f;
 
         CameraBehavior zoomedShot = new CameraBehavior(initialShot);
+        zoomedShot.debugName = "ZOOMED SHOT";
         zoomedShot.pitch = 20f;
         zoomedShot.zoom = -1.75f;
 
         CameraBehavior zoomedShotB = new CameraBehavior(zoomedShot);
         FlagsHelper.Set(ref zoomedShotB.changedProperties, CameraProperties.Position);
+        zoomedShotB.debugName = "FIGHT SHOT";
         zoomedShotB.target = null;
         zoomedShotB.position = Vector3.Lerp(transform.position, GameManager.player.transform.position, 0.35f);
         zoomedShotB.pitch = 40f;
         zoomedShotB.zoom = -20f;
 
+       
+        // Wait for level to begin
+        while (LevelManager.beginningLevel)
+        {
+            yield return null;
+        }
+        yield return new WaitForSeconds(0.1f);
 
         // Quickly switch to the initial shot
-        CameraManager.DoShiftToNewShot(initialShot, 0.01f);
-        yield return new WaitForSeconds(0.02f);
+        CameraManager.ApplyBehavior(initialShot);
 
         // Play the cutscene
         if (!cutsceneWatched && !skipCutscene)
@@ -210,14 +359,14 @@ public class BossA : CollidingEntity
             ui.StartCoroutine(ui.ScreenFadeChange(0f, 7f));
             Camera.main.fieldOfView = 60f;
 
-            CameraManager.DoShiftToNewShot(zoomedShot, 14f);
+            CameraManager.DoShiftToNewShot(zoomedShot, 14f, 2);
             yield return new WaitForSeconds(10f);
 
             elapsedTime = 0;
             StartCoroutine(MusicWindDown());
             yield return new WaitForSeconds(5f);
 
-            CameraManager.DoShiftToNewShot(zoomedShotB, 1f);
+            CameraManager.DoShiftToNewShot(zoomedShotB, 1f, 3);
             StartCoroutine(ReduceFOV());
             yield return new WaitForSeconds(2f);
 
@@ -230,7 +379,7 @@ public class BossA : CollidingEntity
             // Music
             yield return new WaitForSeconds(0.25f);
             AudioManager.musicPitch = 1f;
-            AudioManager.SetMusic(AudioManager.instance.songs[AudioManager.instance.songs.Count - 2].key);
+            AudioManager.SetMusic(AudioManager.instance.songs.Count - 2);
             yield return new WaitForSeconds(0.25f);
 
             // Final line
@@ -244,7 +393,7 @@ public class BossA : CollidingEntity
         else
         {
             ui.StartCoroutine(ui.ScreenFadeChange(0f, 1f));
-            AudioManager.SetMusic(AudioManager.instance.songs[AudioManager.instance.songs.Count - 2].key);
+            AudioManager.SetMusic(AudioManager.instance.songs.Count - 2);
 
             CameraManager.DoShiftToNewShot(zoomedShotB, 1f);
             StartCoroutine(ReduceFOV());
@@ -274,29 +423,158 @@ public class BossA : CollidingEntity
         rotSpeed = 15f;
         velocity = (transform.forward + transform.right*0.3f) * -1 * slideSpeed;
 
-        while (health.currentHp > 4)
+        while (health.currentHp/ health.hp >= 0.5f)
         {
             yield return null;
         }
 
         // Phase 2
+        // Slow down and zoom in
+        zoomedShot.zoom = -2.5f;
+
         GameManager.cutsceneMode = true;
-        GameManager.player.PerformGenericJump(JumpType.Jump);
-        GameManager.player.velocity = bossArenaTransform.position - GameManager.player.transform.position;
+        droppingIcicles = true;
 
-        AudioManager.FadeOutMusic(1f, true);
+        AudioManager.FadeOutMusic(2f, true);
         Time.timeScale = 0.25f;
-        yield return new WaitForSecondsRealtime(2f);
+        yield return new WaitForSeconds(0.25f);
 
+        // Restore player HP
+        GameManager.player.health.currentHp = GameManager.player.health.hp;
+
+        // Stop spinning
+        velocity = Vector3.zero;
+        rotSpeed = 0f;
+        spinSoundSource.Stop();
+        yield return StartCoroutine(Spin(22f, 1f, true));
+        //yield return new WaitForSecondsRealtime(1f);
+
+        // Start shaking
+        AudioSource quakeSource = AudioManager.PlaySound(AudioManager.instance.quakeSound);
+        StartCoroutine(Intensifies());
+        yield return StartCoroutine(Spin(0f, 0.5f, true));
+        yield return new WaitForSeconds(0.75f);
+
+        // Zoom back out
+        quakeSource.Stop();
+        poweringUp = false;
         Time.timeScale = 1f;
-        yield return new WaitForSeconds(1f);
 
-        AudioManager.SetMusic(AudioManager.instance.songs[AudioManager.instance.songs.Count - 1].key);
+        AudioManager.SetMusic(AudioManager.instance.songs.Count - 1);
+        yield return new WaitForSeconds(2f);
+
         GameManager.cutsceneMode = false;
+        droppingIcicles = false;
 
-        while (health.currentHp > 0)
+        while (true)
         {
+            // Shockwave jump
+            yield return StartCoroutine(ShockwaveJump());
+            yield return new WaitForSeconds(0.5f);
+
+            // Start spinning
+            spinSoundSource = multiAudio.Play("spin", true, 0.5f);
+            rotSpeed = 15f;
+            velocity = (transform.forward + transform.right * 0.3f) * -1 * slideSpeed;
+            
+            // Hit walls X number of times
+            for (int i = Mathf.FloorToInt(Random.Range(2f,4f));  i > 0;  i--)
+            {
+                while (!justHitWall)
+                {
+                    yield return null;
+                }
+                yield return new WaitForSeconds(1f);
+            }
+
+            // Do a moving shockwave jump
+            yield return StartCoroutine(ShockwaveJump());
+
+            // Wait for more wall hits
+            for (int i = Mathf.FloorToInt(Random.Range(2f, 4f)); i > 0; i--)
+            {
+                while (!justHitWall)
+                {
+                    yield return null;
+                }
+                yield return new WaitForSeconds(1f);
+            }
+
+            // Do multistomp
+            rotSpeed = 0f;
+            velocity = Vector3.zero;
+            spinSoundSource.Stop();
+
+            for (int i = Mathf.FloorToInt(Random.Range(1f, 3f)); i > 0; i--)
+            {
+                yield return StartCoroutine(ShockwaveJump());
+                yield return new WaitForSeconds(0.25f);
+            }
+
             yield return null;
         }
+    }
+
+
+    IEnumerator PostBattle()
+    {
+        CameraBehavior zoomedShot = CameraManager.CaptureCurrentShot();
+        zoomedShot.target = transform;
+        zoomedShot.yaw = transform.rotation.eulerAngles.y;
+        zoomedShot.pitch = 10f;
+        zoomedShot.panY = 0f;
+        zoomedShot.zoom = -4.5f;
+        spinSoundSource.Stop();
+
+
+        // Stop moving
+        GameManager.cutsceneMode = true;
+        AudioManager.StopMusic();
+
+        rotSpeed = 0f;
+        velocity = Vector3.zero;
+
+        CameraManager.DoShiftToNewShot(zoomedShot, 4f);
+        yield return new WaitForSeconds(4f);
+
+        AudioSource crackingSource = multiAudio.Play("cracking");
+        shake.effectAmount = 0.25f;
+        yield return new WaitForSeconds(2f);
+
+        shake.effectAmount = 0.25f;
+        yield return new WaitForSeconds(1.5f);
+        shake.effectAmount = 0.25f;
+        yield return new WaitForSeconds(1f);
+        shake.effectAmount = 0.25f;
+        yield return new WaitForSeconds(0.75f);
+        shake.effectAmount = 0.25f;
+        yield return new WaitForSeconds(0.5f);
+        shake.effectAmount = 0.25f;
+        yield return new WaitForSeconds(0.25f);
+
+        while (crackingSource.isPlaying)
+        {
+            shake.effectAmount = 0.25f;
+            yield return new WaitForSeconds(0.125f);
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        multiAudio.Play("shatter");
+        GameObject.Instantiate(shatterEffect, transform.position, Quaternion.identity);
+        modelTrans.gameObject.SetActive(false);
+        yield return new WaitForSeconds(4f);
+
+        GameManager.YouDidIt();
+        yield return new WaitForSeconds(2f);
+
+        UIManager.DoScreenFadeChange(1f, 4f);
+        AudioManager.SetMusic(AudioManager.instance.songs.Count - 3);
+        yield return UIManager.instance.StartCoroutine(UIManager.instance.Credits(false));
+
+        AudioManager.FadeOutMusic(2f, true);
+        yield return new WaitForSeconds(4f);
+
+        LevelManager.EnterLevel(SaveManager.currentSave.currentHubScene);
     }
 }
