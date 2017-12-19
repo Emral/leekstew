@@ -156,9 +156,11 @@ MonoBehaviour:
   groundPoint: {x: 0, y: 0, z: 0}
   bounceFlagsUsed: 1
   powerFlagsUsed: 0
+  velocity: {x: 0, y: 0, z: 0}
   gravityRate: 0
   bounceRestoresDoubleJump: 0
   bounceStrength: 18
   canPower: 1
   powerCooldown: 0
   powerTargets: []
+  shouldShiftDown: 0

@@ -49,7 +49,7 @@ Material:
     - _ShadowDotRadius: 0.01
     - _ShadowLineDensity: 1
     - _ShadowLineStroke: 500
-    - _ShadowOffset: 0.1
+    - _ShadowOffset: 0.25
     - _ShadowSaturation: 3
     - _ShadowSharpness: 2
     - _SpecDotDensity: 0.8
@@ -61,7 +61,7 @@ Material:
     - _SrcBlend: 1
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _FresColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
     - _ShadowHue: {r: 1, g: 1, b: 1, a: 0.5019608}
     - _SpecColor: {r: 0.13494809, g: 0.42593968, b: 0.7647059, a: 0.19607843}

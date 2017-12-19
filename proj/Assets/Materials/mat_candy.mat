@@ -72,9 +72,9 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FresPower: 8
+    - _FresPower: 3.6
     - _GlossMapScale: 1
-    - _Glossiness: 0
+    - _Glossiness: 0.4
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
@@ -91,7 +91,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecDotDensity: 0.8
     - _SpecDotRadius: 0.01
-    - _SpecLevels: 2
+    - _SpecLevels: 4
     - _SpecLineDensity: 0.5
     - _SpecLineStroke: 50
     - _SpecSharpness: 80
@@ -104,4 +104,4 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FresColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
     - _ShadowHue: {r: 0, g: 0, b: 0, a: 0}
-    - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecColor: {r: 0.39215687, g: 0.39215687, b: 0.39215687, a: 1}
