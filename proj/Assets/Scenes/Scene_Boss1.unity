@@ -1724,6 +1724,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultActive: 1
   type: 1
+  powerOnSound: {fileID: 0}
+  powerOffSound: {fileID: 0}
 --- !u!143 &410307004
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1780,7 +1782,7 @@ MonoBehaviour:
   powerCooldown: 0
   powerTargets: []
   shouldShiftDown: 0
-  skipCutscene: 1
+  skipCutscene: 0
   jumpTimer: 0
   jumpsUntilThrash: 0
   powerupEffect: {fileID: 1531973698217286, guid: f62d5997ebd492344928fc9c8d8c7cea,

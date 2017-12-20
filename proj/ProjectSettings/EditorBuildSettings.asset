@@ -8,10 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Scene_Title.unity
     guid: cf94125349c00e9419b9db28ccc3e97b
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Scene_RockyTest.unity
     guid: 170b435466214f341a533d3982736482
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Scene_EnjlTest.unity
     guid: 4e752dbe2d03bf64ebb9c0956ef7e7ec
   - enabled: 1

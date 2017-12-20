@@ -230,14 +230,17 @@ public class UIManager : MonoBehaviour
     #region methods
     void PauseGame()
     {
-        Time.timeScale = 0;
-        pauseMenuObj.SetActive(true);
-        eventSystem.SetSelectedGameObject(topPauseButtonObj);
-
-        backToHubButton.interactable = true;
-        if (LevelManager.currentLevel.isHub)
+        if (SceneManager.GetActiveScene().name != "Scene_Title")
         {
-            backToHubButton.interactable = false;
+            Time.timeScale = 0;
+            pauseMenuObj.SetActive(true);
+            eventSystem.SetSelectedGameObject(topPauseButtonObj);
+
+            backToHubButton.interactable = true;
+            if (LevelManager.currentLevel.isHub)
+            {
+                backToHubButton.interactable = false;
+            }
         }
 
     }

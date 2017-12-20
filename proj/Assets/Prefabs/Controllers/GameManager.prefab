@@ -8731,15 +8731,15 @@ MonoBehaviour:
   levels:
   - key: Scene_Hub
     name: Popsicle Garden
-    creator: Enjl
+    creator: Hubzone Placeville
     isHub: 1
     isIncluded: 1
     thumbnail: {fileID: 2800000, guid: 4e913ace9e23176479a9bfdf0b6f2251, type: 3}
     music: {fileID: 8300000, guid: 0959a9436e264cc4289de265fea8f34f, type: 3}
     index: 0
   - key: Scene_Boss1
-    name: Showdown in Snowtown
-    creator: Rockythechao
+    name: It's Boss Time, Mr. Guy!
+    creator: 'Made by: Rockythechao'
     isHub: 0
     isIncluded: 1
     thumbnail: {fileID: 2800000, guid: 9806c0d0de2606e448499632b3edae7b, type: 3}
@@ -8763,7 +8763,7 @@ MonoBehaviour:
     index: 0
   - key: Scene_Sublevel_1
     name: Candy Cove
-    creator: Enjl
+    creator: 'Made by: Enjl'
     isHub: 0
     isIncluded: 1
     thumbnail: {fileID: 2800000, guid: a5e79638d2017934793976e05ee6ba42, type: 3}
@@ -8771,7 +8771,7 @@ MonoBehaviour:
     index: 0
   - key: Scene_Sublevel_3
     name: Sorbet Sky
-    creator: Enjl
+    creator: 'Made by: Enjl'
     isHub: 0
     isIncluded: 1
     thumbnail: {fileID: 2800000, guid: a41256c6e5fb520449939f33032176ad, type: 3}
@@ -12041,7 +12041,7 @@ CanvasGroup:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1365357872551282}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0

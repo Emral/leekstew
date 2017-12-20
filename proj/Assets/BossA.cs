@@ -103,7 +103,7 @@ public class BossA : CollidingEntity
 
     public IEnumerator SequentialIcicles()
     {
-        for (int i = 1 + Mathf.FloorToInt((health.hp - health.currentHp)%6 * 0.5f); i >= 0; i--)
+        for (int i = 1 + Mathf.FloorToInt((health.hp - health.currentHp)%4 * 0.5f); i >= 0; i--)
         {
             yield return new WaitForSeconds(Random.Range(0f, 0.5f));
             droppingIcicles = false;
@@ -213,7 +213,7 @@ public class BossA : CollidingEntity
         multiAudio.Play("hit floor");
 
         GameObject prefabToSpawn = slowShockwavePrefab;
-        if (health.currentHp/health.hp <= 0.25f && Random.value < 0.5f)
+        if (health.currentHp <= 2 && Random.value < 0.5f)
             prefabToSpawn = fastShockwavePrefab;
 
         GameObject.Instantiate(prefabToSpawn, new Vector3(transform.position.x, bossArenaTransform.position.y+0.1f, transform.position.z), Quaternion.identity);
@@ -251,7 +251,7 @@ public class BossA : CollidingEntity
         while (poweringUp)
         {
             float squashCap = Mathf.Lerp(0f, 0.125f, Mathf.Max(elapsedTime) / 3);
-            squash.effectAmount = Random.RandomRange(-squashCap, squashCap);
+            squash.effectAmount = Random.Range(-squashCap, squashCap);
             shake.effectAmount = Mathf.Lerp(0f, 0.125f, Mathf.Max(elapsedTime) / 3);
             elapsedTime += Time.unscaledDeltaTime;
             yield return null;
@@ -313,7 +313,7 @@ public class BossA : CollidingEntity
 
     private IEnumerator Battle()
     {
-        float elapsedTime;
+        //float elapsedTime;
 
         // Cutscene mode
         GameManager.cutsceneMode = true;
@@ -362,7 +362,7 @@ public class BossA : CollidingEntity
             CameraManager.DoShiftToNewShot(zoomedShot, 14f, 2);
             yield return new WaitForSeconds(10f);
 
-            elapsedTime = 0;
+            //elapsedTime = 0;
             StartCoroutine(MusicWindDown());
             yield return new WaitForSeconds(5f);
 
@@ -423,7 +423,7 @@ public class BossA : CollidingEntity
         rotSpeed = 15f;
         velocity = (transform.forward + transform.right*0.3f) * -1 * slideSpeed;
 
-        while (health.currentHp/ health.hp >= 0.5f)
+        while (health.currentHp > 4)
         {
             yield return null;
         }
@@ -575,6 +575,7 @@ public class BossA : CollidingEntity
         AudioManager.FadeOutMusic(2f, true);
         yield return new WaitForSeconds(4f);
 
+        GameManager.cutsceneMode = false;
         LevelManager.EnterLevel(SaveManager.currentSave.currentHubScene);
     }
 }

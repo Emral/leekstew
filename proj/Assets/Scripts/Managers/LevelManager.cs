@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
+//using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -98,6 +98,7 @@ public class LevelManager : MonoBehaviour
 
     public void OnValidate()
     {
+        /*
         // If the player checked the thing, load all of the levels' scenes into the build scene list
         if (checkToAddScenesToBuildList)
         {
@@ -121,6 +122,7 @@ public class LevelManager : MonoBehaviour
 
             EditorBuildSettings.scenes = newSettings;
         }
+        */
     }
     #endregion
 
