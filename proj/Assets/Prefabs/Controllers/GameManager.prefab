@@ -6135,6 +6135,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sounds:
+  - key: game start
+    clips:
+    - {fileID: 8300000, guid: 6b592ce6ad223694b94cd1cfa620c9f9, type: 3}
   - key: pop
     clips:
     - {fileID: 8300000, guid: 90377185243492e458a6bdc0a6f8cff4, type: 3}

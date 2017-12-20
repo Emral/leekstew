@@ -23,7 +23,7 @@ public class NPC : MonoBehaviour
 
     public virtual void OnGUI()
     {
-        if (distToPlayer < talkDist && !GameManager.cutsceneMode && talkCooldown <= 0f)
+        if (distToPlayer < talkDist && GameManager.player.InputHasEffect && talkCooldown <= 0f)
         {
             Vector3 worldPos = transform.position + Vector3.up*talkIconHeight;
             Vector3 pos = Camera.main.WorldToScreenPoint(worldPos);

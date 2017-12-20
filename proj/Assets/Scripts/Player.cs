@@ -109,7 +109,7 @@ public class Player : CollidingEntity
     {
         get
         {
-            return (inputActive && !GameManager.cutsceneMode);
+            return (inputActive && !GameManager.cutsceneMode && !GameManager.isGamePaused);
         }
     }
 
@@ -124,8 +124,6 @@ public class Player : CollidingEntity
         carryStates.Add(CarryState.NotCarrying);
 
         UpdateReferences();
-        health.hp = 3 + SaveManager.currentSave.TotalGoldRadishes;
-        health.currentHp = LevelManager.playerCurrentHp;// Mathf.Max(Mathf.FloorToInt(health.hp*2f/3f));
         //startPos = transform.position;
     }
     

@@ -2,7 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Title : MonoBehaviour {
+public class Title : MonoBehaviour
+{
+    public GameObject pressAnyObj;
+    public GameObject buttonsObj;
+    public GameObject newGameObj;
+    public GameObject continueObj;
+    
 
     private bool started = false;
 
@@ -15,16 +21,37 @@ public class Title : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-		if (GameManager.inputPress["Any"] && !started)
+        if (GameManager.inputPress["Any"] && !started)
         {
             started = true;
-            StartCoroutine(StartGame());
+            AudioManager.PlaySound("game start");
+
+            if (SaveManager.currentSave.gameStarted)
+            {
+                pressAnyObj.SetActive(false);
+                buttonsObj.SetActive(true);
+                UIManager.instance.eventSystem.SetSelectedGameObject(continueObj);
+            }
+            else
+            {
+                DoStartGame();
+            }
         }
 	}
 
+    public void DoStartGame()
+    {
+        StartCoroutine(StartGame());
+    }
+    public void DoNewGame()
+    {
+        SaveManager.NewGame();
+        DoStartGame();
+    }
+
     public IEnumerator StartGame()
     {
-        GetComponent<AudioSource>().Play();
+        AudioManager.PlaySound("game start");
         AudioManager.StopMusic();
 
         UIManager ui = UIManager.instance;

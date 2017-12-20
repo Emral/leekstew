@@ -43,6 +43,7 @@ public class GlobalSaveData
     public int teethSpent;
     public int teethLost;
     public int greenTeethSpent;
+    public bool gameStarted;
 
     public int TotalGoldRadishes
     {
@@ -121,6 +122,7 @@ public class GlobalSaveData
 
     public GlobalSaveData()
     {
+        gameStarted = false;
         allLevelSaves = new List<LevelSaveData>();
         foreach (LevelData levelData in LevelManager.instance.levels)
         {
@@ -204,7 +206,13 @@ public class SaveManager : MonoBehaviour
     public static void Autosave()
     {
         if (OptionsManager.autosave)
-            instance.StartCoroutine(instance.AutosaveCoroutine());
+            DoSaveGame();
+    }
+
+    public static void DoSaveGame()
+    {
+        currentSave.gameStarted = true;
+        instance.StartCoroutine(instance.AutosaveCoroutine());
     }
 
     public IEnumerator AutosaveCoroutine()

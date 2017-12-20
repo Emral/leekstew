@@ -34,7 +34,7 @@ public class LevelManager : MonoBehaviour
     public static int currentRoom = 0;
     public static int checkpointRoom = 0;
 
-    public static int playerCurrentHp = 1;
+    public static int playerCurrentHp = -1;
 
     public static int currentCheckpoint = -1;
     public static List<int> checkpointsActive = new List<int>();
@@ -147,8 +147,6 @@ public class LevelManager : MonoBehaviour
     }
     public void LoadScene(string scene, bool resetCheckpoints=true)
     {
-        playerCurrentHp = GameManager.player.health.currentHp;
-
         if (resetCheckpoints)
         {
             currentCheckpoint = -1;
@@ -186,9 +184,14 @@ public class LevelManager : MonoBehaviour
     }
     public static void EnterLevel(string level)
     {
+        if (GameManager.player != null)
+        {
+            if (GameManager.player.health.currentHp > GameManager.player.health.hp)
+                playerCurrentHp = GameManager.player.health.currentHp;
+        }
+
         beginningLevel = true;
         instance.LoadScene(level, true);
-        playerCurrentHp = 3 + SaveManager.currentSave.TotalGoldRadishes;
     }
     public static void CatalogRooms()
     {
@@ -232,10 +235,18 @@ public class LevelManager : MonoBehaviour
             yield return null;
         }
 
-        // Reset the player's health
+        // Reset the player's health and stuff
         GameManager.player.UpdateReferences();
-        GameManager.player.health.currentHp = 2;
+
+        GameManager.player.health.hp = 3+SaveManager.currentSave.TotalGoldRadishes;
+        if (playerCurrentHp != -1)
+            GameManager.player.health.currentHp = playerCurrentHp;
+        else
+            GameManager.player.health.currentHp = GameManager.player.health.hp;
+        playerCurrentHp = -1;
+
         GameManager.player.inputActive = false;
+
 
         // Set the camera's target to the player if a preset target doesn't exist
         if (CameraManager.instance.target == null)
