@@ -68,7 +68,7 @@ public class Checkpoint : MonoBehaviour
             LevelManager.currentCheckpoint = checkpointID;
             LevelManager.checkpointRoom = LevelManager.currentRoom;
 
-            GetComponent<AudioSource>().Play();
+            AudioManager.PlaySound("checkpoint");
             GameManager.ScreenShake(1f);
             if (activateEffect != null)
                 GameObject.Instantiate(activateEffect, transform.position, Quaternion.identity);
@@ -126,7 +126,7 @@ public class Checkpoint : MonoBehaviour
             float scaleMult = Mathf.Cos(bounceTime);
             float jumpMult = Mathf.Cos(bounceTime*0.5f - Mathf.Deg2Rad*60);
 
-            if ((bounceTime*Mathf.Rad2Deg)%360 <= (prevBounceTime * Mathf.Rad2Deg)%360)
+            if ((bounceTime*Mathf.Rad2Deg)%360 <= (prevBounceTime * Mathf.Rad2Deg)%360  &&  !GameManager.isGamePaused)
             {
                 modelTrans.GetComponent<AudioSource>().Play();
             }

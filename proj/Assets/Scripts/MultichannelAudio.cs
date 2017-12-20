@@ -50,7 +50,9 @@ public class MultichannelAudio : MonoBehaviour
         sourcesUsed = new List<AudioSource>();
         for (int i = 0; i < channelCount; i++)
         {
-            sourcesAvailable.Add(gameObject.AddComponent<AudioSource>());
+            AudioSource newSource = gameObject.AddComponent<AudioSource>();
+            newSource.outputAudioMixerGroup = AudioManager.instance.SfxMixGroup;
+            sourcesAvailable.Add(newSource);
         }
 	}
 

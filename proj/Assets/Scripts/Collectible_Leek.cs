@@ -25,6 +25,7 @@ public class Collectible_Leek : Collectible
         }
 
         SaveManager.CurrentLevelSave.leeksCollected.Add(instanceID);
+        SaveManager.Autosave();
 
         yield return null;
 	}

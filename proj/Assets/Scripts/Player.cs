@@ -105,6 +105,14 @@ public class Player : CollidingEntity
     private bool ehhhImWalkinHere;
 
 
+    public bool InputHasEffect
+    {
+        get
+        {
+            return (inputActive && !GameManager.cutsceneMode);
+        }
+    }
+
 
     public override void Start ()
     {
@@ -117,7 +125,7 @@ public class Player : CollidingEntity
 
         UpdateReferences();
         health.hp = 3 + SaveManager.currentSave.TotalGoldRadishes;
-        health.currentHp = Mathf.FloorToInt(health.hp*2f/3f);
+        health.currentHp = LevelManager.playerCurrentHp;// Mathf.Max(Mathf.FloorToInt(health.hp*2f/3f));
         //startPos = transform.position;
     }
     
@@ -277,8 +285,8 @@ public class Player : CollidingEntity
             health.invincible = GameManager.cutsceneMode;
 
             // Get walk/steer input vector
-            float h = inputActive && !GameManager.cutsceneMode ? GameManager.inputVals["Walk X"] : 0;
-            float v = inputActive && !GameManager.cutsceneMode ? GameManager.inputVals["Walk Y"] : 0;
+            float h = InputHasEffect ? GameManager.inputVals["Walk X"] : 0;
+            float v = InputHasEffect ? GameManager.inputVals["Walk Y"] : 0;
 
             if (Camera.main != null)
             {
@@ -343,7 +351,7 @@ public class Player : CollidingEntity
                     }
 
                     // Jumping
-                    if (GameManager.inputPress["Jump"] && !GameManager.cutsceneMode)
+                    if (GameManager.inputPress["Jump"] && InputHasEffect)
                         PerformGenericJump(JumpType.Jump);
 
                     // Substate behavior
@@ -473,7 +481,7 @@ public class Player : CollidingEntity
                     }
 
                     // Variable jumping - dampen jump upon button release
-                    if (GameManager.inputRelease["Jump"] && controller.velocity.y > 0 && !releasedJump && !GameManager.cutsceneMode)
+                    if (GameManager.inputRelease["Jump"] && controller.velocity.y > 0 && !releasedJump && InputHasEffect)
                     {
                         releasedJump = true;
                         velocity.y *= 0.5f;
@@ -526,7 +534,7 @@ public class Player : CollidingEntity
 
                             // Walljumping
                             canDoubleJump = false;
-                            if (GameManager.inputPress["Jump"] && !GameManager.cutsceneMode)
+                            if (GameManager.inputPress["Jump"] && InputHasEffect)
                                 PerformWallJump();
 
                             // Stop sliding if contact with the wall is lost
@@ -548,7 +556,7 @@ public class Player : CollidingEntity
 
 
                     // Double jump yo
-                    if (GameManager.inputPress["Jump"] && canDoubleJump && !GameManager.cutsceneMode)
+                    if (GameManager.inputPress["Jump"] && canDoubleJump && InputHasEffect)
                     {
                         if (jumpLenienceTimer > 0f)
                             PerformGenericJump(JumpType.Jump);
@@ -814,6 +822,7 @@ public class Player : CollidingEntity
 
         yield return UIManager.instance.StartCoroutine(UIManager.instance.ScreenFadeChange(1f, 0.5f));
         yield return new WaitForSeconds(0.5f);
+        LevelManager.playerCurrentHp = health.hp;
         LevelManager.instance.ReloadScene();
 
         yield return null;

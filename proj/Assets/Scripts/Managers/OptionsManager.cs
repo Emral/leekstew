@@ -31,6 +31,7 @@ public class OptionsManager : MonoBehaviour
     public Toggle DynamicCamToggle;
     public Toggle CamXToggle;
     public Toggle CamYToggle;
+    public Toggle AutosaveToggle;
 
 
     void Awake ()
@@ -48,6 +49,7 @@ public class OptionsManager : MonoBehaviour
         dynamicCamera = DynamicCamToggle.isOn;
         cameraInvertedX = CamXToggle.isOn;
         cameraInvertedY = CamYToggle.isOn;
+        autosave = AutosaveToggle.isOn;
 
         soundVolume = SoundSlider.value;
         musicVolume = MusicSlider.value;

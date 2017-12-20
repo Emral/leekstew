@@ -34,7 +34,7 @@ public class Collectible : MonoBehaviour
     public virtual IEnumerator OnCollectStart()
     {
         if (collectStartSound != null)
-            GameManager.player.PlaySound(collectStartSound, Random.Range(0.75f, 1.25f));
+            AudioManager.PlaySound(collectStartSound, false, 1f, Random.Range(0.75f, 1.25f));
         if (collectStartEffect != null)
         {
 
@@ -47,7 +47,7 @@ public class Collectible : MonoBehaviour
     public virtual IEnumerator OnCollectEnd()
     {
         if (collectEndSound != null)
-            GameManager.player.PlaySound(collectEndSound, Random.Range(0.75f, 1.25f));
+            AudioManager.PlaySound(collectEndSound, false, 1f, Random.Range(0.75f, 1.25f));
         if (collectEndEffect != null)
         {
             GameObject.Instantiate(collectEndEffect, transform.position, Quaternion.identity);

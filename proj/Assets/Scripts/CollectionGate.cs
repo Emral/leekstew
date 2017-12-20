@@ -106,7 +106,7 @@ public class CollectionGate : NPC
     public void Deny()
     {
         UIManager.pickupFadeCounter = 0f;
-        AudioManager.PlayDeniedSound();
+        AudioManager.PlaySound("denied");
         StartCoroutine(DenyDisplay());
     }
 
@@ -185,11 +185,12 @@ public class CollectionGate : NPC
     public IEnumerator OpenSequence()
     {
         SaveManager.CurrentLevelSave.collectGatesOpened.Add(instanceID);
+        SaveManager.Autosave();
         GameManager.cutsceneMode = true;
         AudioManager.PauseMusic();
 
         // Start zooming in
-        AudioSource quakeSource = AudioManager.PlaySound(AudioManager.instance.quakeSound, 1f, (gatesUnlockedThisSession+1f));
+        AudioSource quakeSource = AudioManager.PlaySound("quake", false, 1f, (gatesUnlockedThisSession+1f));
         CameraBehavior newShot = CameraManager.CaptureCurrentShot();
         //CameraBehavior origShot = CameraManager.CaptureCurrentShot();
         newShot.yaw = 180 + transform.rotation.eulerAngles.y;
@@ -208,7 +209,7 @@ public class CollectionGate : NPC
         yield return new WaitForSeconds(0.5f / (gatesUnlockedThisSession + 1f));
 
         HideTheKids(false);
-        AudioManager.PlayPopSound();
+        AudioManager.PlaySound("pop");
         yield return new WaitForSeconds(1f / (gatesUnlockedThisSession + 1f));
 
         UIManager.DoScreenFadeChange(1f, 0.5f);

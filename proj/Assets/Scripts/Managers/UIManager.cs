@@ -59,8 +59,9 @@ public class UIManager : MonoBehaviour
     public Text creditsText;
     public static bool midCredits;
 
-    //public Text saveTextObj;
-    //public CanvasGroup saveTextGroup;
+    public CanvasGroup saveTextGroup;
+    public Text saveText;
+
     public CanvasGroup hpBarGroup;
     public GameObject canvasObj;
 
@@ -193,6 +194,10 @@ public class UIManager : MonoBehaviour
     }
     void UpdateMenus()
     {
+        // Free the cursor by default
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         // Handle pausing
         GameManager.isGamePaused = true;
         GameObject activeObj = null;
@@ -221,6 +226,9 @@ public class UIManager : MonoBehaviour
 
         } else
         {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
             GameManager.isGamePaused = false;
             if (GameManager.inputRelease["Pause"])
                 PauseGame();
@@ -234,13 +242,15 @@ public class UIManager : MonoBehaviour
         {
             Time.timeScale = 0;
             pauseMenuObj.SetActive(true);
-            eventSystem.SetSelectedGameObject(topPauseButtonObj);
 
             backToHubButton.interactable = true;
             if (LevelManager.currentLevel.isHub)
             {
                 backToHubButton.interactable = false;
             }
+
+            eventSystem.SetSelectedGameObject(topPauseButtonObj);
+            topPauseButtonObj.GetComponent<Button>().Select();
         }
 
     }
@@ -521,17 +531,17 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /*public IEnumerator ShowSaving()
+    public IEnumerator ShowSaving()
     {
-        saveTextObj.text = "Saving...";
-        yield return FadeCanvasGroup(saveTextGroup, 1, 0.5f);
+        saveText.text = "Saving...";
+        yield return FadeCanvasGroup(saveTextGroup, 1f, 0.5f);
     }
     public IEnumerator ShowSaveFinished()
     {
-        saveTextObj.text = "Game Saved!";
+        saveText.text = "Game Saved!";
         yield return new WaitForSeconds(1f);
-        yield return FadeCanvasGroup(saveTextGroup, 1, 1f);
-    }*/
+        yield return FadeCanvasGroup(saveTextGroup, 0f, 1f);
+    }
 
     public IEnumerator ScreenFadeChange(float goal, float goalTime, float delay = 0f)
     {

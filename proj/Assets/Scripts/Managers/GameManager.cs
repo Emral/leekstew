@@ -177,6 +177,25 @@ public class GameManager : MonoBehaviour
             inputRelease["Any"] = inputRelease["Any"] || inputRelease[verb];
         }
 
+        // Additional handling for gamepad D-pad
+        bool menusUseDPad = false;
+        if (controllerType == ControllerType.Gamepad)
+        {
+            if (Input.GetAxis("Gamepad DPad X") != 0f && Input.GetAxis("Gamepad Walk X") == 0f)
+            {
+                inputVals["Walk X"] = Input.GetAxis("Gamepad DPad X");
+                inputPress["Walk X"] = Input.GetButtonDown("Gamepad DPad X");
+                inputRelease["Walk X"] = Input.GetButtonUp("Gamepad DPad X");
+                menusUseDPad = true;
+            }
+            if (Input.GetAxis("Gamepad DPad Y") != 0f && Input.GetAxis("Gamepad Walk Y") == 0f)
+            {
+                inputVals["Walk Y"] = Input.GetAxis("Gamepad DPad Y");
+                inputPress["Walk Y"] = Input.GetButtonDown("Gamepad DPad Y");
+                inputRelease["Walk Y"] = Input.GetButtonUp("Gamepad DPad Y");
+                menusUseDPad = true;
+            }
+        }
 
         // Time since any input was pressed
         timeSinceInput += Time.deltaTime;
@@ -194,6 +213,12 @@ public class GameManager : MonoBehaviour
             UIManager.instance.inputModule.verticalAxis = controllerTypeStr + " Walk Y";
             UIManager.instance.inputModule.cancelButton = controllerTypeStr + " Run";
             UIManager.instance.inputModule.submitButton = controllerTypeStr + " Jump";
+
+            if (menusUseDPad)
+            {
+                UIManager.instance.inputModule.horizontalAxis = "Gamepad DPad X";
+                UIManager.instance.inputModule.verticalAxis = "Gamepad DPad Y";
+            }
         }
 
 

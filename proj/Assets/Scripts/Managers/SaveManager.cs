@@ -140,6 +140,8 @@ public class SaveManager : MonoBehaviour
     public static GlobalSaveData currentSave;
     public static int saveSlot = 0;
 
+    public static SaveManager instance;
+
     public static LevelSaveData CurrentLevelSave
     {
         get
@@ -159,6 +161,11 @@ public class SaveManager : MonoBehaviour
     /**
      * Saves the save data to the disk
      */
+
+    public void Start()
+    {
+        instance = this;
+    }
 
     public void Update()
     {
@@ -197,7 +204,14 @@ public class SaveManager : MonoBehaviour
     public static void Autosave()
     {
         if (OptionsManager.autosave)
-            SaveProgress();
+            instance.StartCoroutine(instance.AutosaveCoroutine());
+    }
+
+    public IEnumerator AutosaveCoroutine()
+    {
+        yield return UIManager.instance.StartCoroutine(UIManager.instance.ShowSaving());
+        SaveProgress();
+        yield return UIManager.instance.StartCoroutine(UIManager.instance.ShowSaveFinished());
     }
 
     public static void SaveProgress()
@@ -207,7 +221,6 @@ public class SaveManager : MonoBehaviour
         bf.Serialize(file, currentSave);
         file.Close();
     }
-
 
     public static GlobalSaveData LoadProgressFromDisk()
     {

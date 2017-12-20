@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 
 [System.Serializable]
@@ -28,7 +29,10 @@ public class AudioManager : MonoBehaviour
     public AudioClip popSound;
     public AudioClip quakeSound;
 
-    public static AudioSource source;
+    public AudioSource musicSource;
+    public MultichannelAudio multiSource;
+
+    public AudioMixerGroup SfxMixGroup;
 
     public static AudioClip currentMusic;
     public static SongData currentSong;
@@ -40,8 +44,6 @@ public class AudioManager : MonoBehaviour
     // Use this for initialization
     private void Awake ()
     {
-        source = transform.GetComponent<AudioSource>();
-
         if (instance == null)
             instance = this;
 
@@ -59,55 +61,41 @@ public class AudioManager : MonoBehaviour
         mixer.SetFloat("soundVolume", (1 - Mathf.Pow(1 - OptionsManager.soundVolume, 2)) * 80f - 80f);
 
         currentMusic = null;
-        source = transform.GetComponent<AudioSource>();
-        if (source.isPlaying)
+        instance.musicSource = transform.GetComponent<AudioSource>();
+        if (instance.musicSource.isPlaying)
         {
-            currentMusic = source.clip;
+            currentMusic = instance.musicSource.clip;
             currentSong = songDict[currentMusic];
-            source.pitch = Time.timeScale*musicPitch;
-            source.volume = musicFadeAmount;
+            instance.musicSource.volume = musicFadeAmount;
+
+            if (!GameManager.isGamePaused)
+                instance.musicSource.pitch = Time.timeScale * musicPitch;
         }
     }
 
 
-    public static AudioSource PlaySound(AudioClip clip, float volume = 1f, float pitch = 1f)
+    public static AudioSource PlaySound(AudioClip clip, bool loop = false, float volume = 1f, float pitch = 1f)
     {
-        AudioSource source = UIManager.instance.canvasObj.GetComponent<AudioSource>();
-
-        source.pitch = pitch;
-        source.PlayOneShot(clip, volume);
-
-        return source;
+        return instance.multiSource.Play(clip, loop, volume, pitch);
     }
-
-    public static AudioSource PlayDeniedSound()
+    public static AudioSource PlaySound(string group, bool loop = false, float volume = 1f, float pitch = 1f)
     {
-        return PlaySound(instance.deniedSounds[(int)Random.Range(0, instance.deniedSounds.Length)], Random.Range(0.8f, 1.2f));
-    }
-
-    public static AudioSource PlayPopSound()
-    {
-        return PlaySound(instance.popSound, Random.Range(0.8f, 1.2f));
-    }
-
-    public static AudioSource PlayQuakeSound()
-    {
-        return PlaySound(instance.quakeSound);
+        return instance.multiSource.Play(group, loop, volume, pitch);
     }
 
     public static void StopMusic()
     {
-        source.Stop();
+        instance.musicSource.Stop();
     }
 
     public static void PauseMusic()
     {
-        source.Pause();
+        instance.musicSource.Pause();
     }
 
     public static void ResumeMusic()
     {
-        source.UnPause();
+        instance.musicSource.UnPause();
     }
 
     public static void FadeOutMusic(float seconds, bool stop)
@@ -120,15 +108,15 @@ public class AudioManager : MonoBehaviour
 
     public static void SetMusic(AudioClip music, bool loop = true, bool useLoopPoints = false)
     {
-        if (source.clip != music || source.loop != loop || usingLoopPoints != useLoopPoints)
+        if (instance.musicSource.clip != music || instance.musicSource.loop != loop || usingLoopPoints != useLoopPoints || !instance.musicSource.isPlaying)
         {
             UIManager.musicFadeCounter = 0f;
 
             StopMusic();
 
-            source.loop = loop;
-            source.clip = music;
-            source.Play();
+            instance.musicSource.loop = loop;
+            instance.musicSource.clip = music;
+            instance.musicSource.Play();
             currentMusic = music;
             musicFadeAmount = 1f;
 
@@ -179,10 +167,10 @@ public class AudioManager : MonoBehaviour
             loopEnd = thisSongData.loopEnd > 0 ? thisSongData.loopEnd : loopEnd;
         }
 
-        while (source.isPlaying)
+        while (instance.musicSource.isPlaying)
         {
-            if (source.timeSamples >= loopEnd && loopEnd < audio.samples)
-                source.timeSamples = loopStart;
+            if (instance.musicSource.timeSamples >= loopEnd && loopEnd < audio.samples)
+                instance.musicSource.timeSamples = loopStart;
             yield return null;
         }
     }

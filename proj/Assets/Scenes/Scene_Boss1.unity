@@ -1686,7 +1686,8 @@ MonoBehaviour:
   - The crew worked hard to make this game as good as it could be.  Thanks for play!
   - 'Well, before we bring this to a close, here''s a few fun facts about the developers:'
   - '[Fact about Enjl]'
-  - '[Fact about Hoeloe]'
+  - In addition to being the current project lead for A2XT Episode 2, Hoeloe is developing
+    a roguelike card game called Tarochi.  He was also a programmer for Lego Dimensions!
   - And Rocky, well...
 --- !u!114 &410307002
 MonoBehaviour:
@@ -1842,7 +1843,7 @@ MonoBehaviour:
   - key: shatter
     clips:
     - {fileID: 8300000, guid: af6d0d992b6077147971ccfba8f771c1, type: 3}
-  channelCount: 3
+  channelCount: 5
 --- !u!1 &418259130
 GameObject:
   m_ObjectHideFlags: 0

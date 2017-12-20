@@ -34,6 +34,8 @@ public class LevelManager : MonoBehaviour
     public static int currentRoom = 0;
     public static int checkpointRoom = 0;
 
+    public static int playerCurrentHp = 1;
+
     public static int currentCheckpoint = -1;
     public static List<int> checkpointsActive = new List<int>();
     public static List<int> warpsActive = new List<int>();
@@ -145,6 +147,8 @@ public class LevelManager : MonoBehaviour
     }
     public void LoadScene(string scene, bool resetCheckpoints=true)
     {
+        playerCurrentHp = GameManager.player.health.currentHp;
+
         if (resetCheckpoints)
         {
             currentCheckpoint = -1;
@@ -177,12 +181,14 @@ public class LevelManager : MonoBehaviour
     }
     public void BackToHub()
     {
-        LoadScene(SaveManager.currentSave.currentHubScene, true);
+        GameManager.cutsceneMode = false;
+        EnterLevel(SaveManager.currentSave.currentHubScene);
     }
     public static void EnterLevel(string level)
     {
         beginningLevel = true;
         instance.LoadScene(level, true);
+        playerCurrentHp = 3 + SaveManager.currentSave.TotalGoldRadishes;
     }
     public static void CatalogRooms()
     {
@@ -302,7 +308,9 @@ public class LevelManager : MonoBehaviour
         if (currentLevel != null)
         {
             if (currentLevel.music != null)
+            {
                 AudioManager.SetMusic(currentLevel.music);
+            }
         }
 
         // Fade the screen in

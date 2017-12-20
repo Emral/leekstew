@@ -68,7 +68,7 @@ public class WarpPad : NPC
         // Deny if locked
         if (locked)
         {
-            AudioManager.PlayDeniedSound();
+            AudioManager.PlaySound("denied");
         }
         else
         {

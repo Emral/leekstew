@@ -189,7 +189,7 @@ public class BossA : CollidingEntity
         float elapsedTime = 0f;
         while (elapsedTime < 0.5f)
         {
-            squash.effectAmount = Mathf.SmoothStep(0f, 0.5f, elapsedTime);
+            squash.effectAmount = Mathf.SmoothStep(0f, 1f, elapsedTime);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -200,13 +200,21 @@ public class BossA : CollidingEntity
         {
             velocity = tempVel.normalized * forwardSpeed;
         }
-        velocity.y = 0.25f;
 
-        while (!controller.isGrounded)
+        elapsedTime = 0f;
+        float totalTime = 0.25f;
+        float groundY = transform.position.y;
+        while (elapsedTime < totalTime)
         {
-            velocity.y -= gravityRate * Time.deltaTime * 60f;
+            float timePercent = elapsedTime/totalTime;
+            float jumpMult = Mathf.Sin(timePercent * Mathf.Deg2Rad * 180f);
+
+            transform.position = new Vector3(transform.position.x, groundY + jumpMult * 2f, transform.position.z);
+
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
+        transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
 
         // Land
         GameManager.ScreenShake(0.5f);
@@ -450,7 +458,7 @@ public class BossA : CollidingEntity
         //yield return new WaitForSecondsRealtime(1f);
 
         // Start shaking
-        AudioSource quakeSource = AudioManager.PlaySound(AudioManager.instance.quakeSound);
+        AudioSource quakeSource = AudioManager.PlaySound("quake");
         StartCoroutine(Intensifies());
         yield return StartCoroutine(Spin(0f, 0.5f, true));
         yield return new WaitForSeconds(0.75f);

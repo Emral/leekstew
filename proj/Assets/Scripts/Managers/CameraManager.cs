@@ -520,7 +520,9 @@ public class CameraManager : MonoBehaviour
                             // Camera snap if holding the right trigger
                             if (GameManager.inputVals["Cam Focus"] > 0.5 && (playerAngleFromCamera < 160f || playercc.velocity.magnitude == 0f))
                             {
-                                dollyTrans.rotation = Quaternion.Lerp(dollyTrans.rotation, GameManager.player.transform.rotation, 0.03f);
+                                Vector3 zTargetEuler = GameManager.player.transform.rotation.eulerAngles;
+                                zTargetEuler.x = 8f;
+                                dollyTrans.rotation = Quaternion.Lerp(dollyTrans.rotation, Quaternion.Euler(zTargetEuler), 0.03f);
                             }
 
 
@@ -749,7 +751,8 @@ public class CameraManager : MonoBehaviour
                 //print("NEW POSITION: "+newPos.ToString());
 
 
-                timeLeft -= Time.unscaledDeltaTime;
+                if (!GameManager.isGamePaused)
+                    timeLeft -= Time.unscaledDeltaTime;
 
                 yield return null;
             }

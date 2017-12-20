@@ -14,6 +14,7 @@ public class Collectible_GoldRadish : Collectible_Radish
     {
         GameManager.player.health.hp++;
         SaveManager.CurrentLevelSave.goldRadishCollected = true;
+        SaveManager.Autosave();
         base.OnCollectEnd();
         yield return null;
     }
