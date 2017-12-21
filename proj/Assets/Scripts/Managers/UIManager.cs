@@ -335,10 +335,11 @@ public class UIManager : MonoBehaviour
         float height = 0f;
         float heightNeeded = 600f + 4500f + 20f;//creditsText.preferredHeight + 20f;
 
+        float dt = Application.isFocused ? Time.unscaledDeltaTime * 60f : 0;
         // Scroll up until done or the player has pressed an input
         while (height < heightNeeded)
         {
-            height += Time.unscaledDeltaTime * 60f;
+            height += dt;
             creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -290f + height);
 
             menusGroup.alpha = 0f;
@@ -347,7 +348,7 @@ public class UIManager : MonoBehaviour
 
             //*
             if (GameManager.inputVals["Run"] != 0f)//GameManager.GetEatenInputPressed("Run"))
-                height += Time.unscaledDeltaTime * 60f;
+                height += dt;
             else if (GameManager.inputPress["Any"] && skippable)
                 height = heightNeeded * 1.5f;
 

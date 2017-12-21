@@ -102,7 +102,7 @@ public class MultichannelAudio : MonoBehaviour
             source.clip = clip;
             source.loop = loop;
             source.pitch = pitch;
-            source.volume = volume * OptionsManager.soundVolume;
+            source.volume = volume;
             source.Play();
         }
 

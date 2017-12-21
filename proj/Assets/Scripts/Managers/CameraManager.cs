@@ -131,6 +131,16 @@ public class CameraManager : MonoBehaviour
         return (currentBehavior == behavior);
     }
 
+    public static void PlaySound(AudioClip clip)
+    {
+        AudioSource sound = instance.GetComponent<AudioSource>();
+        if (sound != null)
+        {
+            sound.clip = clip;
+            sound.PlayOneShot(clip);
+        }
+    }
+
     public void UpdateRefs()
     {
         instance = this;

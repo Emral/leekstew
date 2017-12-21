@@ -57,7 +57,7 @@ public class AudioManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        mixer.SetFloat("musicVolume", (1 - Mathf.Pow(1 - OptionsManager.musicVolume, 2)) * 70f - 80f);
+        mixer.SetFloat("musicVolume", (1 - Mathf.Pow(1 - OptionsManager.musicVolume, 2)) * 80f - 80f);
         mixer.SetFloat("soundVolume", (1 - Mathf.Pow(1 - OptionsManager.soundVolume, 2)) * 80f - 80f);
 
         currentMusic = null;
