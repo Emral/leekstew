@@ -232,7 +232,9 @@ public class GameManager : MonoBehaviour
         if (controllerType == ControllerType.Gamepad)
         {
             controllerTypeStr = "Gamepad";
-            controllerNameStr = Input.GetJoystickNames()[0];
+            controllerNameStr = "GAMEPAD NOT FOUND";
+            if (Input.GetJoystickNames().Length > 0)
+                controllerNameStr = Input.GetJoystickNames()[0];
         }
 
         if (controllerType != prevControllerType)

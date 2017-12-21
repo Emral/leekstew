@@ -82,7 +82,7 @@ public class HealthPoints : MonoBehaviour
             currentHp = 0;
             Kill();
         }
-        else
+        else if (amount < 0)
         {
             vulnerable = false;
             mercyCountdown = mercySeconds;

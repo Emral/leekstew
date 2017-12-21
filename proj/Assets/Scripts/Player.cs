@@ -458,7 +458,7 @@ public class Player : CollidingEntity
                     Vector3 airSteering = moveDir * walkSpeed * 0.5f;
                     Vector2 newHorzVel = Vector2.ClampMagnitude(new Vector2(velocity.x + airSteering.x, velocity.z + airSteering.z), runSpeed);
                     velocity = new Vector3(newHorzVel.x, velocity.y, newHorzVel.y);
-                    if (moveDir.magnitude == 0f)
+                    if (moveDir.magnitude == 0f && InputHasEffect)
                     {
                         velocity.x *= 0.98f;
                         velocity.z *= 0.98f;

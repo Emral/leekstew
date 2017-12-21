@@ -124,7 +124,7 @@ public class BossA : CollidingEntity
 
     public override void GiveBounce(CollidingEntity otherScr)
     {
-        if (otherScr == GameManager.player)
+        if (otherScr == GameManager.player && !GameManager.cutsceneMode)
         {
             GameManager.player.velocity = Quaternion.AngleAxis(Random.Range(-90f, 90f), Vector3.up) * (bossArenaTransform.position - GameManager.player.transform.position);
             GameManager.player.PerformGenericJump(JumpType.Jump);
