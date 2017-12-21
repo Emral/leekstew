@@ -333,7 +333,7 @@ public class UIManager : MonoBehaviour
         yield return instance.StartCoroutine(FadeCanvasGroup(menusGroup, 0f, 0.5f));
 
         float height = 0f;
-        float heightNeeded = 600f + 4200f + 20f;//creditsText.preferredHeight + 20f;
+        float heightNeeded = 600f + 4500f + 20f;//creditsText.preferredHeight + 20f;
 
         // Scroll up until done or the player has pressed an input
         while (height < heightNeeded)
