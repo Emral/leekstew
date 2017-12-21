@@ -217,6 +217,8 @@ public class BossA : CollidingEntity
         transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
 
         // Land
+        shake.effectAmount = 0.5f;
+        squash.effectAmount = 0.25f;
         GameManager.ScreenShake(0.5f);
         multiAudio.Play("hit floor");
 
@@ -385,13 +387,13 @@ public class BossA : CollidingEntity
             yield return dialogSeq.StartCoroutine(dialogSeq.RunSequence());
 
             // Music
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.5f);
             AudioManager.musicPitch = 1f;
             AudioManager.SetMusic(AudioManager.instance.songs.Count - 2);
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.75f);
 
             // Final line
-            string[] newLines = { "Rocky really likes double fake-outs." };
+            string[] newLines = { "Rocky really likes fake-outs." };
             dialogSeq.lines = newLines;
             yield return dialogSeq.StartCoroutine(dialogSeq.RunSequence());
 

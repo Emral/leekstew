@@ -23,7 +23,7 @@ public class Checkpoint : MonoBehaviour
 
         if (dialog != null)
         {
-            dialog.dialogEnabled = IsCurrent();
+            dialog.dialogEnabled = IsCurrent;
         }
 
         Player playerScr = GameManager.player;
@@ -33,7 +33,7 @@ public class Checkpoint : MonoBehaviour
             float distanceToPlayer = Vector3.Distance(transform.position, playerTrans.position);
 
             // Excite if not active
-            if (!IsCurrent())
+            if (!IsCurrent)
             {
                 modelTrans.LookAt(playerScr.transform);
                 squash = Mathf.Lerp(0.5f, 0f, Mathf.InverseLerp(1.5f, 4f, distanceToPlayer));
@@ -55,15 +55,18 @@ public class Checkpoint : MonoBehaviour
         modelTrans.localScale = Vector3.one + new Vector3(squash, -squash, squash);
     }
 
-    public bool IsCurrent()
+    public bool IsCurrent
     {
-        return LevelManager.currentCheckpoint == checkpointID;
+        get
+        {
+            return LevelManager.currentCheckpoint == checkpointID;
+        }
     }
 
     public void SetCurrent()
     {
         // Make this the current checkpoint
-        if (LevelManager.currentCheckpoint != checkpointID)
+        if (!IsCurrent)
         {
             LevelManager.currentCheckpoint = checkpointID;
             LevelManager.checkpointRoom = LevelManager.currentRoom;
@@ -91,9 +94,9 @@ public class Checkpoint : MonoBehaviour
         checkpointActive = true;
 
         // Add self to the list of active checkpoints
-        if (!LevelManager.checkpointsActive.Contains(checkpointID))
+        if (!SaveManager.CurrentLevelSave.checkpointsActivated.Contains(checkpointID))
         {
-            LevelManager.checkpointsActive.Add(checkpointID);
+            SaveManager.CurrentLevelSave.checkpointsActivated.Add(checkpointID);
         }
     }
 
@@ -119,7 +122,7 @@ public class Checkpoint : MonoBehaviour
         float prevBounceTime = Time.time * 20f;
 
         // Loop the loop the loop
-        while (LevelManager.currentCheckpoint == checkpointID)
+        while (IsCurrent)
         {
             // Catculate the bounce math stuff
             float bounceTime = Time.time * 20f;

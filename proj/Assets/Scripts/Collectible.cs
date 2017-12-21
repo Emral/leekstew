@@ -20,15 +20,28 @@ public class Collectible : MonoBehaviour
     private float collectRange;
     private bool collecting = false;
 
-    void Start ()
+
+
+    public void Start()
     {
+        StartCoroutine(DelayedRespawnCheck());
+    }
+    public IEnumerator DelayedRespawnCheck()
+    {
+        yield return new WaitForSeconds(0.5f);
         if (!respawn && !RespawnConditions())
             GameObject.Destroy(gameObject);
     }
 
+
+
     public virtual bool RespawnConditions()
     {
-        return (GameManager.itemsCollected[instanceID] == false);
+        if (GameManager.itemsCollected.ContainsKey(instanceID))
+        {
+            return (GameManager.itemsCollected[instanceID] == false);
+        }
+        return false;
     }
 
     public virtual IEnumerator OnCollectStart()

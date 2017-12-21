@@ -65,6 +65,10 @@ public class UIManager : MonoBehaviour
     public CanvasGroup hpBarGroup;
     public GameObject canvasObj;
 
+    public CanvasGroup inputDeviceGroup;
+    public Text inputDeviceText;
+    public static float inputDeviceFadeCounter;
+
     public CanvasGroup menusGroup;
     public GameObject pauseMenuObj;
     public GameObject[] otherMenuObjs;
@@ -73,7 +77,7 @@ public class UIManager : MonoBehaviour
     public GameObject topPauseButtonObj;
     public Button backToHubButton;
 
-    public UnityEngine.EventSystems.StandaloneInputModule inputModule;
+    public StandaloneInputModuleEx inputModule;
     public UnityEngine.EventSystems.EventSystem eventSystem;
 
     //public GamepadButtonImage[] gamepadButtonImages;
@@ -122,6 +126,15 @@ public class UIManager : MonoBehaviour
         }
 
         {
+            bool shouldFade = true;
+            inputDeviceFadeCounter += (shouldFade ? 1 : -1) * Time.unscaledDeltaTime;
+            inputDeviceFadeCounter = Mathf.Max(inputDeviceFadeCounter, 0f);
+            inputDeviceGroup.alpha = 8f - inputDeviceFadeCounter;
+
+            inputDeviceText.text = "Input:\n" + GameManager.controllerNameStr;
+        }
+
+        {
             bool playerHpCheck = true;
             if (GameManager.playerExists)
             {
@@ -129,7 +142,7 @@ public class UIManager : MonoBehaviour
             }
 
             bool shouldFade = hpFadeCounter < 7f || (GameManager.timeSinceInput <= 1f && playerHpCheck);
-            hpFadeCounter += (shouldFade ? 1 : -1) * Time.deltaTime;
+            hpFadeCounter += (shouldFade ? 1 : -1) * Time.unscaledDeltaTime;
             hpFadeCounter = Mathf.Max(hpFadeCounter, 0f);
             if (hpFadeCounter >= 7f)
                 hpFadeCounter = Mathf.Clamp(hpFadeCounter, 7f, 8f);
@@ -142,7 +155,7 @@ public class UIManager : MonoBehaviour
 
         {
             bool shouldFade = (GameManager.timeSinceInput <= 1f || pickupFadeCounter < 7f);
-            pickupFadeCounter += (shouldFade ? 1 : -1) * Time.deltaTime;
+            pickupFadeCounter += (shouldFade ? 1 : -1) * Time.unscaledDeltaTime;
             pickupFadeCounter = Mathf.Max(pickupFadeCounter, 0f);
             if (pickupFadeCounter >= 7f)
                 pickupFadeCounter = Mathf.Clamp(pickupFadeCounter, 7f, 8f);
@@ -152,13 +165,13 @@ public class UIManager : MonoBehaviour
 
         if (AudioManager.currentSong != null)
         {
-            songInfo.text = AudioManager.currentSong.name + (AudioManager.currentSong.artist == null ? "" : "\n" + AudioManager.currentSong.artist) + (AudioManager.currentSong.album == null ? "" : "\n" + AudioManager.currentSong.album);
+            songInfo.text = AudioManager.currentSong.name + "\n" + (AudioManager.currentSong.artist == null ? " " : AudioManager.currentSong.artist) + "\n" + (AudioManager.currentSong.album == null ? " " : AudioManager.currentSong.album);
         }
         else
-            songInfo.text = "The Silent\nOmnipresent";
+            songInfo.text = "The Silent\nOmnipresent\nSo Scary";
         musicCreditsObj.sizeDelta = new Vector2(songInfo.preferredWidth + 20f, songInfo.preferredHeight + 8f);
 
-        musicFadeCounter += Time.deltaTime;
+        musicFadeCounter += Time.unscaledDeltaTime;
         musicFadeCounter = Mathf.Clamp(musicFadeCounter, 0f, 8f);
 
         if (!OptionsManager.showMusicCredits && !GameManager.isGamePaused)
@@ -196,7 +209,6 @@ public class UIManager : MonoBehaviour
     {
         // Free the cursor by default
         Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
 
         // Handle pausing
         GameManager.isGamePaused = true;
@@ -211,14 +223,14 @@ public class UIManager : MonoBehaviour
         }
         if (pauseMenuObj.activeInHierarchy)
         {
-            if (GameManager.inputRelease["Pause"])
+            if (GameManager.inputRelease["Pause"] || GameManager.inputRelease["Run"])
             {
                 UnpauseGame();
             }
 
         } else if (activeObj != null)
         {
-            if (GameManager.inputRelease["Pause"] || GameManager.inputRelease["Run"])
+            if ((GameManager.inputRelease["Pause"] || GameManager.inputRelease["Run"]) && !midCredits)
             {
                 activeObj.SetActive(false);
                 PauseGame();
@@ -227,7 +239,6 @@ public class UIManager : MonoBehaviour
         } else
         {
             Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
 
             GameManager.isGamePaused = false;
             if (GameManager.inputRelease["Pause"])
@@ -238,7 +249,7 @@ public class UIManager : MonoBehaviour
     #region methods
     void PauseGame()
     {
-        if (SceneManager.GetActiveScene().name != "Scene_Title")
+        if (SceneManager.GetActiveScene().name != "Scene_Title" && !midCredits)
         {
             Time.timeScale = 0;
             pauseMenuObj.SetActive(true);
@@ -256,10 +267,13 @@ public class UIManager : MonoBehaviour
     }
     void UnpauseGame()
     {
-        Time.timeScale = GameManager.timeRate;
-        pauseMenuObj.SetActive(false);
-        musicFadeCounter = 999f;
-        pickupFadeCounter = 999f;
+        if (SceneManager.GetActiveScene().name != "Scene_Title" && !midCredits)
+        {
+            Time.timeScale = GameManager.timeRate;
+            pauseMenuObj.SetActive(false);
+            musicFadeCounter = 999f;
+            pickupFadeCounter = 999f;
+        }
     }
     public void ResetLevel()
     {
@@ -319,7 +333,7 @@ public class UIManager : MonoBehaviour
         yield return instance.StartCoroutine(FadeCanvasGroup(menusGroup, 0f, 0.5f));
 
         float height = 0f;
-        float heightNeeded = 600f + 3400f + 20f;//creditsText.preferredHeight + 20f;
+        float heightNeeded = 600f + 4200f + 20f;//creditsText.preferredHeight + 20f;
 
         // Scroll up until done or the player has pressed an input
         while (height < heightNeeded)
@@ -332,12 +346,12 @@ public class UIManager : MonoBehaviour
             pickupBarGroup.alpha = 0f;
 
             //*
-            if (GameManager.GetEatenInputPressed("Run"))
+            if (GameManager.inputVals["Run"] != 0f)//GameManager.GetEatenInputPressed("Run"))
                 height += Time.unscaledDeltaTime * 60f;
-            else if (GameManager.GetEatenInputPressed() && skippable)
+            else if (GameManager.inputPress["Any"] && skippable)
                 height = heightNeeded * 1.5f;
 
-            GameManager.EatInput();
+            //GameManager.EatInput();
             //*/
 
             yield return null;

@@ -30,10 +30,7 @@ public class CollectionGate : NPC
 
     IEnumerator DestroyAtStart()
     {
-        while(SaveManager.CurrentLevelSave == null)
-        {
-            yield return null;
-        }
+        yield return new WaitForSeconds(0.5f);
         UpdateRefs();
 
         if (SaveManager.CurrentLevelSave.collectGatesOpened.Contains(instanceID))

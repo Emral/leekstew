@@ -5,13 +5,13 @@ using UnityEngine;
 public class Collectible_Leek : Collectible
 {
 
-    // Use this for initialization
     public override bool RespawnConditions()
     {
         return !SaveManager.CurrentLevelSave.leeksCollected.Contains(instanceID);
     }
 
-    // Update is called once per frame
+
+
     public override IEnumerator OnCollectEnd()
     {
         //base.OnCollectEnd();

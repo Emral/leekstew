@@ -1362,12 +1362,12 @@ Prefab:
     - target: {fileID: 224053647050786996, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 346
+      value: 493.5
       objectReference: {fileID: 0}
     - target: {fileID: 224053647050786996, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 194.5
+      value: 277.5
       objectReference: {fileID: 0}
     - target: {fileID: 224453690056944086, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
@@ -1680,15 +1680,20 @@ MonoBehaviour:
   - Hey there, raocow! Sorry, we kinda ran out of time so the boss had to be, uh,
     put on ice, so to speak.
   - Jeez, this is so embarrassing...  We really wanted to make this an awesome, climactic
-    finale to reflect all the fun you've given us over the years!
+    finale as a show of appreciation for all the fun you've given us over the years!
   - Ah, well, no sense in worrying about that now.  Hopefully you enjoyed what we
     did manage to accomplish!
-  - The crew worked hard to make this game as good as it could be.  Thanks for play!
+  - Thanks for play!  The crew worked hard to make this game as good as it could be.
   - 'Well, before we bring this to a close, here''s a few fun facts about the developers:'
-  - '[Fact about Enjl]'
-  - In addition to being the current project lead for A2XT Episode 2, Hoeloe is developing
-    a roguelike card game called Tarochi.  He was also a programmer for Lego Dimensions!
-  - And Rocky, well...
+  - Hoeloe was a programmer for Lego Dimensions!  He worked on the special stages
+    of the Sonic pack.
+  - In addition to being the current project lead for A2XT Episode 2,he's also working
+    on a roguelike card game called Tarochi.  It's pretty rad.
+  - Enjl is probably an omniscient demigod.  We're like, 78% sure.  Dude has magic
+    eyes.
+  - In all seriousness though he actually does have heterochromia, so yeah, he's basically
+    literally real-life anime.
+  - And Rocky... well...
 --- !u!114 &410307002
 MonoBehaviour:
   m_ObjectHideFlags: 0

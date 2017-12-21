@@ -6,12 +6,8 @@ public class Collectible_Radish : Collectible
 {
     public bool addSoulHearts = false;
 
-    // Use this for initialization
-    void Start ()
-    {
-    }
 
-    // Update is called once per frame
+
     public override IEnumerator OnCollectEnd()
     {
         base.OnCollectEnd();

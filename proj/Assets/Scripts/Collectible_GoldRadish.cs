@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class Collectible_GoldRadish : Collectible_Radish
 {
-    // Use this for initialization
-    void Start ()
+    public override bool RespawnConditions()
     {
+        return !SaveManager.CurrentLevelSave.goldRadishCollected;
     }
 
-    // Update is called once per frame
+
     public override IEnumerator OnCollectEnd()
     {
         GameManager.player.health.hp++;

@@ -12,13 +12,19 @@ public class GameManager : MonoBehaviour
     public static string controllerTypeStr = "Keyboard";
 
     public static string[] inputVerbs =                    { "Walk X", "Walk Y", "Cam X", "Cam Y", "Cam Focus", "Run", "Jump", "Pause" };
-    public static string[] controllerChangeVerbs =         { "Walk X", "Walk Y", "Run", "Jump", "Pause", "Cam Focus" };
+    public static string[] immediateChangeVerbs =          { "Walk X", "Walk Y",                   "Cam Focus", "Run", "Jump", "Pause" };
+    public static string[] delayedChangeVerbs =            {                     "Cam X", "Cam Y" };
 
-    public static List<string> inputsEaten              = new List<string>();
-    public static List<string> eatenInputsRegistered    = new List<string>();
-    public static Dictionary<string, float> inputVals   = new Dictionary<string, float>();
-    public static Dictionary<string, bool> inputPress   = new Dictionary<string, bool>();
-    public static Dictionary<string, bool> inputRelease = new Dictionary<string, bool>();
+    public static Dictionary<string, float> directInputHoldTime = new Dictionary<string, float>();  // positive values for held, negative for not
+
+    public static string controllerNameStr;
+
+    public static List<string> inputsEaten                = new List<string>();
+    public static List<string> eatenInputsRegistered      = new List<string>();
+    public static Dictionary<string, float> inputHoldTime = new Dictionary<string, float>();  // same as the direct version
+    public static Dictionary<string, float> inputVals     = new Dictionary<string, float>();
+    public static Dictionary<string, bool> inputPress     = new Dictionary<string, bool>();
+    public static Dictionary<string, bool> inputRelease   = new Dictionary<string, bool>();
 
     public static Dictionary<int, bool> itemsCollected =        new Dictionary<int, bool>();
     public static Dictionary<int, System.Type> collectedTypes = new Dictionary<int, System.Type>();
@@ -40,6 +46,8 @@ public class GameManager : MonoBehaviour
     public static bool cutsceneMode = false;
 
     public static float timeSinceInput = 0f;
+
+    public bool debugMode;
 
     public GameObject youDidItPrefab;
     public static int youDidIt = -1;
@@ -109,6 +117,11 @@ public class GameManager : MonoBehaviour
         UpdateRefs();
         ManageInput();
     }
+    private void LateUpdate()
+    {
+        // Reset the list of eaten inputs so they only apply for the current frame
+        inputsEaten.Clear();
+    }
     #endregion
 
     #region initialization
@@ -129,6 +142,21 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region update
+    private void OnGUI()
+    {
+        if (Debug.isDebugBuild)
+        {
+            /*
+            string inputsStr = "";
+            foreach(KeyValuePair<string, float> pair in directInputHoldTime)
+            {
+                inputsStr += pair.Key + ": " + pair.Value.ToString() + "\n";
+            }
+            GUI.Label(new Rect(0f,0f, 256f, Screen.height), inputsStr);
+            */
+        }
+    }
+
     void UpdateRefs()
     {
         // UI manager
@@ -136,41 +164,103 @@ public class GameManager : MonoBehaviour
     }
     void ManageInput()
     {
+        // We'll manage cursor visibility here because it doesn't want to work anywhere else lol
+        Cursor.visible = (GameManager.controllerType == ControllerType.Keyboard && (GameManager.isGamePaused || GameManager.player == null));
+
+        // Reset the list of detected eaten inputs
         eatenInputsRegistered.Clear();
 
-        // Get the controller mode
-        foreach (string verb in controllerChangeVerbs)
+        // Get the direct input hold values
+        foreach (string verb in inputVerbs)
         {
             string kStr = "Keyboard " + verb;
             string gStr = "Gamepad " + verb;
 
-            if (Input.GetButtonDown(kStr))
+            if (!directInputHoldTime.ContainsKey(kStr))
+                directInputHoldTime[kStr] = 0f;
+            if (!directInputHoldTime.ContainsKey(gStr))
+                directInputHoldTime[gStr] = 0f;
+
+            if (Input.GetButton(kStr) || Input.GetAxis(kStr) != 0)
+                directInputHoldTime[kStr] = Mathf.Clamp(directInputHoldTime[kStr] + Time.deltaTime, 0f, 30f);
+            else
+                directInputHoldTime[kStr] = Mathf.Clamp(directInputHoldTime[kStr] - Time.deltaTime, -30f, 0f);
+
+            if (Input.GetButton(gStr) || Input.GetAxis(gStr) != 0)
+                directInputHoldTime[gStr] = Mathf.Clamp (directInputHoldTime[gStr] + Time.deltaTime, 0f, 30f);
+            else
+                directInputHoldTime[gStr] = Mathf.Clamp (directInputHoldTime[gStr] - Time.deltaTime, -30f, 0f);
+        }
+
+
+        // Get the controller mode based on immediate and delayed control detection
+        ControllerType prevControllerType = controllerType;
+
+        foreach (string verb in immediateChangeVerbs)
+        {
+            string kStr = "Keyboard " + verb;
+            string gStr = "Gamepad " + verb;
+
+            if (directInputHoldTime[kStr] > 0f)
             {
                 controllerType = ControllerType.Keyboard;
             }
 
-            if (Input.GetButtonDown(gStr) || Input.GetAxis(gStr) != 0)
+            if (directInputHoldTime[gStr] > 0f)
+            {
+                controllerType = ControllerType.Gamepad;
+            }
+        }
+        foreach (string verb in delayedChangeVerbs)
+        {
+            string kStr = "Keyboard " + verb;
+            string gStr = "Gamepad " + verb;
+
+            if (directInputHoldTime[kStr] > 0.125f)
+            {
+                controllerType = ControllerType.Keyboard;
+            }
+
+            if (directInputHoldTime[gStr] > 0.125f)
             {
                 controllerType = ControllerType.Gamepad;
             }
         }
 
         controllerTypeStr = "Keyboard";
+        controllerNameStr = "Mouse and Keyboard";
         if (controllerType == ControllerType.Gamepad)
+        {
             controllerTypeStr = "Gamepad";
+            controllerNameStr = Input.GetJoystickNames()[0];
+        }
+
+        if (controllerType != prevControllerType)
+            UIManager.inputDeviceFadeCounter = 0f;
 
 
         // Get the values
-        float inputAxisAny = 0f;
+        inputHoldTime["Any"] = -99f;
+        inputVals["Any"] = -99f;
         inputPress["Any"] = false;
         inputRelease["Any"] = false;
+
         foreach (string verb in inputVerbs)
         {
             string ctStr = controllerTypeStr + " " + verb;
 
+            // Button/axis degrees
             inputVals[verb] = Input.GetAxis(ctStr);
             if (inputVals[verb] != 0)
-                inputAxisAny = inputVals[verb];
+            {
+                inputVals["Any"] = inputVals[verb];
+            }
+
+            // Hold time
+            inputHoldTime[verb] = directInputHoldTime[controllerTypeStr + " " + verb];
+            inputHoldTime["Any"] = Mathf.Max(inputHoldTime["Any"], inputHoldTime[verb]);
+
+            // Press and release
             inputPress[verb] = Input.GetButtonDown(ctStr);
             inputPress["Any"] = inputPress["Any"] || inputPress[verb];
             inputRelease[verb] = Input.GetButtonUp(ctStr);
@@ -195,14 +285,6 @@ public class GameManager : MonoBehaviour
                 inputRelease["Walk Y"] = Input.GetButtonUp("Gamepad DPad Y");
                 menusUseDPad = true;
             }
-        }
-
-        // Time since any input was pressed
-        timeSinceInput += Time.deltaTime;
-        if (inputPress["Any"] || inputRelease["Any"] || inputAxisAny != 0)
-        {
-            //print("TIME SINCE INPUT RESET");
-            timeSinceInput = 0f;
         }
 
 
@@ -240,8 +322,6 @@ public class GameManager : MonoBehaviour
                     eatenInputsRegistered.Add(verb);
             }
         }
-
-        inputsEaten.Clear();
     }
     #endregion
 

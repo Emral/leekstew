@@ -6,12 +6,8 @@ public class Collectible_Tooth : Collectible
 {
     public int teethValue = 1;
 
-    // Use this for initialization
-    void Start ()
-    {
-    }
 
-    // Update is called once per frame
+
     public override IEnumerator OnCollectEnd()
     {
         UIManager.pickupFadeCounter = 0f;

@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: a3003a3f7879a674493d483950279d2c
-timeCreated: 1513163193
+timeCreated: 1513828560
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -8,6 +8,7 @@ TextureImporter:
     21300002: tex_collectibleSprites_plactus
     21300004: tex_collectibleSprites_tooth
     21300006: tex_collectibleSprites_goldradish
+    21300008: tex_collectibleSprites_greenTooth
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -86,7 +87,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 16
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -100,7 +101,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 16
+        y: 48
         width: 16
         height: 16
       alignment: 0
@@ -114,7 +115,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 32
         width: 16
         height: 16
       alignment: 0
@@ -127,12 +128,26 @@ TextureImporter:
       name: tex_collectibleSprites_goldradish
       rect:
         serializedVersion: 2
-        x: 16
-        y: 0
+        x: 0
+        y: 16
         width: 16
         height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: tex_collectibleSprites_greenTooth
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 32
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

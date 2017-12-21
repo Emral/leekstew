@@ -455,9 +455,14 @@ public class Player : CollidingEntity
 
 
                     // Different momentum in the air because PHYSIIIIIICS YOOOOOOOO
-                    Vector3 airSteering = moveDir * walkSpeed * 0.135f;
+                    Vector3 airSteering = moveDir * walkSpeed * 0.5f;
                     Vector2 newHorzVel = Vector2.ClampMagnitude(new Vector2(velocity.x + airSteering.x, velocity.z + airSteering.z), runSpeed);
                     velocity = new Vector3(newHorzVel.x, velocity.y, newHorzVel.y);
+                    if (moveDir.magnitude == 0f)
+                    {
+                        velocity.x *= 0.98f;
+                        velocity.z *= 0.98f;
+                    }
 
                     // LET THERE BE G̮̰͕̻͇̼Ŕ͜͏̤͚̝̼͇͚A̸̶̻̼̼̫͇͟V̨͏̣̘̞̝̜Į̝̗͖̙̭̪ͅT̲̱̥̥̗͡Y̭̘͍͔̗͖͎
                     velocity.y = Mathf.Max(velocity.y - gravityRate*Time.deltaTime*60f, -2f);
@@ -485,11 +490,6 @@ public class Player : CollidingEntity
                         velocity.y *= 0.5f;
                     }
 
-                    // Change the animation state to jumping or falling
-                    string newState = controller.velocity.y > 0 ? "jumping" : "falling";
-                    //SetAnimState(newState, 0.5f);
-
-
                     // Reset some wall sliding stuff if not wall sliding
                     if (airbornStates[0] != AirbornState.WallSliding)
                     {
@@ -499,14 +499,17 @@ public class Player : CollidingEntity
 
 
                     // Can double jump flag
-                    bool canDoubleJump = !jumpsSinceGround.Contains(JumpType.DoubleJump);
+                    bool canDoubleJump = !jumpsSinceGround.Contains(JumpType.DoubleJump) || GameManager.instance.debugMode;
 
                     // Substate behavior
                     switch (airbornStates[0])
                     {
                         case (AirbornState.Falling):
+                            SetAnimState("falling", 0.5f);
                             break;
                         case (AirbornState.Jumping):
+                            if (animState != "falling")
+                                SetAnimState("jumping", 0.5f);
                             break;
                         case (AirbornState.KnockedBack):
                             break;
@@ -780,10 +783,10 @@ public class Player : CollidingEntity
     }
     IEnumerator DoubleJumpFlip()
     {
-        SetAnimState("flipping", 0.5f);
+        SetAnimState("flipping", 0.25f);
         lockedAnimState = true;
         Transform modelCenter = transform.Find("modelCentered");
-        float totalTime = 0.5f;
+        float totalTime = 0.4f;
         float timeLeft = totalTime;
 
         float lastTimeLeft = timeLeft;
@@ -791,11 +794,11 @@ public class Player : CollidingEntity
         while (timeLeft > 0 && !GetGrounded())
         {
             float timeMult = timeLeft / totalTime;
-            float timeMultEased = Mathf.Sqrt(1 - timeMult * timeMult);
+            float timeMultEased = Mathf.SmoothStep(1f, 0f, timeMult); // Mathf.Sqrt(1 - timeMult * timeMult);
             modelCenter.localRotation = Quaternion.Euler(360 * timeMultEased, 0, 0);
             timeLeft -= Time.deltaTime;
 
-            if (timeLeft < 0.5f * totalTime && lastTimeLeft >= 0.5f * totalTime)
+            if (timeLeft < 0.35f * totalTime && lastTimeLeft >= 0.35f * totalTime)
             {
                 lockedAnimState = false;
                 SetAnimState("falling", 1f);
