@@ -93,8 +93,8 @@ public class Dialog : MonoBehaviour {
 
             if (animPercent == 1 && !passive)
             {
-                GUI.DrawTexture(new Rect(boxRect.xMax - Screen.width * 0.015f, 
-                                         boxRect.yMax - Screen.width * 0.015f, 
+                GUI.DrawTexture(new Rect(boxRect.xMax - Screen.width * 0.0075f, 
+                                         boxRect.yMax - Screen.width * 0.0075f, 
                                          Screen.width * 0.03f, 
                                          Screen.width * 0.03f), 
                                 UIManager.TalkTextureAnimated);
