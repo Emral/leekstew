@@ -21,6 +21,7 @@ public class Generator : PlacementTool
 
     public GameObject spawnEffect;
 
+    private AudioSource spawnSound;
 
     // Projectile stuff
     public bool spawnProjectiles;
@@ -58,6 +59,8 @@ public class Generator : PlacementTool
 
         spawnEffectPool = new GameObject[poolSize];
         deathEffectPool = new GameObject[poolSize];
+
+        spawnSound = GetComponent<AudioSource>();
 
         for (int i = 0; i < poolSize; i++)
         {
@@ -221,6 +224,10 @@ public class Generator : PlacementTool
             if (spawnedInstance != null)
             {
                 spawnedInstance.transform.position = transform.position + randomPos;
+                if (spawnSound != null)
+                {
+                    spawnSound.Play();
+                }
                 spawnedInstance.transform.rotation = Quaternion.identity;
                 Projectile projectileScr = spawnedInstance.GetComponent<Projectile>();
                 if (projectileScr == null)
