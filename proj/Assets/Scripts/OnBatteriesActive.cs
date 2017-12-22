@@ -6,7 +6,7 @@ public class OnBatteriesActive : MonoBehaviour {
 
     public GameObject batteryParent;
     public GameObject target;
-    public AudioClip goalSound;
+    public GameObject goalEffect;
 
     private Battery[] batteries;
     private bool done = false;
@@ -33,7 +33,8 @@ public class OnBatteriesActive : MonoBehaviour {
             {
                 done = true;
                 target.SetActive(true);
-                AudioManager.PlaySound(goalSound);
+                if (goalEffect != null)
+                    GameObject.Instantiate(goalEffect, GameManager.player.transform.position, Quaternion.identity);
             }
         }
 	}
