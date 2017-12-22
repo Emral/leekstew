@@ -28,7 +28,7 @@ public class NPC : MonoBehaviour
             Vector3 worldPos = transform.position + Vector3.up*talkIconHeight;
             Vector3 pos = Camera.main.WorldToScreenPoint(worldPos);
 
-            GUI.DrawTexture(new Rect(pos.x - Screen.width * 0.025f, Screen.height - pos.y - Screen.width * 0.025f, Screen.width*0.05f, Screen.width * 0.05f), UIManager.instance.talkButtonTexture);
+            GUI.DrawTexture(new Rect(pos.x - Screen.width * 0.025f, Screen.height - pos.y - Screen.width * 0.025f, Screen.width*0.05f, Screen.width * 0.05f), UIManager.TalkTextureAnimated);
         }
     }
 

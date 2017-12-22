@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hover: {fileID: 4680532564001732}
-  toothModel: {fileID: 0}
+  toothModel: {fileID: 4668584881817184}
 --- !u!114 &114850705137601192
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -236,7 +236,7 @@ MonoBehaviour:
   collectStartEffect: {fileID: 0}
   collectEndSound: {fileID: 8300000, guid: b77b7e1590637cd4cbc30d73f81662e0, type: 3}
   collectEndEffect: {fileID: 100000, guid: 0d142f301e46cb44f8b703d429f489db, type: 2}
-  teethValue: 1
+  teethValue: 2
 --- !u!198 &198398072633772512
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -297,7 +297,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 2
-  randomSeed: -259886664
+  randomSeed: 340185041
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -375,7 +375,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 0.6666667, b: 0.23529412, a: 0.7058824}
-      maxColor: {r: 1, g: 0.78039217, b: 0.30980393, a: 0.5019608}
+      maxColor: {r: 0, g: 0.53676474, b: 0.0037017958, a: 0.5019608}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -3638,7 +3638,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 0.6666667, b: 0.23529412, a: 0.7058824}
-      maxColor: {r: 1, g: 0.78039217, b: 0.30980393, a: 0.5019608}
+      maxColor: {r: 0, g: 0.8161765, b: 0.106947176, a: 0.5019608}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -6841,7 +6841,7 @@ ParticleSystemRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6b22999712355474795091cef25021b4, type: 2}
+  - {fileID: 2100000, guid: 0438adcdefc12d349a285d0ec6295fc2, type: 2}
   - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0

@@ -8,8 +8,31 @@ using UnityEngine.EventSystems;
 public class StandaloneInputModuleEx : StandaloneInputModule
 {
     private Vector2 previousMouse = Vector2.zero;
-    private GameObject lastAnalogSelected;
+    private GameObject lastSelectedObj;
+    private GameObject currentSelection;
+    private GameObject currentHover;
     private bool useMouse = false;
+    private bool previousUseMouse = false;
+    private ControllerType prevControlType;
+
+
+
+    public void RefreshSelectionToLast()
+    {
+        if (GameManager.controllerType != prevControlType || useMouse != previousUseMouse)
+        {
+            ClearSelection();
+            eventSystem.SetSelectedGameObject(currentSelection);
+        }
+    }
+
+
+    public void SwitchToMouse()
+    {
+        GameManager.controllerType = ControllerType.Keyboard;
+        useMouse = true;
+    }
+
 
     public override void Process()
     {
@@ -24,68 +47,74 @@ public class StandaloneInputModuleEx : StandaloneInputModule
                 SendSubmitEventToSelectedObject();
         }
 
+        // Only process the mouse if in m&k mode
+        if (GameManager.controllerType == ControllerType.Keyboard && useMouse)
+            ProcessMouseEvent();
+
+
+
         if (GameManager.isGamePaused)
         {
             // Store previous control type
-            ControllerType prevControlType = GameManager.controllerType;
+            prevControlType = GameManager.controllerType;
 
-            // Event system reference
-            EventSystem evSys = UIManager.instance.eventSystem;
-
-            // Switch to mouse & keyboard
+            // If mouse input detected, switch to mouse & keyboard controls using the mouse
             if (input.mousePosition != previousMouse || input.GetMouseButton(0) || input.GetMouseButton(1) || input.GetMouseButton(2))
             {
-                GameManager.controllerType = ControllerType.Keyboard;
-
-                useMouse = true;
-                if (evSys.currentSelectedGameObject != null)
-                    lastAnalogSelected = evSys.currentSelectedGameObject;
-                evSys.SetSelectedGameObject(null);
+                SwitchToMouse();
             }
-            else
+
+            // Otherwise, use
+            else if (Input.anyKey)
             {
-                foreach (string verb in GameManager.inputVerbs)
-                {
-                    if (Input.GetAxis("Keyboard " + verb) != 0f)
-                    {
-                        GameManager.controllerType = ControllerType.Keyboard;
-                        break;
-                    }
-                }
-
-                if (Input.anyKey && evSys.currentSelectedGameObject == null)
-                {
-                    ClearSelection();
-                    evSys.SetSelectedGameObject(lastAnalogSelected);
-                    useMouse = false;
-                }
+                GameManager.controllerType = ControllerType.Keyboard;
+                useMouse = false;
             }
+
 
             // Switch to gamepad
             foreach (string verb in GameManager.inputVerbs)
             {
                 if (Input.GetAxis("Gamepad " + verb) != 0f || Input.GetButton("Gamepad " + verb))
                 {
-                    ClearSelection();
                     GameManager.controllerType = ControllerType.Gamepad;
-                    evSys.SetSelectedGameObject(lastAnalogSelected);
                     break;
                 }
             }
 
-            // Check for change
+
+            // Popup when controller type changes
             if (GameManager.controllerType != prevControlType)
             {
                 UIManager.inputDeviceFadeCounter = 0f;
-                evSys.SetSelectedGameObject(lastAnalogSelected);
             }
+
+
+
+            // Manage current hover vs current selection
+            currentSelection = eventSystem.currentSelectedGameObject;
+            if (useMouse && GameManager.controllerType == ControllerType.Keyboard)
+            {
+                GameObject obj = GetCurrentFocusedGameObject();
+                if (obj != null && obj.layer == 15)
+                    currentSelection = obj;
+            }
+
+            if (currentSelection != null)
+                lastSelectedObj = currentSelection;
+
+            if (eventSystem.currentSelectedGameObject != currentSelection)
+            {
+                ClearSelection();
+                eventSystem.SetSelectedGameObject (currentSelection);
+            }
+
+
+            // Refresh the selection if need be
+            RefreshSelectionToLast();
         }
 
-
-        // Only process the mouse if in m&k mode
-        if (GameManager.controllerType == ControllerType.Keyboard && useMouse)
-            ProcessMouseEvent();
-
         previousMouse = input.mousePosition;
+        previousUseMouse = useMouse;
     }
 }

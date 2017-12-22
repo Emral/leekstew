@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager instance = null;
 
-    public Texture2D talkButtonTexture;
+    public Texture2D[] talkButtonTextures;
 
     public Texture healthSpritesheet;
     public Sprite heartSprite;
@@ -85,6 +85,15 @@ public class UIManager : MonoBehaviour
 
     //public Sprite keyboardNineSliceSprite;
 
+
+    public static Texture2D TalkTextureAnimated
+    {
+        get
+        {
+            int _index = Mathf.FloorToInt(3f*Time.time) % instance.talkButtonTextures.Length;
+            return instance.talkButtonTextures[_index];
+        }
+    }
 
 
     #region monobehavior events
@@ -247,7 +256,7 @@ public class UIManager : MonoBehaviour
     }
 
     #region methods
-    void PauseGame()
+    public void PauseGame()
     {
         if (SceneManager.GetActiveScene().name != "Scene_Title" && !midCredits)
         {
@@ -265,7 +274,7 @@ public class UIManager : MonoBehaviour
         }
 
     }
-    void UnpauseGame()
+    public void UnpauseGame()
     {
         if (SceneManager.GetActiveScene().name != "Scene_Title" && !midCredits)
         {

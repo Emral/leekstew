@@ -97,7 +97,7 @@ public class Dialog : MonoBehaviour {
                                          boxRect.yMax - Screen.width * 0.015f, 
                                          Screen.width * 0.03f, 
                                          Screen.width * 0.03f), 
-                                UIManager.instance.talkButtonTexture);
+                                UIManager.TalkTextureAnimated);
             }
 
         }

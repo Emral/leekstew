@@ -455,12 +455,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lines:
-  - TEST BUILD EPSILON GAMMA
-  - Things are still subject to change between now and the final build
+  - TEST BUILD NITRO PORCUPINE SIGMA GAMMA ESQ.
+  - Probably the second-to-last test build
   - See the testing channel on the server for known bugs
-  - New games don't take effect until the first save so if you accidentally clicked
-    it, just quit and restart.
-  - Also be sure to check out the revised pre-boss scene and credits.
+  - Credits revised further, still not finalized
 --- !u!114 &42267947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1500,7 +1498,7 @@ Prefab:
     - target: {fileID: 224570500086149788, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 781.9429
+      value: 1150.4358
       objectReference: {fileID: 0}
     - target: {fileID: 224882045988601664, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
@@ -1510,7 +1508,7 @@ Prefab:
     - target: {fileID: 224882045988601664, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: -790.06104
+      value: -1158.554
       objectReference: {fileID: 0}
     - target: {fileID: 224053647050786996, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
@@ -1530,7 +1528,7 @@ Prefab:
     - target: {fileID: 224708114851296106, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: -789.9429
+      value: -1158.4358
       objectReference: {fileID: 0}
     - target: {fileID: 224825417353324114, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
@@ -1540,12 +1538,12 @@ Prefab:
     - target: {fileID: 224453690056944086, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 790.06104
+      value: 1158.554
       objectReference: {fileID: 0}
     - target: {fileID: 224825417353324114, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0.10003662
+      value: 0.099975586
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b9b5891b449a9d548b70e4d7fc3e6887, type: 2}
