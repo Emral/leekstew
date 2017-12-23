@@ -467,11 +467,11 @@ public class CameraManager : MonoBehaviour
                             // Look down when falling
                             if (GameManager.player.groundDistance > 5)
                             {
-                                playerRotEuler.x += 55;
+                                playerRotEuler.x = Mathf.Min(playerRotEuler.x + 55, 40);
                             }
                             if (GameManager.player.groundDistance > 10)
                             {
-                                playerRotEuler.x += 55;
+                                playerRotEuler.x = Mathf.Min(playerRotEuler.x + 55, 40);
                             }
 
                             // Look over the edge when standing at cliffs
@@ -486,7 +486,7 @@ public class CameraManager : MonoBehaviour
                                     floorPoint = hit.point;
 
                                 if (Physics.Linecast(cameraTrans.position, floorPoint, out hit, avoidMask) && floorPoint.y < GameManager.player.groundPoint.y - 0.25f)
-                                    playerRotEuler.x += 55;
+                                    playerRotEuler.x = Mathf.Min(playerRotEuler.x+55, 40);
 
                                 // Look up and down slopes
                                 float groundAngle = Vector3.Angle(GameManager.player.groundNormal, Vector3.up);
@@ -494,11 +494,11 @@ public class CameraManager : MonoBehaviour
                                 {
                                     if (GameManager.player.walkingUphill)
                                     {
-                                        playerRotEuler.x -= 22;
+                                        playerRotEuler.x = Mathf.Max(playerRotEuler.x-22f, -20f);
                                     }
                                     else
                                     {
-                                        playerRotEuler.x += 22;
+                                        playerRotEuler.x = Mathf.Min(playerRotEuler.x + 22f, 40f);
                                     }
                                 }
                             }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 
 public class StandaloneInputModuleEx : StandaloneInputModule
@@ -53,7 +54,7 @@ public class StandaloneInputModuleEx : StandaloneInputModule
 
 
 
-        if (GameManager.isGamePaused)
+        if (GameManager.isGamePaused || SceneManager.GetActiveScene().name == "Scene_Title")
         {
             // Store previous control type
             prevControlType = GameManager.controllerType;

@@ -344,6 +344,7 @@ public class UIManager : MonoBehaviour
         DoFadeCanvasGroup(pickupBarGroup, 0f, 0.5f);
         if (skippable)
             DoFadeCanvasGroup(musicCreditsGroup, 0f, 0.5f);
+
         yield return instance.StartCoroutine(FadeCanvasGroup(menusGroup, 0f, 0.5f));
 
         float height = 0f;
@@ -356,14 +357,14 @@ public class UIManager : MonoBehaviour
             height += dt;
             creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -290f + height);
 
+            menusGroup.alpha = 0f;
             if (skippable)
-                menusGroup.alpha = 0f;
-            musicCreditsGroup.alpha = 0f;
+                musicCreditsGroup.alpha = 0f;
             pickupBarGroup.alpha = 0f;
 
             //*
             if (GameManager.inputVals["Run"] != 0f)//GameManager.GetEatenInputPressed("Run"))
-                height += dt;
+                height += dt*2;
             else if (GameManager.inputPress["Any"] && skippable)
                 height = heightNeeded * 1.5f;
 
@@ -562,7 +563,7 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    public IEnumerator ShowBossSubtitle(Sprite subtitle, float fadeTime=0.5f, float lingerTime=1f)
+    public IEnumerator ShowBossSubtitle(Sprite subtitle, float fadeTime=1f, float lingerTime=1.5f)
     {
         Image subtitleImg = bossSubtitleGroup.GetComponent<Image>();
         subtitleImg.sprite = subtitle;

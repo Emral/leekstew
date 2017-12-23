@@ -51,7 +51,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4845041053144910}
-  - component: {fileID: 95895780698845676}
   m_Layer: 14
   m_Name: mesh_TreeStump
   m_TagString: Untagged
@@ -141,20 +140,3 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1333454086494516}
   m_Mesh: {fileID: 4300000, guid: 0cf7b44f07c10e441b961efbfb5b70ea, type: 3}
---- !u!95 &95895780698845676
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1670972023315946}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 0cf7b44f07c10e441b961efbfb5b70ea, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1

@@ -6,6 +6,7 @@ public class SavePad : NPC
 {
     public override IEnumerator OnPlayerInteract()
     {
+        AudioManager.PlaySound("squoosh");
         SaveManager.DoSaveGame();
         talkCooldown = 1f;
         yield return new WaitForSeconds(1f);

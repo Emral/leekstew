@@ -136,7 +136,7 @@ public class BossA : CollidingEntity
             {
                 squash.effectAmount = 0.5f;
                 shake.effectAmount = 1f;
-                multiAudio.Play("hurt", false, 0.25f);
+                multiAudio.Play("hurt", false, 1f);
             }
             health.TakeHit();
         }
@@ -155,7 +155,7 @@ public class BossA : CollidingEntity
             default:
                 if (otherTrans.gameObject.layer == 9 || otherTrans.gameObject.layer == 14)
                 {
-                    multiAudio.Play("hit wall");
+                    multiAudio.Play("hit floor");
                     GameManager.ScreenShake(2f);
 
                     float tempYVel = velocity.y;
@@ -198,6 +198,7 @@ public class BossA : CollidingEntity
         }
 
         // Jump
+        multiAudio.Play("jump");
         squash.effectAmount = -0.5f;
         if (!maintainVelocity)
         {
@@ -223,7 +224,7 @@ public class BossA : CollidingEntity
         shake.effectAmount = 0.5f;
         squash.effectAmount = 0.25f;
         GameManager.ScreenShake(0.5f);
-        multiAudio.Play("hit floor");
+        multiAudio.Play("hit floor", false, 1.5f);
 
         GameObject prefabToSpawn = slowShockwavePrefab;
         if (health.currentHp <= 2 && Random.value < 0.5f)
@@ -422,7 +423,7 @@ public class BossA : CollidingEntity
 
         yield return StartCoroutine(Spin(-22f, 0.5f));
 
-        spinSoundSource = multiAudio.Play("spin", true, 0.5f);
+        spinSoundSource = multiAudio.Play("spin", true);
         yield return StartCoroutine(Spin(44f+720f, 1f));
         spinSoundSource.Stop();
 
@@ -434,7 +435,7 @@ public class BossA : CollidingEntity
         HealthPoints health = GetComponent<HealthPoints>();
 
         // Phase 1
-        spinSoundSource = multiAudio.Play("spin", true, 0.5f);
+        spinSoundSource = multiAudio.Play("spin", true);
         rotSpeed = 15f;
         velocity = (transform.forward + transform.right*0.3f) * -1 * slideSpeed;
 
@@ -467,7 +468,7 @@ public class BossA : CollidingEntity
         // Start shaking
         AudioSource quakeSource = AudioManager.PlaySound("quake");
         StartCoroutine(Intensifies());
-        yield return StartCoroutine(Spin(0f, 0.5f, true));
+        yield return StartCoroutine(Spin(0f, 0.75f, true));
         yield return new WaitForSeconds(0.75f);
 
         // Zoom back out
@@ -488,7 +489,7 @@ public class BossA : CollidingEntity
             yield return new WaitForSeconds(0.5f);
 
             // Start spinning
-            spinSoundSource = multiAudio.Play("spin", true, 0.5f);
+            spinSoundSource = multiAudio.Play("spin", true);
             rotSpeed = 15f;
             velocity = (transform.forward + transform.right * 0.3f) * -1 * slideSpeed;
             

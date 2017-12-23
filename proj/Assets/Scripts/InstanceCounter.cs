@@ -9,6 +9,7 @@ public class InstanceCounter : MonoBehaviour
     public string tag = "Green Tooth";
     public string before;
     public string after;
+    public bool blankOnZero = true;
     private Text text;
 
 	// Use this for initialization
@@ -20,7 +21,11 @@ public class InstanceCounter : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        text.text = before + (GameObject.FindGameObjectsWithTag(tag).Length + offset).ToString() + after;
+        int numLeft = GameObject.FindGameObjectsWithTag(tag).Length;
+
+        text.text = "";
+        if (numLeft > 0 || !blankOnZero)
+            text.text = before + (numLeft + offset).ToString() + after;
 
     }
 }

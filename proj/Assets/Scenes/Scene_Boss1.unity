@@ -1723,7 +1723,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 836c9f91335694b40ab500f9cb018b09, type: 3}
     - {fileID: 8300000, guid: afc953e27ba2187468a62ebbe03e01a5, type: 3}
     - {fileID: 8300000, guid: 53b8f23c3c41f2d47b8e0dd240c71420, type: 3}
-  - key: hit wall
+  - key: hit floor
     clips:
     - {fileID: 8300000, guid: 8509ae766af1cef4abe1d0cb83e5b9f1, type: 3}
     - {fileID: 8300000, guid: a4c7d35daaeee3e458eebe51e10d5856, type: 3}
@@ -1734,7 +1734,7 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: f46fcca49186d67469b56cac0a3437a6, type: 3}
     - {fileID: 8300000, guid: 4e0a79da7d8475145a6c04e8a49bdbe7, type: 3}
-  - key: hit floor
+  - key: hit wall
     clips:
     - {fileID: 8300000, guid: 358c46c1f6e711041ac83b58e8dc9206, type: 3}
     - {fileID: 8300000, guid: e0be6a1ba818e084fa86b41287d4f99e, type: 3}
