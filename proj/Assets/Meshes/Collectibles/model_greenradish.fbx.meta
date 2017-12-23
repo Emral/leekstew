@@ -16,7 +16,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: lambert2
-    second: {fileID: 2100000, guid: d09b5206cdc70e941b7107ebefb8fa61, type: 2}
+    second: {fileID: 2100000, guid: 0aa904126eb16844db3dbffb7748fff9, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
@@ -66,7 +66,7 @@ ModelImporter:
     useFileScale: 1
   tangentSpace:
     normalSmoothAngle: 60
-    normalImportMode: 0
+    normalImportMode: 1
     tangentImportMode: 3
     normalCalculationMode: 4
   importAnimation: 0
