@@ -62,6 +62,9 @@ public class UIManager : MonoBehaviour
     public CanvasGroup saveTextGroup;
     public Text saveText;
 
+    public CanvasGroup bossSubtitleGroup;
+    public Sprite leekGetSprite;
+
     public CanvasGroup hpBarGroup;
     public GameObject canvasObj;
 
@@ -247,7 +250,8 @@ public class UIManager : MonoBehaviour
 
         } else
         {
-            Cursor.lockState = CursorLockMode.Locked;
+            if (SceneManager.GetActiveScene().name != "Scene_Title" && Application.isFocused)
+                Cursor.lockState = CursorLockMode.Locked;
 
             GameManager.isGamePaused = false;
             if (GameManager.inputRelease["Pause"])
@@ -338,7 +342,8 @@ public class UIManager : MonoBehaviour
         inputModule.enabled = false;
 
         DoFadeCanvasGroup(pickupBarGroup, 0f, 0.5f);
-        DoFadeCanvasGroup(musicCreditsGroup, 0f, 0.5f);
+        if (skippable)
+            DoFadeCanvasGroup(musicCreditsGroup, 0f, 0.5f);
         yield return instance.StartCoroutine(FadeCanvasGroup(menusGroup, 0f, 0.5f));
 
         float height = 0f;
@@ -351,7 +356,8 @@ public class UIManager : MonoBehaviour
             height += dt;
             creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -290f + height);
 
-            menusGroup.alpha = 0f;
+            if (skippable)
+                menusGroup.alpha = 0f;
             musicCreditsGroup.alpha = 0f;
             pickupBarGroup.alpha = 0f;
 
@@ -371,7 +377,8 @@ public class UIManager : MonoBehaviour
         creditsTrans.localPosition = new Vector2(creditsTrans.localPosition.x, -290f);
 
         DoFadeCanvasGroup(pickupBarGroup, 1f, 0.5f);
-        DoFadeCanvasGroup(musicCreditsGroup, 1f, 0.5f);
+        if (skippable)
+            DoFadeCanvasGroup(musicCreditsGroup, 1f, 0.5f);
         yield return instance.StartCoroutine(FadeCanvasGroup(menusGroup, 1f, 0.5f));
 
         inputModule.enabled = true;
@@ -553,6 +560,16 @@ public class UIManager : MonoBehaviour
             }
             yield return null;
         }
+    }
+    
+    public IEnumerator ShowBossSubtitle(Sprite subtitle, float fadeTime=0.5f, float lingerTime=1f)
+    {
+        Image subtitleImg = bossSubtitleGroup.GetComponent<Image>();
+        subtitleImg.sprite = subtitle;
+
+        yield return StartCoroutine(FadeCanvasGroup(bossSubtitleGroup, 1f, fadeTime));
+        yield return new WaitForSeconds(lingerTime);
+        yield return StartCoroutine(FadeCanvasGroup(bossSubtitleGroup, 0f, fadeTime));
     }
 
     public IEnumerator ShowSaving()

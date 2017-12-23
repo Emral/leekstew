@@ -11,6 +11,7 @@ TagManager:
   - WarpPad
   - FurbaMesh
   - IcecubeMesh
+  - Green Tooth
   layers:
   - Default
   - TransparentFX
@@ -28,7 +29,7 @@ TagManager:
   - 
   - Camera Ignore Terrain
   - Interactive UI
-  - 
+  - Green Tooth
   - 
   - 
   - 

@@ -11,7 +11,7 @@ public class Collectible_Tooth : Collectible
     public override IEnumerator OnCollectEnd()
     {
         UIManager.pickupFadeCounter = 0f;
-        base.OnCollectEnd();
+        StartCoroutine(base.OnCollectEnd());
         SaveManager.currentSave.teethCollected += teethValue;
         yield return null;
     }

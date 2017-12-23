@@ -455,10 +455,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lines:
-  - TEST BUILD NITRO PORCUPINE SIGMA GAMMA ESQ.
-  - Probably the second-to-last test build
-  - See the testing channel on the server for known bugs
-  - Credits revised further, still not finalized
+  - TEST BUILD ROBOT SHARK DRAGON WEARING A SANTA HAT BETA
+  - Thanks again, everyone.
 --- !u!114 &42267947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1513,12 +1511,12 @@ Prefab:
     - target: {fileID: 224053647050786996, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 419
+      value: 493.5
       objectReference: {fileID: 0}
     - target: {fileID: 224053647050786996, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 235.5
+      value: 277.5
       objectReference: {fileID: 0}
     - target: {fileID: 224708114851296106, guid: b9b5891b449a9d548b70e4d7fc3e6887,
         type: 2}
@@ -5414,16 +5412,16 @@ Prefab:
       value: 45
       objectReference: {fileID: 0}
     - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0.834
+      propertyPath: m_LocalPosition.x
+      value: -0.018
       objectReference: {fileID: 0}
     - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -0.021
+      propertyPath: m_LocalPosition.y
+      value: 0.903
       objectReference: {fileID: 0}
     - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 0.089
+      value: 0.084
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
@@ -6635,18 +6633,6 @@ Prefab:
     - target: {fileID: 4462222702050906, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
       value: -7.4110003
-      objectReference: {fileID: 0}
-    - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0.834
-      objectReference: {fileID: 0}
-    - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -0.021
-      objectReference: {fileID: 0}
-    - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0.089
       objectReference: {fileID: 0}
     - target: {fileID: 1806117691034352, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
       propertyPath: m_Name
@@ -8478,15 +8464,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0.596
-      objectReference: {fileID: 0}
-    - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0.106
+      value: 0.659
       objectReference: {fileID: 0}
     - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -0.029
+      value: -0.027
+      objectReference: {fileID: 0}
+    - target: {fileID: 4395532712961972, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0.102
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 4b5faa352307f8149a39eb4dcddc9b97, type: 2}
@@ -10857,7 +10843,7 @@ Prefab:
     - target: {fileID: 114406176144057452, guid: ccfcd0d3fe634ee4b9b4740978c7fd34,
         type: 2}
       propertyPath: text
-      value: Debug shortcut to the boss (just in case)
+      value: Debug shortcut to the boss
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ccfcd0d3fe634ee4b9b4740978c7fd34, type: 2}

@@ -32,6 +32,9 @@ public class BossA : CollidingEntity
     private float rotSpeed = 0f;
     public float slideSpeed = 0.085f;
 
+    public AudioClip[] musicTracks;
+    public Sprite subtitleSprite;
+
     private MultichannelAudio multiAudio;
 
     private AudioSource spinSoundSource;
@@ -389,7 +392,7 @@ public class BossA : CollidingEntity
             // Music
             yield return new WaitForSeconds(0.5f);
             AudioManager.musicPitch = 1f;
-            AudioManager.SetMusic(AudioManager.instance.songs.Count - 2);
+            AudioManager.SetMusic(musicTracks[0]);
             yield return new WaitForSeconds(0.75f);
 
             // Final line
@@ -398,12 +401,14 @@ public class BossA : CollidingEntity
             yield return dialogSeq.StartCoroutine(dialogSeq.RunSequence());
 
             // Toggle the cutscene flag
+            UIManager.instance.StartCoroutine(UIManager.instance.ShowBossSubtitle(subtitleSprite));
+
             cutsceneWatched = true;
         }
         else
         {
             ui.StartCoroutine(ui.ScreenFadeChange(0f, 1f));
-            AudioManager.SetMusic(AudioManager.instance.songs.Count - 2);
+            AudioManager.SetMusic(musicTracks[0]);
 
             CameraManager.DoShiftToNewShot(zoomedShotB, 1f);
             StartCoroutine(ReduceFOV());
@@ -470,7 +475,7 @@ public class BossA : CollidingEntity
         poweringUp = false;
         Time.timeScale = 1f;
 
-        AudioManager.SetMusic(AudioManager.instance.songs.Count - 1);
+        AudioManager.SetMusic(musicTracks[1]);
         yield return new WaitForSeconds(2f);
 
         GameManager.cutsceneMode = false;
@@ -579,7 +584,7 @@ public class BossA : CollidingEntity
         yield return new WaitForSeconds(2f);
 
         UIManager.DoScreenFadeChange(1f, 4f);
-        AudioManager.SetMusic(AudioManager.instance.songs.Count - 3);
+        AudioManager.SetMusic(musicTracks[2]);
         yield return UIManager.instance.StartCoroutine(UIManager.instance.Credits(false));
 
         AudioManager.FadeOutMusic(2f, true);

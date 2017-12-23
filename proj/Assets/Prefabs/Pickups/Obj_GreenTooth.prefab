@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 114850705137601192}
   m_Layer: 10
   m_Name: Obj_GreenTooth
-  m_TagString: Untagged
+  m_TagString: Green Tooth
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -235,7 +235,8 @@ MonoBehaviour:
   collectStartSound: {fileID: 8300000, guid: f6c5cb333dabb484fa0f85f0e3fed3d2, type: 3}
   collectStartEffect: {fileID: 0}
   collectEndSound: {fileID: 8300000, guid: b77b7e1590637cd4cbc30d73f81662e0, type: 3}
-  collectEndEffect: {fileID: 100000, guid: 0d142f301e46cb44f8b703d429f489db, type: 2}
+  collectEndEffect: {fileID: 1165810927252642, guid: 5729b58eadb68ec4d8e334f64959ce33,
+    type: 2}
   teethValue: 2
 --- !u!198 &198398072633772512
 ParticleSystem:

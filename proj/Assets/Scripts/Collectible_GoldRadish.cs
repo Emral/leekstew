@@ -12,8 +12,8 @@ public class Collectible_GoldRadish : Collectible_Radish
 
     public override IEnumerator OnCollectEnd()
     {
-        GameManager.player.health.hp++;
         SaveManager.CurrentLevelSave.goldRadishCollected = true;
+        GameManager.player.health.hp = 3 + SaveManager.currentSave.TotalGoldRadishes;
         SaveManager.Autosave();
         base.OnCollectEnd();
         yield return null;

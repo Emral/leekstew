@@ -310,8 +310,8 @@ public class CameraManager : MonoBehaviour
                             // Whiskers to avoid walls
                             leftWhiskerDistances.Clear();
                             rightWhiskerDistances.Clear();
-                            float rightMinDist = 999f;
-                            float leftMinDist = 999f;
+                            //float rightMinDist = 999f;
+                            //float leftMinDist = 999f;
 
 
                             Vector3 startDirection = cameraTrans.position - target.position;

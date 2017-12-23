@@ -66,7 +66,7 @@ public class ListDrawer : PropertyDrawer
         string indString = path.Substring(indStart, indEnd - indStart);
         int myIndex = int.Parse(indString);
 
-        bool moveUp = false;
+        //bool moveUp = false;
         bool moveDown = false;
 
         float baseHeight = base.GetPropertyHeight(property, label);

@@ -15,7 +15,12 @@ public class GroupCollectReward : MonoBehaviour
             activated = true;
             foreach (GameObject prefab in rewardObjs)
             {
-                GameObject.Instantiate(prefab, GameManager.player.transform.position, Quaternion.identity);
+                GameObject obj = GameObject.Instantiate(prefab, GameManager.player.transform.position, Quaternion.identity);
+                UnityStandardAssets.Utility.FollowTarget follow = obj.GetComponent<UnityStandardAssets.Utility.FollowTarget>();
+                if (follow != null)
+                {
+                    follow.target = GameManager.player.transform;
+                }
             }
         }
 	}

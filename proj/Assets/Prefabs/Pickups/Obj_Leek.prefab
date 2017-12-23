@@ -468,7 +468,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
-  m_Range: 10
+  m_Range: 2
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
@@ -525,6 +525,8 @@ MonoBehaviour:
   collectStartEffect: {fileID: 0}
   collectEndSound: {fileID: 8300000, guid: 1bd58cbf328dd5e4c8d0a45d57432613, type: 3}
   collectEndEffect: {fileID: 100000, guid: ee24f1eaef0d51144add93b32d225267, type: 2}
+  glowObj: {fileID: 4575330449622644}
+  lightObj: {fileID: 4816323901351658}
 --- !u!198 &198325860389300798
 ParticleSystem:
   m_ObjectHideFlags: 1

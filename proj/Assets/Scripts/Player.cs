@@ -53,7 +53,7 @@ public class Player : CollidingEntity
 
     // Sliding-related
     public float slidingDelayTime = 2f;
-    private float slidingTimer = 0f;
+    //private float slidingTimer = 0f;
     private float slideSpeed = 0f;
     private Vector3 slideForwardVector;
 
@@ -73,7 +73,7 @@ public class Player : CollidingEntity
     //private Vector3 startPos;
 
     private bool releasedJump = false;
-    private bool groundedCompensation = false;
+    //private bool groundedCompensation = false;
     private bool touchingMovingSurface = false;
 
     // References
@@ -98,7 +98,7 @@ public class Player : CollidingEntity
 
     // Animation-related
     private string animState;
-    private bool lockedAnimState = false;
+    [HideInInspector] public bool lockedAnimState = false;
 
     // Yikes I need to organize this stuff better
     private Vector3 cameraForward;
@@ -152,7 +152,7 @@ public class Player : CollidingEntity
 
 
 
-    void SetAnimState (string state, float crossfade)
+    public void SetAnimState (string state, float crossfade)
     {
         if (animState != state && !lockedAnimState)
         {
@@ -407,7 +407,7 @@ public class Player : CollidingEntity
                             }
                             else
                             {
-                                slidingTimer = slidingDelayTime;
+                                //slidingTimer = slidingDelayTime;
                             }
                             break;
 
@@ -644,6 +644,30 @@ public class Player : CollidingEntity
     #endregion
 
     #region coroutines
+    public IEnumerator Spin(float changeAmt, float changeTime, bool absolute = false)
+    {
+        Vector3 oldRot = transform.rotation.eulerAngles;
+        float newVal;
+
+        float elapsedTime = 0;
+        while (elapsedTime < changeTime)
+        {
+            newVal = oldRot.y + changeAmt;
+            if (absolute)
+                newVal = changeAmt;
+
+            transform.rotation = Quaternion.Euler(new Vector3(oldRot.x, Mathf.SmoothStep(oldRot.y, newVal, elapsedTime / changeTime), oldRot.z));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        newVal = oldRot.y + changeAmt;
+        if (absolute)
+            newVal = changeAmt;
+
+        transform.rotation = Quaternion.Euler(new Vector3(oldRot.x, newVal, oldRot.z));
+    }
+
     IEnumerator HurtAnim()
     {
         // Delay by a frame for reasons
