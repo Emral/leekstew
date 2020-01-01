@@ -23,10 +23,15 @@ public class BossA : CollidingEntity
     public GameObject slowShockwavePrefab;
     public GameObject fastShockwavePrefab;
 
-    public Texture2D newFurbaColorsTex;
-    public Texture2D newIceColorsTex;
+	public Texture2D newFurbaColorsTex;
+	public Texture2D newFurbaHurtColorsTex;
+	public Texture2D newIceColorsTex;
+	public Texture2D newIceHurtColorsTex;
 
-    private bool poweringUp = false;
+	public Renderer furbaRenderer;
+	public Renderer iceRenderer;
+
+	private bool poweringUp = false;
     private bool bossStarted = false;
     private bool bossEnded = false;
     private float rotSpeed = 0f;
@@ -134,7 +139,8 @@ public class BossA : CollidingEntity
 
             if (health.vulnerable)
             {
-                squash.effectAmount = 0.5f;
+				StartCoroutine(HurtFlash());
+				squash.effectAmount = 0.5f;
                 shake.effectAmount = 1f;
                 multiAudio.Play("hurt", false, 1f);
             }
@@ -234,7 +240,24 @@ public class BossA : CollidingEntity
     }
 
 
-    private IEnumerator ReduceFOV()
+	private IEnumerator HurtFlash()
+	{
+		//Material tempFurbaMat = furbaRenderer.material;
+		Material tempIceMat = iceRenderer.material;
+
+		for (int i = 0; i < 3; i++)
+		{
+			//tempFurbaMat.mainTexture = newFurbaHurtColorsTex;
+			tempIceMat.mainTexture = newIceHurtColorsTex;
+			yield return new WaitForSeconds(0.1f);
+
+			//tempFurbaMat.mainTexture = newFurbaColorsTex;
+			tempIceMat.mainTexture = newIceColorsTex;
+			yield return new WaitForSeconds(0.1f);
+		}
+	}
+
+	private IEnumerator ReduceFOV()
     {
         float elapsedTime = 0f;
         while (elapsedTime < 1)
@@ -547,7 +570,14 @@ public class BossA : CollidingEntity
         GameManager.cutsceneMode = true;
         AudioManager.StopMusic();
 
-        rotSpeed = 0f;
+
+		StartCoroutine(HurtFlash());
+		squash.effectAmount = 0.5f;
+		shake.effectAmount = 1f;
+		multiAudio.Play("hurt", false, 1f);
+
+
+		rotSpeed = 0f;
         velocity = Vector3.zero;
 
         CameraManager.DoShiftToNewShot(zoomedShot, 4f);

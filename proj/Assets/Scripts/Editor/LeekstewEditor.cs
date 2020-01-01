@@ -47,7 +47,6 @@ public class LeekstewEditor : Editor
 
         if (enclose)
         {
-            //EditorGUI.indentLevel--;
             EditorGUI.indentLevel--;
             EditorGUILayout.EndVertical();
         }
@@ -58,14 +57,15 @@ public class LeekstewEditor : Editor
 
     public void FoldingPropertyGroup(string[] properties, string groupName, AnimBool toggleBool, bool enclose = true)
     {
-        if (EditorGUILayout.BeginFadeGroup(toggleBool.faded))
-        {
+		bool fadeGroupOpened = EditorGUILayout.BeginFadeGroup(toggleBool.faded);
+		if (fadeGroupOpened)
+		{
             ShowPropertyGroup(properties, groupName, enclose);
-            EditorGUILayout.EndFadeGroup();
         }
-    }
+		EditorGUILayout.EndFadeGroup();
+	}
 
-    public void TogglableFoldingPropertyGroup(string[] properties, string groupName, AnimBool toggleBool, string togglePropName = "", bool enclose = true)
+	public void TogglableFoldingPropertyGroup(string[] properties, string groupName, AnimBool toggleBool, string togglePropName = "", bool enclose = true)
     {
         //CollidingEntity targetCollidingEntity = (CollidingEntity)target;
 
@@ -83,7 +83,6 @@ public class LeekstewEditor : Editor
 
         if (enclose)
         {
-            //EditorGUI.indentLevel--;
             EditorGUI.indentLevel--;
             EditorGUILayout.EndVertical();
         }
@@ -104,12 +103,15 @@ public class LeekstewEditor : Editor
         m_ShowDefaultInspector.target = EditorGUILayout.ToggleLeft("Show Default Inspector", m_ShowDefaultInspector.target);
 
         EditorGUI.indentLevel++;
-        if (EditorGUILayout.BeginFadeGroup(m_ShowDefaultInspector.faded))
+		bool fadeGroupOpened = EditorGUILayout.BeginFadeGroup(m_ShowDefaultInspector.faded);
+
+		if (fadeGroupOpened)
         {
             DrawDefaultInspector();
-            EditorGUILayout.EndFadeGroup();
         }
-        EditorGUI.indentLevel--;
+		EditorGUILayout.EndFadeGroup();
+
+		EditorGUI.indentLevel--;
         EditorGUILayout.EndVertical();
     }
 
