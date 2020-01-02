@@ -10381,7 +10381,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1.5
-  m_Text: '2018  202X PROBABLY
+  m_Text: '2018  202X
 
     A 2ND X THING EPISODE 2: DIGITAL GROOVE'
 --- !u!82 &82527568396371964
@@ -15275,7 +15275,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -144.1, y: -3.8}
+  m_AnchoredPosition: {x: -55.6, y: -3.8}
   m_SizeDelta: {x: 100, y: 7.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1925456739650053102
